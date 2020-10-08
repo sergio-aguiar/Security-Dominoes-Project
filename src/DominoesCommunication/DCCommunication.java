@@ -1,4 +1,4 @@
-package DominoesClient;
+package DominoesCommunication;
 
 public class DCCommunication
 {

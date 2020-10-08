@@ -1,4 +1,4 @@
-package DominoesServer;
+package DominoesCommunication;
 
 public class DSCommunication
 {
