@@ -30,22 +30,11 @@ public class DCThread extends Thread
 
     private static final Scanner sc = new Scanner(System.in);
 
-    private String serverHost;
-    private int serverPort;
+    private final DCInterface dcInterface;
 
-    // private final DCInterface dcInterface;
-
-    /*public DCThread(DCInterface dcInterface)
+    public DCThread(DCInterface dcInterface)
     {
-        this.serverHost = "";
-        this.serverPort = -1;
         this.dcInterface = dcInterface;
-    }*/
-
-    public DCThread()
-    {
-        this.serverHost = "";
-        this.serverPort = -1;
     }
 
     @Override
@@ -53,7 +42,6 @@ public class DCThread extends Thread
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
 
-        clientInitMenu();
         while (true)
         {
             int option = clientMainMenu();
@@ -61,20 +49,28 @@ public class DCThread extends Thread
             switch (option)
             {
                 case 1:
-                    // TODO: Add table creating logic
                     System.out.println("\n[CLIENT] Creating a dominoes table...");
+                    this.dcInterface.createTable();
+                    // TODO: Add Table Leader Menu
                     break;
                 case 2:
-                    // TODO: Add table listing logic
                     System.out.println("\n[CLIENT] Listing available dominoes tables...");
+                    this.dcInterface.listAvailableTables();
+                    // TODO: Add Table Listing
                     break;
                 case 3:
-                    // TODO: Add specific table joining logic
-                    System.out.println("\n[CLIENT] Joining a specific dominoes table...");
-                    break;
                 case 4:
-                    // TODO: Add random table joining logic
-                    System.out.println("\n[CLIENT] Joining a random dominoes table...");
+                    if (option == 3)
+                    {
+                        System.out.println("\n[CLIENT] Joining a specific dominoes table...");
+                        this.dcInterface.joinTable();
+                    }
+                    else
+                    {
+                        System.out.println("\n[CLIENT] Joining a random dominoes table...");
+                        this.dcInterface.joinRandomTable();
+                    }
+                    // TODO: Add Table Guest Menu
                     break;
                 case 5:
                     System.out.println("\n[CLIENT] Shutting down...");
@@ -82,43 +78,6 @@ public class DCThread extends Thread
                 default:
                     System.out.println("\n[CLIENT] Unexpected Error...");
                     System.exit(703);
-            }
-        }
-    }
-
-    private boolean isServerAddressValid()
-    {
-        return !this.serverHost.equals("") && this.serverPort > 1023 && this.serverPort < 65536;
-    }
-
-    private void clientInitMenu()
-    {
-        while (true)
-        {
-            DominoesMenus.clientInitMenu();
-
-            int option = getMenuOption();
-            switch (option)
-            {
-                case 1:
-                    setServerAddress();
-                    break;
-                case 2:
-                    if (!isServerAddressValid())
-                    {
-                        System.out.println("\n[CLIENT] Server Address has not been set yet.");
-                    }
-                    else
-                    {
-                        System.out.println("\n[CLIENT] Attempting to connect to server...");
-                        return;
-                    }
-                    break;
-                case 3:
-                    System.out.println("\n[CLIENT] Shutting down...");
-                    System.exit(701);
-                default:
-                    System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-3].");
             }
         }
     }
@@ -141,76 +100,6 @@ public class DCThread extends Thread
                 default:
                     System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-5].");
             }
-        }
-    }
-
-    private void setServerAddress()
-    {
-        while (this.serverHost.equals("") || this.serverPort < 1024 || this.serverPort > 65535)
-        {
-            System.out.print("\n[CLIENT] Server Address: ");
-            String[] option = sc.next().split(":");
-
-            if (option.length != 2)
-            {
-                System.out.println("\n[CLIENT] Incorrect format for server address.\n[CLIENT] Must be HOST:PORT.");
-                continue;
-            }
-
-            String[] splitHost = option[0].split("\\.");
-            if (splitHost.length != 4)
-            {
-                System.out.println("[CLIENT] Incorrect format for server host.\n[CLIENT] Must be IPv4.");
-                continue;
-            }
-
-            boolean failed = false;
-            for (int i = 0; i < splitHost.length; i++)
-            {
-                try
-                {
-                    int parse = Integer.parseInt(splitHost[i]);
-
-                    if (i == 3)
-                    {
-                        if (parse < 1 || parse > 254) failed = true;
-                    }
-                    else
-                    {
-                        if (parse < 0 || parse > 255) failed = true;
-                    }
-                }
-                catch (NumberFormatException e)
-                {
-                    failed = true;
-                    break;
-                }
-            }
-
-            if (failed)
-            {
-                System.out.println("[CLIENT] Incorrect format for server host.\n[CLIENT] Must be IPv4.");
-                continue;
-            }
-
-            this.serverHost = option[0];
-
-            try
-            {
-                this.serverPort = Integer.parseInt(option[1]);
-            }
-            catch (NumberFormatException e)
-            {
-                System.out.println("[CLIENT] Incorrect server port.\n[CLIENT] Must be a number.");
-                continue;
-            }
-
-            if (this.serverPort < 1024 || this.serverPort > 65535)
-            {
-                System.out.println("[CLIENT] Incorrect server port.\n[CLIENT] Must be within the [1024-65535] range.");
-            }
-
-            System.out.println("[CLIENT] Successful address!");
         }
     }
 
