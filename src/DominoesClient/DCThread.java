@@ -9,7 +9,7 @@ public class DCThread extends Thread
 {
     public enum DCStates
     {
-        AT_MAIN_MENU("AMM"),
+        AT_MAIN_MENUS("AMM"),
         AT_TABLE_LEADER_MENU("ATLM"),
         AT_TABLE_GUEST_MENU("ATGM"),
         AWAITING_GAME_START("AGS"),
@@ -52,8 +52,38 @@ public class DCThread extends Thread
     public void run()
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
-        clientInitMenu();
 
+        clientInitMenu();
+        while (true)
+        {
+            int option = clientMainMenu();
+
+            switch (option)
+            {
+                case 1:
+                    // TODO: Add table creating logic
+                    System.out.println("\n[CLIENT] Creating a dominoes table...");
+                    break;
+                case 2:
+                    // TODO: Add table listing logic
+                    System.out.println("\n[CLIENT] Listing available dominoes tables...");
+                    break;
+                case 3:
+                    // TODO: Add specific table joining logic
+                    System.out.println("\n[CLIENT] Joining a specific dominoes table...");
+                    break;
+                case 4:
+                    // TODO: Add random table joining logic
+                    System.out.println("\n[CLIENT] Joining a random dominoes table...");
+                    break;
+                case 5:
+                    System.out.println("\n[CLIENT] Shutting down...");
+                    System.exit(702);
+                default:
+                    System.out.println("\n[CLIENT] Unexpected Error...");
+                    System.exit(703);
+            }
+        }
     }
 
     private boolean isServerAddressValid()
@@ -63,21 +93,11 @@ public class DCThread extends Thread
 
     private void clientInitMenu()
     {
-        int option;
         while (true)
         {
             DominoesMenus.clientInitMenu();
 
-            try
-            {
-                option = sc.nextInt();
-            }
-            catch (InputMismatchException e)
-            {
-                sc.next();
-                option = -1;
-            }
-
+            int option = getMenuOption();
             switch (option)
             {
                 case 1:
@@ -99,6 +119,27 @@ public class DCThread extends Thread
                     System.exit(701);
                 default:
                     System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-3].");
+            }
+        }
+    }
+
+    private int clientMainMenu()
+    {
+        while (true)
+        {
+            DominoesMenus.clientMainMenu();
+
+            int option = getMenuOption();
+            switch (option)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    return option;
+                default:
+                    System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-5].");
             }
         }
     }
@@ -171,5 +212,20 @@ public class DCThread extends Thread
 
             System.out.println("[CLIENT] Successful address!");
         }
+    }
+
+    private int getMenuOption()
+    {
+        int option;
+        try
+        {
+            option = sc.nextInt();
+        }
+        catch (InputMismatchException e)
+        {
+            sc.next();
+            option = -1;
+        }
+        return option;
     }
 }

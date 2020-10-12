@@ -10,4 +10,15 @@ public class DominoesMenus
                 + "3- Exit\n"
                 + "Option: ");
     }
+
+    public static void clientMainMenu()
+    {
+        System.out.print("\n[Client] Game lobby:\n"
+                + "1- Create table\n"
+                + "2- List available tables\n"
+                + "3- Join table\n"
+                + "4- Join random table\n"
+                + "5- Exit\n"
+                + "Option: ");
+    }
 }
