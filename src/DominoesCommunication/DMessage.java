@@ -2,7 +2,7 @@ package DominoesCommunication;
 
 import java.io.Serializable;
 
-public class Message implements Serializable
+public class DMessage implements Serializable
 {
     public enum MessageType implements Serializable
     {
@@ -38,15 +38,31 @@ public class Message implements Serializable
     private final int messageType;
     private final Object returnInfo;
 
-    public Message(int messageType)
+    public DMessage(int messageType) throws DMessageException
     {
         this.messageType = messageType;
         this.returnInfo = null;
     }
 
-    public Message(int messageType, Object returnInfo)
+    public DMessage(int messageType, Object returnInfo) throws DMessageException
     {
         this.messageType = messageType;
         this.returnInfo = returnInfo;
+    }
+
+    public int getMessageType()
+    {
+        return this.messageType;
+    }
+
+    public Object getReturnInfo()
+    {
+        return this.returnInfo;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "DMessage{" + "messageType=" + messageType + ", returnInfo=" + returnInfo + '}';
     }
 }
