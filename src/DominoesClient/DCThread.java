@@ -2,6 +2,7 @@ package DominoesClient;
 
 import DominoesMisc.DominoesMenus;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -60,7 +61,7 @@ public class DCThread extends Thread
                     break;
                 case 2:
                     System.out.println("\n[CLIENT] Listing available dominoes tables...");
-                    System.out.println(this.dcInterface.listAvailableTables(this.pseudonym));
+                    System.out.println(Arrays.toString(this.dcInterface.listAvailableTables(this.pseudonym)));
                     // TODO: Add Table Listing
                     break;
                 case 3:

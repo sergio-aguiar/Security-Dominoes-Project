@@ -4,6 +4,7 @@ import DominoesClient.DCInterface;
 import DominoesMisc.DominoesTable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DSImplementation implements DCInterface
@@ -46,7 +47,7 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            tables = (DominoesTable[]) this.dominoesTables.toArray();
+            tables = this.dominoesTables.toArray(new DominoesTable[0]);
         }
         catch (Exception e)
         {
@@ -88,16 +89,17 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables)
-                if (!table.isFull()) if (table.joinTable(pseudonym))
-                {
-                    System.out.println(this.dominoesTables.indexOf(table));
-                    tableID = this.dominoesTables.indexOf(table);
-                }
+            DominoesTable[] tables = this.dominoesTables.toArray(new DominoesTable[0]);
+            for (int i = 0; i < tables.length; i++) if (!tables[i].isFull())
+            {
+                this.dominoesTables.get(i).joinTable(pseudonym);
+                tableID = i;
+                break;
+            }
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: joinTable: " + e.toString());
+            System.out.println("DSImplementation: joinRandomTable: " + e.toString());
             tableID = -1;
         }
         finally

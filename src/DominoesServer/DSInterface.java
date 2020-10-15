@@ -56,7 +56,7 @@ public class DSInterface
                 break;
             case 4:
                 int return4 = this.dsImplementation.joinRandomTable(inMessage.getPseudonym());
-                outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return4);
+                outMessage = new DMessage(DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode(), return4);
                 break;
         }
 

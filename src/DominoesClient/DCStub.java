@@ -186,7 +186,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinRandomTable: missing" +
-                    " return " + "value!");
+                    " return value!");
 
             System.exit(707);
         }
