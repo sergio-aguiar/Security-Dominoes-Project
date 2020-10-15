@@ -9,7 +9,7 @@ public class DCMain
     {
         DCStub dcStub = new DCStub(serverHostName, serverPort);
 
-        DCThread dcThread = new DCThread(dcStub);
+        DCThread dcThread = new DCThread("Tester", dcStub);
         dcThread.start();
     }
 }

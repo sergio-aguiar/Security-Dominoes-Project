@@ -9,12 +9,14 @@ public class DMessageException extends Exception
         super(errorMessage);
     }
 
-    public DMessageException(String errorMessage, DMessage message) {
+    public DMessageException(String errorMessage, DMessage message)
+    {
         super(errorMessage);
         this.errorMessage = message;
     }
 
-    public DMessage getErrorMessage() {
+    public DMessage getErrorMessage()
+    {
         return this.errorMessage;
     }
 }

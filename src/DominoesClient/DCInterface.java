@@ -4,8 +4,8 @@ import DominoesMisc.DominoesTable;
 
 public interface DCInterface
 {
-    public int createTable();
-    public DominoesTable[] listAvailableTables();
-    public int joinTable();
-    public int joinRandomTable();
+    public int createTable(String pseudonym, int playerCap);
+    public DominoesTable[] listAvailableTables(String pseudonym);
+    public boolean joinTable(String pseudonym, int tableID);
+    public int joinRandomTable(String pseudonym);
 }

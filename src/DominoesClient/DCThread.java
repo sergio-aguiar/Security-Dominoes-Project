@@ -29,11 +29,16 @@ public class DCThread extends Thread
     }
 
     private static final Scanner sc = new Scanner(System.in);
+    private static int gID = 0;
 
+    private final int id;
+    private final String pseudonym;
     private final DCInterface dcInterface;
 
-    public DCThread(DCInterface dcInterface)
+    public DCThread(String pseudonym, DCInterface dcInterface)
     {
+        this.id = gID++;
+        this.pseudonym = pseudonym;
         this.dcInterface = dcInterface;
     }
 
@@ -50,12 +55,12 @@ public class DCThread extends Thread
             {
                 case 1:
                     System.out.println("\n[CLIENT] Creating a dominoes table...");
-                    this.dcInterface.createTable();
+                    System.out.println(this.dcInterface.createTable(this.pseudonym, 4));
                     // TODO: Add Table Leader Menu
                     break;
                 case 2:
                     System.out.println("\n[CLIENT] Listing available dominoes tables...");
-                    this.dcInterface.listAvailableTables();
+                    System.out.println(this.dcInterface.listAvailableTables(this.pseudonym));
                     // TODO: Add Table Listing
                     break;
                 case 3:
@@ -63,12 +68,13 @@ public class DCThread extends Thread
                     if (option == 3)
                     {
                         System.out.println("\n[CLIENT] Joining a specific dominoes table...");
-                        this.dcInterface.joinTable();
+                        // TODO: Add Table Choosing
+                        System.out.println(this.dcInterface.joinTable(this.pseudonym, 0));
                     }
                     else
                     {
                         System.out.println("\n[CLIENT] Joining a random dominoes table...");
-                        this.dcInterface.joinRandomTable();
+                        System.out.println(this.dcInterface.joinRandomTable(this.pseudonym));
                     }
                     // TODO: Add Table Guest Menu
                     break;
