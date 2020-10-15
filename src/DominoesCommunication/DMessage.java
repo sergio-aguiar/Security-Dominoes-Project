@@ -92,9 +92,14 @@ public class DMessage implements Serializable
         return this.firstArgument;
     }
 
-    public boolean hasFirstArgument()
+    public boolean noReturnInfo()
     {
-        return this.firstArgument != null;
+        return this.returnInfo == null;
+    }
+
+    public boolean noFirstArgument()
+    {
+        return this.firstArgument == null;
     }
 
     @Override

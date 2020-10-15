@@ -51,7 +51,15 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: createTable: missing return " +
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: createTable: incorrect " +
+                    "reply message!");
+
+            System.exit(704);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: createTable: no return " +
                     "value!");
 
             System.exit(704);
@@ -96,10 +104,18 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: listAvailableTables: missing" +
-                    " return " + "value!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: listAvailableTables: " +
+                    "incorrect reply message!");
 
             System.exit(705);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: listAvailableTables: no " +
+                    "return value!");
+
+            System.exit(704);
         }
         dcCommunication.close();
 
@@ -140,10 +156,18 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.JOIN_TABLE_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinTable: missing" +
-                    " return " + "value!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinTable: incorrect " +
+                    "reply message!");
 
             System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinTable: no return " +
+                    "value!");
+
+            System.exit(704);
         }
         dcCommunication.close();
 
@@ -185,10 +209,18 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinRandomTable: missing" +
-                    " return value!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinRandomTable: incorrect " +
+                    "reply message!");
 
             System.exit(707);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: joinRandomTable: no return " +
+                    "value!");
+
+            System.exit(704);
         }
         dcCommunication.close();
 

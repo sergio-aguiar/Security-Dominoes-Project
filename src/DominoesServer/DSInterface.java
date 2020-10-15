@@ -20,7 +20,7 @@ public class DSInterface
         switch(inMessage.getMessageType())
         {
             case 1:
-                if (!inMessage.hasFirstArgument())
+                if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"playerCap\" was not given.", inMessage);
                 if ((int) inMessage.getFirstArgument() < 2 || (int) inMessage.getFirstArgument() > 7)
                     throw new DMessageException("Argument \"playerCap\" was given an incorrect value.", inMessage);
@@ -29,7 +29,7 @@ public class DSInterface
             case 4:
                 break;
             case 3:
-                if (!inMessage.hasFirstArgument())
+                if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value.", inMessage);
