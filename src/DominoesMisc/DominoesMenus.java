@@ -21,4 +21,23 @@ public class DominoesMenus
                 + "5- Exit\n"
                 + "Option: ");
     }
+
+    public static void clientPlayerCapMenu()
+    {
+        System.out.print("\n[Client] Number of Players:\n"
+                + "1- 2 players\n"
+                + "2- 4 players\n"
+                + "3- 7 players\n"
+                + "4- Exit\n"
+                + "Option: ");
+    }
+
+    public static void clientTableLeaderMenu()
+    {
+        System.out.print("\n[Client] Table Operations:\n"
+                + "1- Start game\n"
+                + "2- List table information\n"
+                + "3- Disband table\n"
+                + "Option: ");
+    }
 }
