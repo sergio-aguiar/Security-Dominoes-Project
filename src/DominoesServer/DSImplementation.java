@@ -4,7 +4,6 @@ import DominoesClient.DCInterface;
 import DominoesMisc.DominoesTable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DSImplementation implements DCInterface
@@ -110,8 +109,27 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean startGame() {
-        return false;
+    public boolean startGame(int tableID) {
+        boolean started = true;
+        this.reentrantLock.lock();
+        try
+        {
+            for (boolean ready : this.dominoesTables.get(tableID).getReadyStates()) if (!ready) {
+                started = false;
+                break;
+            }
+            if (started) this.dominoesTables.get(tableID).startGame();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: startGame: " + e.toString());
+            started = false;
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return started;
     }
 
     @Override

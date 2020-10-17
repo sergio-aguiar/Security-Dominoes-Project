@@ -10,6 +10,8 @@ public class DominoesTable implements Serializable
     private final String[] players;
     private final boolean[] readyStates;
 
+    private boolean started;
+
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
     {
         if (!this.isValidPlayerCap(playerCap)) throw new DominoesTableException("Invalid player capacity value!");
@@ -59,6 +61,21 @@ public class DominoesTable implements Serializable
     public String[] getPlayers()
     {
         return this.players;
+    }
+
+    public boolean[] getReadyStates()
+    {
+        return this.readyStates;
+    }
+
+    public boolean hasStarted()
+    {
+        return this.started;
+    }
+
+    public void startGame()
+    {
+        this.started = true;
     }
 
     public boolean isFull()

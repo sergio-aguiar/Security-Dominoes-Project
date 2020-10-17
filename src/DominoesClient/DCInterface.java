@@ -8,7 +8,7 @@ public interface DCInterface
     DominoesTable[] listAvailableTables();
     boolean joinTable(String pseudonym, int tableID);
     int joinRandomTable(String pseudonym);
-    boolean startGame();
+    boolean startGame(int tableID);
     void disbandTable();
     void markAsReady(String pseudonym);
     DominoesTable listTableInfo(int tableID);

@@ -228,7 +228,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean startGame() {
+    public boolean startGame(int tableID) {
         return false;
     }
 
