@@ -79,8 +79,8 @@ public class DCThread extends Thread
                                 System.out.println("\n[CLIENT] Unexpected Error...");
                                 System.exit(703);
                         }
-                        if (exit1) break;
-                        else
+
+                        if (!exit1)
                         {
                             // TODO: Add Table Leader Menu
                             boolean exit2 = false;
@@ -108,8 +108,8 @@ public class DCThread extends Thread
                                 }
                             }
                             while (!exit2);
-                            break;
                         }
+                        break;
                     }
                     break;
                 case 2:
