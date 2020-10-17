@@ -1,13 +1,16 @@
 package DominoesMisc;
 
-import javax.swing.Spring;
-
-import java.io.Console;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DominoesDeck {
+/**
+ * The deck management system.
+ * Manages Draw Swap and Insert
+ * @author Ricardo Rodrigues Azevedo
+ * @version 1.0
+ * @since 2019-10-17
+ */
 
-    private Spring tile;
+public class DominoesDeck {
 
     private String[] deck;
 
@@ -22,6 +25,11 @@ public class DominoesDeck {
         GenerateSet(this.size);
     }
 
+
+    /**
+     * Method for initialize the deck. Also shuffle it
+     * @param size Size for the deck
+     */
     private void GenerateSet(int size){
 
         int count = 0;
@@ -87,6 +95,10 @@ public class DominoesDeck {
         
     }
 
+    /**
+     * Method for draw one of the available tile in the set
+     * @return a String of the tile
+     */
     public String TakeTile()
     {
         if (isEmpty())
@@ -101,8 +113,12 @@ public class DominoesDeck {
         return tile_to_take;
     }
 
-
-    public String SwapCard(String tile){
+    /**
+     * Method for swap a player tile with one of the available. The tile to swap is inserted in the deck and top tile of the available's deck is draw
+     * @param tile to swap
+     * @return tile from the available's list
+     */
+    public String SwapTile(String tile){
 
         String tileToTake = getTile();
 
@@ -116,6 +132,10 @@ public class DominoesDeck {
 
     }
 
+    /**
+     * Method to insert a tile in the deck
+     * @param tile to insert
+     */
     public void InsertTile(String tile){
 
         addTile(tile);
@@ -198,6 +218,10 @@ public class DominoesDeck {
         
     }
 
+    /**
+     * Check if there is any tiles in the deck
+     * @return true if the deck has tiles. false if not
+     */
     public boolean isEmpty()
     {
         return this.pointer < 0;
