@@ -54,62 +54,58 @@ public class DCThread extends Thread
             switch (option1)
             {
                 case 1:
-                    while (true)
+                    int option2 = clientPlayerCapMenu();
+                    boolean exit1 = false;
+                    switch (option2)
                     {
-                        int option2 = clientPlayerCapMenu();
-                        boolean exit1 = false;
-                        switch (option2)
-                        {
-                            case 1:
-                                System.out.println("\n[CLIENT] Creating a dominoes table...");
-                                System.out.println(this.dcInterface.createTable(this.pseudonym, 2));
-                                break;
-                            case 2:
-                                System.out.println("\n[CLIENT] Creating a dominoes table...");
-                                System.out.println(this.dcInterface.createTable(this.pseudonym, 4));
-                                break;
-                            case 3:
-                                System.out.println("\n[CLIENT] Creating a dominoes table...");
-                                System.out.println(this.dcInterface.createTable(this.pseudonym, 7));
-                                break;
-                            case 4:
-                                exit1 = true;
-                                break;
-                            default:
-                                System.out.println("\n[CLIENT] Unexpected Error...");
-                                System.exit(703);
-                        }
+                        case 1:
+                            System.out.println("\n[CLIENT] Creating a dominoes table...");
+                            System.out.println(this.dcInterface.createTable(this.pseudonym, 2));
+                            break;
+                        case 2:
+                            System.out.println("\n[CLIENT] Creating a dominoes table...");
+                            System.out.println(this.dcInterface.createTable(this.pseudonym, 4));
+                            break;
+                        case 3:
+                            System.out.println("\n[CLIENT] Creating a dominoes table...");
+                            System.out.println(this.dcInterface.createTable(this.pseudonym, 7));
+                            break;
+                        case 4:
+                            exit1 = true;
+                            break;
+                        default:
+                            System.out.println("\n[CLIENT] Unexpected Error...");
+                            System.exit(703);
+                    }
 
-                        if (!exit1)
+                    if (!exit1)
+                    {
+                        // TODO: Add Table Leader Menu
+                        boolean exit2 = false;
+                        do
                         {
-                            // TODO: Add Table Leader Menu
-                            boolean exit2 = false;
-                            do
+                            int option3 = clientTableMenu(true);
+                            switch (option3)
                             {
-                                int option3 = clientTableMenu(true);
-                                switch (option3)
-                                {
-                                    case 1:
-                                        // TODO: START GAME LOGIC
-                                        System.out.println("\n[CLIENT] Starting Game...");
-                                        break;
-                                    case 2:
-                                        // TODO: LIST TABLE INFORMATION LOGIC
-                                        System.out.println("\n[CLIENT] Listing Table Information...");
-                                        break;
-                                    case 3:
-                                        // TODO: DISBAND TABLE LOGIC
-                                        System.out.println("\n[CLIENT] Disbanding Table...");
-                                        exit2 = true;
-                                        break;
-                                    default:
-                                        System.out.println("\n[CLIENT] Unexpected Error...");
-                                        System.exit(703);
-                                }
+                                case 1:
+                                    // TODO: START GAME LOGIC
+                                    System.out.println("\n[CLIENT] Starting Game...");
+                                    break;
+                                case 2:
+                                    // TODO: LIST TABLE INFORMATION LOGIC
+                                    System.out.println("\n[CLIENT] Listing Table Information...");
+                                    break;
+                                case 3:
+                                    // TODO: DISBAND TABLE LOGIC
+                                    System.out.println("\n[CLIENT] Disbanding Table...");
+                                    exit2 = true;
+                                    break;
+                                default:
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
                             }
-                            while (!exit2);
                         }
-                        break;
+                        while (!exit2);
                     }
                     break;
                 case 2:
