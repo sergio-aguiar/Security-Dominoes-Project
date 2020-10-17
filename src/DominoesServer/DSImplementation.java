@@ -106,7 +106,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean startGame(int tableID)
+    public boolean startGame(String pseudonym, int tableID)
     {
         int started = 0;
         this.reentrantLock.lock();
@@ -139,7 +139,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void disbandTable(int tableID)
+    public void disbandTable(String pseudonym, int tableID)
     {
         this.reentrantLock.lock();
         try
@@ -183,7 +183,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTable listTableInfo(int tableID)
+    public DominoesTable listTableInfo(String pseudonym, int tableID)
     {
         DominoesTable dTable = null;
         this.reentrantLock.lock();

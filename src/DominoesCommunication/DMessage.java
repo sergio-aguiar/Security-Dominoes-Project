@@ -12,7 +12,9 @@ public class DMessage implements Serializable
         JOIN_RANDOM_TABLE_REQUEST(4),
         LIST_TABLE_INFO_REQUEST(5),
         DISBAND_TABLE_REQUEST(6),
-        LEAVE_TABLE_REQUEST(7);
+        LEAVE_TABLE_REQUEST(7),
+        START_GAME_REQUEST(8),
+        MARK_AS_READY_REQUEST(9);
 
         private static final long serialVersionUID = 1102L;
 
