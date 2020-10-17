@@ -86,7 +86,7 @@ public class DCThread extends Thread
                             boolean exit2 = false;
                             do
                             {
-                                int option3 = clientTableLeaderMenu();
+                                int option3 = clientTableMenu(true);
                                 switch (option3)
                                 {
                                     case 1:
@@ -129,7 +129,34 @@ public class DCThread extends Thread
                         System.out.println("\n[CLIENT] Joining a random dominoes table...");
                         System.out.println(this.dcInterface.joinRandomTable(this.pseudonym));
                     }
+
                     // TODO: Add Table Guest Menu
+                    boolean exit3 = false;
+                    do
+                    {
+                        int option4 = clientTableMenu(false);
+                        switch (option4)
+                        {
+                            case 1:
+                                // TODO: START GAME LOGIC
+                                System.out.println("\n[CLIENT] Marking self as ready...");
+                                break;
+                            case 2:
+                                // TODO: LIST TABLE INFORMATION LOGIC
+                                System.out.println("\n[CLIENT] Listing Table Information...");
+                                break;
+                            case 3:
+                                // TODO: DISBAND TABLE LOGIC
+                                System.out.println("\n[CLIENT] Leaving Table...");
+                                exit3 = true;
+                                break;
+                            default:
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
+                        }
+                    }
+                    while (!exit3);
+
                     break;
                 case 5:
                     System.out.println("\n[CLIENT] Shutting down...");
@@ -182,11 +209,12 @@ public class DCThread extends Thread
         }
     }
 
-    private int clientTableLeaderMenu()
+    private int clientTableMenu(boolean leader)
     {
         while (true)
         {
-            DominoesMenus.clientTableLeaderMenu();
+            if (leader) DominoesMenus.clientTableLeaderMenu();
+            else DominoesMenus.clientTableGuestMenu();
 
             int option = getMenuOption();
             switch (option)

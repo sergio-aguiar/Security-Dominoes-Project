@@ -40,4 +40,13 @@ public class DominoesMenus
                 + "3- Disband table\n"
                 + "Option: ");
     }
+
+    public static void clientTableGuestMenu()
+    {
+        System.out.print("\n[Client] Table Operations:\n"
+                + "1- Mark as ready\n"
+                + "2- List table information\n"
+                + "3- Leave table\n"
+                + "Option: ");
+    }
 }
