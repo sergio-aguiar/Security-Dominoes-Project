@@ -48,7 +48,7 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return1);
                 break;
             case 2:
-                DominoesTable[] return2 = this.dsImplementation.listAvailableTables(inMessage.getPseudonym());
+                DominoesTable[] return2 = this.dsImplementation.listAvailableTables();
                 outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode(), return2);
                 break;
             case 3:

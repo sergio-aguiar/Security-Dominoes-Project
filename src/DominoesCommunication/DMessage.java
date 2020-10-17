@@ -48,6 +48,14 @@ public class DMessage implements Serializable
     private final Object returnInfo;
     private final Object firstArgument;
 
+    public DMessage(int messageType) throws DMessageException
+    {
+        this.messageType = messageType;
+        this.pseudonym = null;
+        this.returnInfo = null;
+        this.firstArgument = null;
+    }
+
     public DMessage(int messageType, String pseudonym) throws DMessageException
     {
         this.messageType = messageType;

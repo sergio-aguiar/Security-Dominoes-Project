@@ -70,7 +70,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesTable[] listAvailableTables(String pseudonym)
+    public DominoesTable[] listAvailableTables()
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -91,7 +91,7 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode(), pseudonym);
+            outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode());
         }
         catch (DMessageException e)
         {
@@ -225,5 +225,32 @@ public class DCStub implements DCInterface
         dcCommunication.close();
 
         return (int) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean startGame() {
+        return false;
+    }
+
+    @Override
+    public void disbandTable() {
+
+    }
+
+    @Override
+    public void markAsReady(String pseudonym) {
+
+    }
+
+    @Override
+    public DominoesTable listTableInfo(int tableID)
+    {
+        return null;
+    }
+
+    @Override
+    public void leaveTable(String pseudonym)
+    {
+
     }
 }

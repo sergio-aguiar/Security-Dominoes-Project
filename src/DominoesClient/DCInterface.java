@@ -4,8 +4,13 @@ import DominoesMisc.DominoesTable;
 
 public interface DCInterface
 {
-    public int createTable(String pseudonym, int playerCap);
-    public DominoesTable[] listAvailableTables(String pseudonym);
-    public boolean joinTable(String pseudonym, int tableID);
-    public int joinRandomTable(String pseudonym);
+    int createTable(String pseudonym, int playerCap);
+    DominoesTable[] listAvailableTables();
+    boolean joinTable(String pseudonym, int tableID);
+    int joinRandomTable(String pseudonym);
+    boolean startGame();
+    void disbandTable();
+    void markAsReady(String pseudonym);
+    DominoesTable listTableInfo(int tableID);
+    void leaveTable(String pseudonym);
 }

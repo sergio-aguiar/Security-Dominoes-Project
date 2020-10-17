@@ -41,7 +41,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTable[] listAvailableTables(String pseudonym)
+    public DominoesTable[] listAvailableTables()
     {
         DominoesTable[] tables;
         this.reentrantLock.lock();
@@ -107,5 +107,30 @@ public class DSImplementation implements DCInterface
             this.reentrantLock.unlock();
         }
         return tableID;
+    }
+
+    @Override
+    public boolean startGame() {
+        return false;
+    }
+
+    @Override
+    public void disbandTable() {
+
+    }
+
+    @Override
+    public void markAsReady(String pseudonym) {
+
+    }
+
+    @Override
+    public DominoesTable listTableInfo(int tableID) {
+        return null;
+    }
+
+    @Override
+    public void leaveTable(String pseudonym) {
+
     }
 }

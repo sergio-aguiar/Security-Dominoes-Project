@@ -36,11 +36,14 @@ public class DCThread extends Thread
     private final String pseudonym;
     private final DCInterface dcInterface;
 
+    private int tableID;
+
     public DCThread(String pseudonym, DCInterface dcInterface)
     {
         this.id = gID++;
         this.pseudonym = pseudonym;
         this.dcInterface = dcInterface;
+        this.tableID = -1;
     }
 
     @Override
@@ -60,15 +63,15 @@ public class DCThread extends Thread
                     {
                         case 1:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            System.out.println(this.dcInterface.createTable(this.pseudonym, 2));
+                            tableID = this.dcInterface.createTable(this.pseudonym, 2);
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            System.out.println(this.dcInterface.createTable(this.pseudonym, 4));
+                            tableID = this.dcInterface.createTable(this.pseudonym, 4);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            System.out.println(this.dcInterface.createTable(this.pseudonym, 7));
+                            tableID = this.dcInterface.createTable(this.pseudonym, 7);
                             break;
                         case 4:
                             exit1 = true;
@@ -110,7 +113,7 @@ public class DCThread extends Thread
                     break;
                 case 2:
                     System.out.println("\n[CLIENT] Listing available dominoes tables...");
-                    System.out.println(Arrays.toString(this.dcInterface.listAvailableTables(this.pseudonym)));
+                    System.out.println(Arrays.toString(this.dcInterface.listAvailableTables()));
                     // TODO: Add Table Listing
                     break;
                 case 3:
@@ -134,7 +137,7 @@ public class DCThread extends Thread
                         switch (option4)
                         {
                             case 1:
-                                // TODO: START GAME LOGIC
+                                // TODO: MARK AS READY LOGIC
                                 System.out.println("\n[CLIENT] Marking self as ready...");
                                 break;
                             case 2:
@@ -142,7 +145,7 @@ public class DCThread extends Thread
                                 System.out.println("\n[CLIENT] Listing Table Information...");
                                 break;
                             case 3:
-                                // TODO: DISBAND TABLE LOGIC
+                                // TODO: LEAVE TABLE LOGIC
                                 System.out.println("\n[CLIENT] Leaving Table...");
                                 exit3 = true;
                                 break;
