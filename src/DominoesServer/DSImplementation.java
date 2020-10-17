@@ -24,8 +24,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            this.dominoesTables.add(new DominoesTable(playerCap, pseudonym));
-            tableID = this.dominoesTables.size() - 1;
+            DominoesTable table = new DominoesTable(playerCap, pseudonym);
+            tableID = table.getId();
+            this.dominoesTables.add(table);
         }
         catch (Exception e)
         {
@@ -63,11 +64,12 @@ public class DSImplementation implements DCInterface
     @Override
     public boolean joinTable(String pseudonym, int tableID)
     {
-        boolean joined;
+        boolean joined = false;
         this.reentrantLock.lock();
         try
         {
-            joined = this.dominoesTables.get(tableID).joinTable(pseudonym);
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                joined = table.joinTable(pseudonym);
         }
         catch (Exception e)
         {
@@ -88,13 +90,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            DominoesTable[] tables = this.dominoesTables.toArray(new DominoesTable[0]);
-            for (int i = 0; i < tables.length; i++) if (!tables[i].isFull())
-            {
-                this.dominoesTables.get(i).joinTable(pseudonym);
-                tableID = i;
-                break;
-            }
+            for (DominoesTable table : this.dominoesTables) if (!table.isFull()) if (table.joinTable(pseudonym))
+                tableID = table.getId();
         }
         catch (Exception e)
         {
@@ -109,46 +106,125 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean startGame(int tableID) {
-        boolean started = true;
+    public boolean startGame(int tableID)
+    {
+        int started = 0;
         this.reentrantLock.lock();
         try
         {
-            for (boolean ready : this.dominoesTables.get(tableID).getReadyStates()) if (!ready) {
-                started = false;
-                break;
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                for (boolean ready : table.getReadyStates()) if (!ready)
+                {
+                    started = -1;
+                    break;
+                }
+                if (started != -1)
+                {
+                    started = table.getId();
+                    table.startGame();
+                }
             }
-            if (started) this.dominoesTables.get(tableID).startGame();
         }
         catch (Exception e)
         {
             System.out.println("DSImplementation: startGame: " + e.toString());
-            started = false;
+            started = -1;
         }
         finally
         {
             this.reentrantLock.unlock();
         }
-        return started;
+        return started >= 0;
     }
 
     @Override
-    public void disbandTable() {
-
+    public void disbandTable(int tableID)
+    {
+        this.reentrantLock.lock();
+        try
+        {
+            this.dominoesTables.removeIf(table -> table.getId() == tableID);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: disbandTable: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
-    public void markAsReady(String pseudonym) {
-
+    public boolean markAsReady(String pseudonym, int tableID)
+    {
+        boolean marked = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
+                {
+                    table.getReadyStates()[i] = true;
+                    marked = true;
+                }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: markAsReady: " + e.toString());
+            marked = false;
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return marked;
     }
 
     @Override
-    public DominoesTable listTableInfo(int tableID) {
-        return null;
+    public DominoesTable listTableInfo(int tableID)
+    {
+        DominoesTable dTable = null;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dTable = table;
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: listTableInfo: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return dTable;
     }
 
     @Override
-    public void leaveTable(String pseudonym) {
-
+    public boolean leaveTable(String pseudonym, int tableID)
+    {
+        boolean left = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
+                {
+                    table.getPlayers()[i] = null;
+                    left = true;
+                }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: markAsReady: " + e.toString());
+            left = false;
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return left;
     }
 }

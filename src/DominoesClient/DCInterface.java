@@ -9,8 +9,8 @@ public interface DCInterface
     boolean joinTable(String pseudonym, int tableID);
     int joinRandomTable(String pseudonym);
     boolean startGame(int tableID);
-    void disbandTable();
-    void markAsReady(String pseudonym);
+    void disbandTable(int tableID);
+    boolean markAsReady(String pseudonym, int tableID);
     DominoesTable listTableInfo(int tableID);
-    void leaveTable(String pseudonym);
+    boolean leaveTable(String pseudonym, int tableID);
 }

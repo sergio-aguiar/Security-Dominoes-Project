@@ -228,18 +228,21 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean startGame(int tableID) {
+    public boolean startGame(int tableID)
+    {
         return false;
     }
 
     @Override
-    public void disbandTable() {
+    public void disbandTable(int tableID)
+    {
 
     }
 
     @Override
-    public void markAsReady(String pseudonym) {
-
+    public boolean markAsReady(String pseudonym, int tableID)
+    {
+        return false;
     }
 
     @Override
@@ -249,8 +252,8 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void leaveTable(String pseudonym)
+    public boolean leaveTable(String pseudonym, int tableID)
     {
-
+        return false;
     }
 }
