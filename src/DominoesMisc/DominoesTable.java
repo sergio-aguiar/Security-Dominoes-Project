@@ -2,7 +2,6 @@ package DominoesMisc;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class DominoesTable implements Serializable
 {
@@ -19,20 +18,7 @@ public class DominoesTable implements Serializable
     {
         if (!this.isValidPlayerCap(playerCap)) throw new DominoesTableException("Invalid player capacity value!");
 
-        ReentrantLock reentrantLock = new ReentrantLock();
-        reentrantLock.unlock();
-        try
-        {
-            this.id = gID++;
-        }
-        catch (Exception e)
-        {
-            throw new DominoesTableException("Lock Issue!");
-        }
-        finally
-        {
-            reentrantLock.unlock();
-        }
+        this.id = gID++;
 
         this.players = new String[playerCap];
         this.players[0] = tableLeader;

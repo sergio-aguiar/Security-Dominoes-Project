@@ -30,9 +30,6 @@ public class DCThread extends Thread
     }
 
     private static final Scanner sc = new Scanner(System.in);
-    private static int gID = 0;
-
-    private final int id;
     private final String pseudonym;
     private final DCInterface dcInterface;
 
@@ -40,7 +37,6 @@ public class DCThread extends Thread
 
     public DCThread(String pseudonym, DCInterface dcInterface)
     {
-        this.id = gID++;
         this.pseudonym = pseudonym;
         this.dcInterface = dcInterface;
         this.tableID = -1;
@@ -63,15 +59,15 @@ public class DCThread extends Thread
                     {
                         case 1:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            tableID = this.dcInterface.createTable(this.pseudonym, 2);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 2);
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            tableID = this.dcInterface.createTable(this.pseudonym, 4);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            tableID = this.dcInterface.createTable(this.pseudonym, 7);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 7);
                             break;
                         case 4:
                             exit1 = true;
@@ -83,7 +79,6 @@ public class DCThread extends Thread
 
                     if (!exit1)
                     {
-                        // TODO: Add Table Leader Menu
                         boolean exit2 = false;
                         do
                         {
@@ -91,16 +86,16 @@ public class DCThread extends Thread
                             switch (option3)
                             {
                                 case 1:
-                                    // TODO: START GAME LOGIC
                                     System.out.println("\n[CLIENT] Starting Game...");
+                                    System.out.println("Start: " + dcInterface.startGame(this.pseudonym, this.tableID));
                                     break;
                                 case 2:
-                                    // TODO: LIST TABLE INFORMATION LOGIC
                                     System.out.println("\n[CLIENT] Listing Table Information...");
+                                    System.out.println(dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
                                     break;
                                 case 3:
-                                    // TODO: DISBAND TABLE LOGIC
                                     System.out.println("\n[CLIENT] Disbanding Table...");
+                                    dcInterface.disbandTable(this.pseudonym, this.tableID);
                                     exit2 = true;
                                     break;
                                 default:
@@ -114,22 +109,20 @@ public class DCThread extends Thread
                 case 2:
                     System.out.println("\n[CLIENT] Listing available dominoes tables...");
                     System.out.println(Arrays.toString(this.dcInterface.listAvailableTables()));
-                    // TODO: Add Table Listing
                     break;
                 case 3:
                 case 4:
                     if (option1 == 3)
                     {
                         System.out.println("\n[CLIENT] Joining a specific dominoes table...");
-                        System.out.println(this.dcInterface.joinTable(this.pseudonym, 0));
+                        if (this.dcInterface.joinTable(this.pseudonym, 0)) tableID = 0;
                     }
                     else
                     {
                         System.out.println("\n[CLIENT] Joining a random dominoes table...");
-                        System.out.println(this.dcInterface.joinRandomTable(this.pseudonym));
+                        tableID = this.dcInterface.joinRandomTable(this.pseudonym);
                     }
 
-                    // TODO: Add Table Guest Menu
                     boolean exit3 = false;
                     do
                     {
@@ -139,14 +132,17 @@ public class DCThread extends Thread
                             case 1:
                                 // TODO: MARK AS READY LOGIC
                                 System.out.println("\n[CLIENT] Marking self as ready...");
+                                System.out.println(this.dcInterface.markAsReady(this.pseudonym, this.tableID));
                                 break;
                             case 2:
                                 // TODO: LIST TABLE INFORMATION LOGIC
                                 System.out.println("\n[CLIENT] Listing Table Information...");
+                                System.out.println(this.dcInterface.listTableInfo(this.pseudonym, this.tableID));
                                 break;
                             case 3:
                                 // TODO: LEAVE TABLE LOGIC
                                 System.out.println("\n[CLIENT] Leaving Table...");
+                                System.out.println(this.dcInterface.leaveTable(this.pseudonym, this.tableID));
                                 exit3 = true;
                                 break;
                             default:

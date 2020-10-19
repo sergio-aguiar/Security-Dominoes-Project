@@ -199,6 +199,9 @@ public class DSImplementation implements DCInterface
         {
             this.reentrantLock.unlock();
         }
+
+        System.out.println(dTable);
+
         return dTable;
     }
 
