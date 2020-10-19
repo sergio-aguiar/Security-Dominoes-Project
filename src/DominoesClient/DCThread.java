@@ -86,8 +86,16 @@ public class DCThread extends Thread
                             switch (option3)
                             {
                                 case 1:
-                                    System.out.println("\n[CLIENT] Starting Game...");
-                                    System.out.println("Start: " + dcInterface.startGame(this.pseudonym, this.tableID));
+                                    if (dcInterface.startGame(this.pseudonym, this.tableID))
+                                    {
+                                        System.out.println("\n[CLIENT] Starting Game...");
+                                        // TODO: @Fabio, add game logic here
+                                    }
+                                    else
+                                    {
+                                        System.out.println("\n[CLIENT] Could not start the game.\n" +
+                                                "[CLIENT] Some players have yet to ready up.");
+                                    }
                                     break;
                                 case 2:
                                     System.out.println("\n[CLIENT] Listing Table Information...");
@@ -112,15 +120,36 @@ public class DCThread extends Thread
                     break;
                 case 3:
                 case 4:
-                    if (option1 == 3)
+                    while (this.tableID < 0)
                     {
-                        System.out.println("\n[CLIENT] Joining a specific dominoes table...");
-                        if (this.dcInterface.joinTable(this.pseudonym, 0)) tableID = 0;
-                    }
-                    else
-                    {
-                        System.out.println("\n[CLIENT] Joining a random dominoes table...");
-                        tableID = this.dcInterface.joinRandomTable(this.pseudonym);
+                        if (option1 == 3)
+                        {
+                            int tableToJoin = -1;
+
+                            do
+                            {
+                                System.out.print("\n[CLIENT] Table ID:");
+                                tableToJoin = getMenuOption();
+
+                                if (tableToJoin < 0) System.out.println("\n[CLIENT] Invalid table ID.");
+                            }
+                            while (tableToJoin < 0);
+
+                            if (this.dcInterface.joinTable(this.pseudonym, tableToJoin))
+                            {
+                                System.out.println("\n[CLIENT] Joining dominoes table #" + tableToJoin + "...");
+                                this.tableID = tableToJoin;
+                            }
+                            else
+                            {
+                                System.out.println("\n[CLIENT] Could not join a table with the specified ID.");
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("\n[CLIENT] Joining a random dominoes table...");
+                            this.tableID = this.dcInterface.joinRandomTable(this.pseudonym);
+                        }
                     }
 
                     boolean exit3 = false;
