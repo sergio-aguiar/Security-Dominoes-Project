@@ -416,10 +416,7 @@ public class DCStub implements DCInterface
 
         if (inMessage.noReturnInfo())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: listTableInfo: no return " +
-                    "value!");
-
-            System.exit(704);
+            return null;
         }
         dcCommunication.close();
 
@@ -427,7 +424,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean leaveTable(String pseudonym, int tableID)
+    public void leaveTable(String pseudonym, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -465,16 +462,5 @@ public class DCStub implements DCInterface
 
             System.exit(706);
         }
-
-        if (inMessage.noReturnInfo())
-        {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: markAsReady: no return " +
-                    "value!");
-
-            System.exit(704);
-        }
-        dcCommunication.close();
-
-        return (boolean) inMessage.getReturnInfo();
     }
 }

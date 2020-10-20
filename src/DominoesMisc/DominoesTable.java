@@ -80,6 +80,15 @@ public class DominoesTable implements Serializable
         return this.readyStates;
     }
 
+    public void setReady(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+        {
+            this.readyStates[i] = true;
+            break;
+        }
+    }
+
     public boolean hasStarted()
     {
         return this.started;
@@ -99,6 +108,13 @@ public class DominoesTable implements Serializable
     @Override
     public String toString()
     {
-        return "DominoesTable{" + "players=" + Arrays.toString(players) + '}';
+        StringBuilder toReturn = new StringBuilder("Table ID = " + this.id + "\n");
+        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null)
+        {
+            toReturn.append((this.readyStates[i]) ? "<READY>" : "<NOT READY>");
+            toReturn.append(" ").append(this.players[i]).append("\n");
+        }
+
+        return toReturn.toString();
     }
 }

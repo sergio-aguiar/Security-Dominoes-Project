@@ -12,5 +12,5 @@ public interface DCInterface
     void disbandTable(String pseudonym, int tableID);
     boolean markAsReady(String pseudonym, int tableID);
     DominoesTable listTableInfo(String pseudonym, int tableID);
-    boolean leaveTable(String pseudonym, int tableID);
+    void leaveTable(String pseudonym, int tableID);
 }

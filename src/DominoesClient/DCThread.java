@@ -1,6 +1,7 @@
 package DominoesClient;
 
 import DominoesMisc.DominoesMenus;
+import DominoesMisc.DominoesTable;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
@@ -98,8 +99,9 @@ public class DCThread extends Thread
                                     }
                                     break;
                                 case 2:
-                                    System.out.println("\n[CLIENT] Listing Table Information...");
-                                    System.out.println(dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
+                                    System.out.println("\n[CLIENT] Fetching Table Information...");
+                                    System.out.println("\n"
+                                            + dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
                                     break;
                                 case 3:
                                     System.out.println("\n[CLIENT] Disbanding Table...");
@@ -115,8 +117,12 @@ public class DCThread extends Thread
                     }
                     break;
                 case 2:
-                    System.out.println("\n[CLIENT] Listing available dominoes tables...");
-                    System.out.println(Arrays.toString(this.dcInterface.listAvailableTables()));
+                    System.out.println("\n[CLIENT] Fetching available dominoes tables...");
+
+                    DominoesTable[] tmpTables = this.dcInterface.listAvailableTables();
+                    if (tmpTables.length == 0) System.out.println("\n[CLIENT] No available tables found.");
+                    else for (DominoesTable table : tmpTables) System.out.print("\n" + table.toString());
+
                     break;
                 case 3:
                 case 4:
@@ -159,19 +165,25 @@ public class DCThread extends Thread
                         switch (option4)
                         {
                             case 1:
-                                // TODO: MARK AS READY LOGIC
                                 System.out.println("\n[CLIENT] Marking self as ready...");
-                                System.out.println(this.dcInterface.markAsReady(this.pseudonym, this.tableID));
+
+                                if (this.dcInterface.markAsReady(this.pseudonym, this.tableID))
+                                {
+                                    // TODO: @Fabio, add game logic here
+                                    System.out.println("\n[CLIENT] Awaiting game Start...");
+                                }
+                                else
+                                {
+                                    System.out.println("\n[CLIENT] The table was disbanded.");
+                                }
                                 break;
                             case 2:
-                                // TODO: LIST TABLE INFORMATION LOGIC
                                 System.out.println("\n[CLIENT] Listing Table Information...");
-                                System.out.println(this.dcInterface.listTableInfo(this.pseudonym, this.tableID));
+                                System.out.println("\n" + this.dcInterface.listTableInfo(this.pseudonym, this.tableID));
                                 break;
                             case 3:
-                                // TODO: LEAVE TABLE LOGIC
                                 System.out.println("\n[CLIENT] Leaving Table...");
-                                System.out.println(this.dcInterface.leaveTable(this.pseudonym, this.tableID));
+                                this.dcInterface.leaveTable(this.pseudonym, this.tableID);
                                 exit3 = true;
                                 break;
                             default:

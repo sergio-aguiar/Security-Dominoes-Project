@@ -75,9 +75,8 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.DISBAND_TABLE_REQUEST.getMessageCode(), (Object) null);
                 break;
             case 7:
-                boolean return7 = this.dsImplementation.leaveTable(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument());
-                outMessage = new DMessage(DMessage.MessageType.LEAVE_TABLE_REQUEST.getMessageCode(), return7);
+                this.dsImplementation.leaveTable(inMessage.getPseudonym(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.LEAVE_TABLE_REQUEST.getMessageCode(), (Object) null);
                 break;
             case 8:
                 boolean return8 = this.dsImplementation.startGame(inMessage.getPseudonym(),
