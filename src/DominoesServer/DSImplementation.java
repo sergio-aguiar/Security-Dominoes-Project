@@ -159,6 +159,8 @@ public class DSImplementation implements DCInterface
     @Override
     public boolean markAsReady(String pseudonym, int tableID)
     {
+        if (tableID < 0) return false;
+
         boolean marked = false;
         this.reentrantLock.lock();
         try
@@ -209,16 +211,19 @@ public class DSImplementation implements DCInterface
     @Override
     public void leaveTable(String pseudonym, int tableID)
     {
+        if (tableID < 0) return;
+
         this.reentrantLock.lock();
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
-                    table.leaveTable(pseudonym);
+                for (int i = 0; i < table.getPlayers().length; i++)
+                    if (table.getPlayers()[i] != null && table.getPlayers()[i].equals(pseudonym))
+                        table.leaveTable(pseudonym);
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: markAsReady: " + e.toString());
+            System.out.println("DSImplementation: leaveTable: " + e.toString());
         }
         finally
         {

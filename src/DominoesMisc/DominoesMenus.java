@@ -49,4 +49,22 @@ public class DominoesMenus
                 + "3- Leave table\n"
                 + "Option: ");
     }
+
+    public static void clientPieceDistributionMenu()
+    {
+        System.out.print("\n[Client] Piece Distribution Operations:\n"
+                + "1- Draw a piece\n"
+                + "2- Skip turn\n"
+                + "Option: ");
+    }
+
+    public static void clientGameMenu()
+    {
+        System.out.print("\n[Client] Game Operations:\n"
+                + "1- Play a piece\n"
+                + "2- List game information\n"
+                + "3- Denounce cheating\n"
+                + "4- Exit\n"
+                + "Option: ");
+    }
 }

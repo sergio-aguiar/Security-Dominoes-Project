@@ -87,7 +87,7 @@ public class DCThread extends Thread
                             switch (option3)
                             {
                                 case 1:
-                                    if (dcInterface.startGame(this.pseudonym, this.tableID))
+                                    if (this.dcInterface.startGame(this.pseudonym, this.tableID))
                                     {
                                         System.out.println("\n[CLIENT] Starting Game...");
                                         // TODO: @Fabio, add game logic here
@@ -100,12 +100,13 @@ public class DCThread extends Thread
                                     break;
                                 case 2:
                                     System.out.println("\n[CLIENT] Fetching Table Information...");
-                                    System.out.println("\n"
-                                            + dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
+                                    System.out.print(
+                                            this.dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
                                     break;
                                 case 3:
                                     System.out.println("\n[CLIENT] Disbanding Table...");
-                                    dcInterface.disbandTable(this.pseudonym, this.tableID);
+                                    this.dcInterface.disbandTable(this.pseudonym, this.tableID);
+                                    this.tableID = -1;
                                     exit2 = true;
                                     break;
                                 default:
@@ -120,12 +121,13 @@ public class DCThread extends Thread
                     System.out.println("\n[CLIENT] Fetching available dominoes tables...");
 
                     DominoesTable[] tmpTables = this.dcInterface.listAvailableTables();
-                    if (tmpTables.length == 0) System.out.println("\n[CLIENT] No available tables found.");
+                    if (tmpTables.length == 0) System.out.println("[CLIENT] No available tables found.");
                     else for (DominoesTable table : tmpTables) System.out.print("\n" + table.toString());
 
                     break;
                 case 3:
                 case 4:
+                    boolean noTables = false;
                     while (this.tableID < 0)
                     {
                         if (option1 == 3)
@@ -134,7 +136,7 @@ public class DCThread extends Thread
 
                             do
                             {
-                                System.out.print("\n[CLIENT] Table ID:");
+                                System.out.print("\n[CLIENT] Table ID: ");
                                 tableToJoin = getMenuOption();
 
                                 if (tableToJoin < 0) System.out.println("\n[CLIENT] Invalid table ID.");
@@ -149,14 +151,25 @@ public class DCThread extends Thread
                             else
                             {
                                 System.out.println("\n[CLIENT] Could not join a table with the specified ID.");
+                                noTables = true;
+                                break;
                             }
                         }
                         else
                         {
                             System.out.println("\n[CLIENT] Joining a random dominoes table...");
                             this.tableID = this.dcInterface.joinRandomTable(this.pseudonym);
+
+                            if (this.tableID == -1)
+                            {
+                                System.out.println("[CLIENT] No available tables to join.");
+                                noTables = true;
+                                break;
+                            }
                         }
                     }
+
+                    if (noTables) break;
 
                     boolean exit3 = false;
                     do
@@ -165,7 +178,7 @@ public class DCThread extends Thread
                         switch (option4)
                         {
                             case 1:
-                                System.out.println("\n[CLIENT] Marking self as ready...");
+                                System.out.print("\n[CLIENT] Marking self as ready...");
 
                                 if (this.dcInterface.markAsReady(this.pseudonym, this.tableID))
                                 {
@@ -175,11 +188,19 @@ public class DCThread extends Thread
                                 else
                                 {
                                     System.out.println("\n[CLIENT] The table was disbanded.");
+                                    exit3 = true;
                                 }
                                 break;
                             case 2:
                                 System.out.println("\n[CLIENT] Listing Table Information...");
-                                System.out.println("\n" + this.dcInterface.listTableInfo(this.pseudonym, this.tableID));
+                                DominoesTable tmpTable = this.dcInterface.listTableInfo(this.pseudonym, this.tableID);
+
+                                if (tmpTable != null) System.out.print(tmpTable.toString());
+                                else
+                                {
+                                    System.out.println("[CLIENT] The table was disbanded.");
+                                    exit3 = true;
+                                }
                                 break;
                             case 3:
                                 System.out.println("\n[CLIENT] Leaving Table...");
@@ -193,6 +214,7 @@ public class DCThread extends Thread
                     }
                     while (!exit3);
 
+                    this.tableID = -1;
                     break;
                 case 5:
                     System.out.println("\n[CLIENT] Shutting down...");
@@ -252,18 +274,37 @@ public class DCThread extends Thread
             if (leader) DominoesMenus.clientTableLeaderMenu();
             else DominoesMenus.clientTableGuestMenu();
 
-            int option = getMenuOption();
-            switch (option)
-            {
-                case 1:
-                case 2:
-                case 3:
-                    return option;
-                default:
-                    System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-3].");
-            }
+            int option = tripleCaseMenuSwitch();
+            if (option != -1) return option;
         }
     }
+
+    private int clientPieceDistributionMenu()
+    {
+        while (true)
+        {
+            DominoesMenus.clientPieceDistributionMenu();
+
+            int option = tripleCaseMenuSwitch();
+            if (option != -1) return option;
+        }
+    }
+
+    private int tripleCaseMenuSwitch()
+    {
+        int option = getMenuOption();
+        switch (option)
+        {
+            case 1:
+            case 2:
+            case 3:
+                return option;
+            default:
+                System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-3].");
+        }
+        return -1;
+    }
+
 
     private static int getMenuOption()
     {
