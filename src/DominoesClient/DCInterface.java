@@ -13,4 +13,5 @@ public interface DCInterface
     boolean markAsReady(String pseudonym, int tableID);
     DominoesTable listTableInfo(String pseudonym, int tableID);
     void leaveTable(String pseudonym, int tableID);
+    boolean isPlayerTurn(String pseudonym, int tableID);
 }

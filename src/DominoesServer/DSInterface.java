@@ -36,6 +36,7 @@ public class DSInterface
             case 7:
             case 8:
             case 9:
+            case 10:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -87,6 +88,11 @@ public class DSInterface
                 boolean return9 = this.dsImplementation.markAsReady(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.MARK_AS_READY_REQUEST.getMessageCode(), return9);
+                break;
+            case 10:
+                boolean return10 = this.dsImplementation.isPlayerTurn(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.TURN_CHECK_REQUEST.getMessageCode(), return10);
                 break;
         }
         return outMessage;

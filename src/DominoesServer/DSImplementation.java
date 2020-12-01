@@ -68,8 +68,7 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                joined = table.joinTable(pseudonym);
+            joined = this.dominoesTables.get(tableID).joinTable(pseudonym);
         }
         catch (Exception e)
         {
@@ -112,18 +111,16 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            DominoesTable table = this.dominoesTables.get(tableID);
+            for (boolean ready : table.getReadyStates()) if (!ready)
             {
-                for (boolean ready : table.getReadyStates()) if (!ready)
-                {
-                    started = -1;
-                    break;
-                }
-                if (started != -1)
-                {
-                    started = table.getId();
-                    table.startGame();
-                }
+                started = -1;
+                break;
+            }
+            if (started != -1)
+            {
+                started = table.getId();
+                table.startGame();
             }
         }
         catch (Exception e)
@@ -165,13 +162,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
-                {
-                    table.setReady(pseudonym);
-                    marked = true;
-                    break;
-                }
+            DominoesTable table = this.dominoesTables.get(tableID);
+            for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
+            {
+                table.setReady(pseudonym);
+                marked = true;
+                break;
+            }
         }
         catch (Exception e)
         {
@@ -192,7 +189,7 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dTable = table;
+            dTable = this.dominoesTables.get(tableID);
         }
         catch (Exception e)
         {
@@ -216,10 +213,10 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                for (int i = 0; i < table.getPlayers().length; i++)
-                    if (table.getPlayers()[i] != null && table.getPlayers()[i].equals(pseudonym))
-                        table.leaveTable(pseudonym);
+            DominoesTable table = this.dominoesTables.get(tableID);
+            for (int i = 0; i < table.getPlayers().length; i++)
+                if (table.getPlayers()[i] != null && table.getPlayers()[i].equals(pseudonym))
+                    table.leaveTable(pseudonym);
         }
         catch (Exception e)
         {
@@ -229,5 +226,25 @@ public class DSImplementation implements DCInterface
         {
             this.reentrantLock.unlock();
         }
+    }
+
+    @Override
+    public boolean isPlayerTurn(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            result = this.dominoesTables.get(tableID).isTurn(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isPlayerTurn: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 }

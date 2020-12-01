@@ -6,6 +6,8 @@ import DominoesMisc.DominoesTable;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DCThread extends Thread
 {
@@ -31,6 +33,10 @@ public class DCThread extends Thread
     }
 
     private static final Scanner sc = new Scanner(System.in);
+
+    private final ReentrantLock reentrantLock;
+    private final Condition turnCondition;
+
     private final String pseudonym;
     private final DCInterface dcInterface;
 
@@ -38,6 +44,8 @@ public class DCThread extends Thread
 
     public DCThread(String pseudonym, DCInterface dcInterface)
     {
+        this.reentrantLock = new ReentrantLock(true);
+        this.turnCondition = this.reentrantLock.newCondition();
         this.pseudonym = pseudonym;
         this.dcInterface = dcInterface;
         this.tableID = -1;
@@ -91,6 +99,7 @@ public class DCThread extends Thread
                                     {
                                         System.out.println("\n[CLIENT] Starting Game...");
                                         // TODO: @Fabio, add game logic here
+                                        gameLogic();
                                     }
                                     else
                                     {
@@ -184,6 +193,7 @@ public class DCThread extends Thread
                                 {
                                     // TODO: @Fabio, add game logic here
                                     System.out.println("\n[CLIENT] Awaiting game Start...");
+                                    gameLogic();
                                 }
                                 else
                                 {
@@ -224,6 +234,32 @@ public class DCThread extends Thread
                     System.exit(703);
             }
         }
+    }
+
+    private void gameLogic()
+    {
+        while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID))
+        {
+            this.reentrantLock.lock();
+            try
+            {
+                synchronized (this)
+                {
+                    this.turnCondition.awaitNanos(100000);
+                    System.out.println("Hi!");
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("DCThread: gameLogic: " + e.toString());
+                System.exit(703);
+            }
+            finally
+            {
+                this.reentrantLock.unlock();
+            }
+        }
+        System.out.println("I got here!");
     }
 
     private int clientMainMenu()
@@ -320,6 +356,4 @@ public class DCThread extends Thread
         }
         return option;
     }
-
-
 }

@@ -13,6 +13,7 @@ public class DominoesTable implements Serializable
     private final boolean[] readyStates;
 
     private boolean started;
+    private int turn;
 
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
     {
@@ -30,6 +31,9 @@ public class DominoesTable implements Serializable
             this.players[i] = null;
             this.readyStates[i] = false;
         }
+
+        this.started = false;
+        this.turn = 0;
     }
 
     private boolean isValidPlayerCap(int playerCap)
@@ -58,6 +62,22 @@ public class DominoesTable implements Serializable
             break;
         }
         return left;
+    }
+
+    public void performTurn()
+    {
+        if (this.turn == this.players.length - 1) this.turn = 0;
+        else this.turn++;
+    }
+
+    public boolean isTurn(String pseudonym)
+    {
+        System.out.println("Turn: " + this.turn);
+        System.out.println("Players: " + Arrays.toString(this.players));
+        System.out.println("Players[Turn]: " + this.players[this.turn]);
+        System.out.println("Pseudonym: " + pseudonym);
+
+        return this.players[this.turn].equals(pseudonym);
     }
 
     public int getId()
@@ -92,6 +112,11 @@ public class DominoesTable implements Serializable
     public boolean hasStarted()
     {
         return this.started;
+    }
+
+    public int getTurn()
+    {
+        return this.turn;
     }
 
     public void startGame()
