@@ -515,4 +515,46 @@ public class DCStub implements DCInterface
 
         return (boolean) inMessage.getReturnInfo();
     }
+
+    @Override
+    public boolean hasGameEnded(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isDeckSorting(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public String drawPiece(String pseudonym, int tableID)
+    {
+        return null;
+    }
+
+    @Override
+    public void returnPiece(String pseudonym, int tableID, String piece)
+    {
+
+    }
+
+    @Override
+    public String swapPiece(String pseudonym, int tableID, String piece)
+    {
+        return null;
+    }
+
+    @Override
+    public void skipTurn(String pseudonym, int tableID)
+    {
+
+    }
+
+    @Override
+    public void commitHand(String pseudonym, int tableID, int bitCommitment)
+    {
+
+    }
 }

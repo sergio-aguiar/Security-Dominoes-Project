@@ -26,8 +26,8 @@ public class DominoesMenus
     {
         System.out.print("\n[Client] Number of Players:\n"
                 + "1- 2 players\n"
-                + "2- 4 players\n"
-                + "3- 7 players\n"
+                + "2- 3 players\n"
+                + "3- 4 players\n"
                 + "4- Exit\n"
                 + "Option: ");
     }
@@ -54,7 +54,10 @@ public class DominoesMenus
     {
         System.out.print("\n[Client] Piece Distribution Operations:\n"
                 + "1- Draw a piece\n"
-                + "2- Skip turn\n"
+                + "2- Return a piece\n"
+                + "3- Swap a random piece\n"
+                + "4- Skip turn\n"
+                + "5- Commit hand\n"
                 + "Option: ");
     }
 

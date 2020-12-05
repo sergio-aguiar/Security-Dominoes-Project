@@ -14,4 +14,11 @@ public interface DCInterface
     DominoesTable listTableInfo(String pseudonym, int tableID);
     void leaveTable(String pseudonym, int tableID);
     boolean isPlayerTurn(String pseudonym, int tableID);
+    boolean hasGameEnded(String pseudonym, int tableID);
+    boolean isDeckSorting(String pseudonym, int tableID);
+    String drawPiece(String pseudonym, int tableID);
+    void returnPiece(String pseudonym, int tableID, String piece);
+    String swapPiece(String pseudonym, int tableID, String piece);
+    void skipTurn(String pseudonym, int tableID);
+    void commitHand(String pseudonym, int tableID, int bitCommitment);
 }

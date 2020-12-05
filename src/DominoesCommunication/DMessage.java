@@ -15,7 +15,13 @@ public class DMessage implements Serializable
         LEAVE_TABLE_REQUEST(7),
         START_GAME_REQUEST(8),
         MARK_AS_READY_REQUEST(9),
-        TURN_CHECK_REQUEST(10);
+        TURN_CHECK_REQUEST(10),
+        GAME_STATE_REQUEST(11),
+        DRAW_PIECE_REQUEST(12),
+        RETURN_PIECE_REQUEST(13),
+        SWAP_PIECE_REQUEST(14),
+        SKIP_TURN_REQUEST(15),
+        COMMIT_HAND_REQUEST(16);
 
         private static final long serialVersionUID = 1102L;
 

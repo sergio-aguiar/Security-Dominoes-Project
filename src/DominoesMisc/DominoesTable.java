@@ -7,6 +7,7 @@ public class DominoesTable implements Serializable
 {
     private static final long serialVersionUID = 1103L;
     private static int gID = 0;
+    private static final int maxPieces = 7;
 
     private final int id;
     private final String[] players;
@@ -36,9 +37,14 @@ public class DominoesTable implements Serializable
         this.turn = 0;
     }
 
+    private static int getMaxPieces()
+    {
+        return maxPieces;
+    }
+
     private boolean isValidPlayerCap(int playerCap)
     {
-        return playerCap > 1 && playerCap < 8;
+        return playerCap >= 2 && playerCap <= 4;
     }
 
     public boolean joinTable(String pseudonym)

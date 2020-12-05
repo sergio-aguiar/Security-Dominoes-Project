@@ -72,11 +72,11 @@ public class DCThread extends Thread
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 3);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 7);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4);
                             break;
                         case 4:
                             exit1 = true;
@@ -238,28 +238,69 @@ public class DCThread extends Thread
 
     private void gameLogic()
     {
-        while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID))
+        while (!this.dcInterface.hasGameEnded(this.pseudonym, this.tableID))
         {
-            this.reentrantLock.lock();
-            try
+            while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID))
             {
-                synchronized (this)
+                this.reentrantLock.lock();
+                try
                 {
-                    this.turnCondition.awaitNanos(100000);
-                    System.out.println("Hi!");
+                    synchronized (this)
+                    {
+                        this.turnCondition.awaitNanos(100000);
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.out.println("DCThread: gameLogic: " + e.toString());
+                    System.exit(703);
+                }
+                finally
+                {
+                    this.reentrantLock.unlock();
                 }
             }
-            catch (Exception e)
+
+            if (this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
             {
-                System.out.println("DCThread: gameLogic: " + e.toString());
-                System.exit(703);
+                int option = clientPieceDistributionMenu();
+                switch (option)
+                {
+                    case 1:
+                        System.out.println("\n[CLIENT] Drawing a piece...");
+                        break;
+                    case 2:
+                        System.out.println("\n[CLIENT] Returning a piece...");
+                        break;
+                    case 3:
+                        System.out.println("\n[CLIENT] Swapping a piece...");
+                        break;
+                    case 4:
+                        System.out.println("\n[CLIENT] Skipping a turn...");
+                        break;
+                    case 5:
+                        System.out.println("\n[CLIENT] Committing your hand...");
+                        break;
+                    default:
+                        System.out.println("\n[CLIENT] Unexpected Error...");
+                        System.exit(703);
+                }
             }
-            finally
+            else
             {
-                this.reentrantLock.unlock();
+
             }
         }
-        System.out.println("I got here!");
+
+        // while game not ended
+        //      if not my turn
+        //          wait
+        //      if my turn
+        //          if deck sorting
+        //              show deck sort menu
+        //          if game
+        //              show game menu
+        // show game ended menu
     }
 
     private int clientMainMenu()
@@ -268,18 +309,8 @@ public class DCThread extends Thread
         {
             DominoesMenus.clientMainMenu();
 
-            int option = getMenuOption();
-            switch (option)
-            {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    return option;
-                default:
-                    System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-5].");
-            }
+            Integer option = quintupleCaseMenuSwitch();
+            if (option != null) return option;
         }
     }
 
@@ -321,9 +352,26 @@ public class DCThread extends Thread
         {
             DominoesMenus.clientPieceDistributionMenu();
 
-            int option = tripleCaseMenuSwitch();
-            if (option != -1) return option;
+            Integer option = quintupleCaseMenuSwitch();
+            if (option != null) return option;
         }
+    }
+
+    private Integer quintupleCaseMenuSwitch()
+    {
+        int option = getMenuOption();
+        switch (option)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return option;
+            default:
+                System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-5].");
+        }
+        return null;
     }
 
     private int tripleCaseMenuSwitch()
