@@ -91,7 +91,8 @@ public class DominoesDeck implements Serializable
      */
     public String drawPiece()
     {
-        if (isEmpty()) return null;
+        if (isEmpty())
+         return null;
 
         String tile = getTile();
         this.pointer--;
@@ -122,10 +123,10 @@ public class DominoesDeck implements Serializable
     public void returnTile(String tile)
     {
         addTile(tile);
-        Shuffle();
+        shuffle();
     }
 
-    private void Shuffle()
+    private void shuffle()
     {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         shuffleSet(this.deck, random.nextInt(this.size - 1,this.size * 2), this.size);
@@ -139,17 +140,18 @@ public class DominoesDeck implements Serializable
         return indexOfOut;
     }
 
-    private void addTile(String tile)
-    {
+    private void addTile(String tile){
+
         int indexOfOut = getIndex(tile, getRightSideSet());
+
         if(indexOfOut < 0) return;
         if(this.pointer + 1 >= this.size) shuffleCard(this.deck, this.pointer + 1, indexOfOut, this.size);
 
         this.pointer++;
     }
 
-    private String getTile()
-    {
+    private String getTile(){
+
         return this.deck[this.pointer];
     }
 
@@ -161,8 +163,18 @@ public class DominoesDeck implements Serializable
         return -1;
     }
 
+    /**
+     * Check if there is any tiles in the deck
+     * @return true if the deck has tiles. false if not
+     */
+    public boolean isEmpty()
+    {
+        return this.pointer < 0;
+    }
+
     private String[] getRightSideSet()
     {
+
         int rightSideSize = this.size - this.pointer - 1;
 
         if(rightSideSize < 1)
@@ -174,23 +186,16 @@ public class DominoesDeck implements Serializable
             rightSide[i] = this.deck[this.pointer + 1 + i];
 
         return rightSide;
+
     }
 
     private String[] getLeftSideSet()
     {
         String[] leftSide = new String[this.pointer + 1];
+
         if (this.pointer + 1 >= 0) System.arraycopy(this.deck, 0, leftSide, 0, this.pointer + 1);
 
         return leftSide;
-    }
-
-    /**
-     * Check if there is any tiles in the deck
-     * @return true if the deck has tiles. false if not
-     */
-    public boolean isEmpty()
-    {
-        return this.pointer < 0;
     }
 
     private void printSet(String[] set)
@@ -200,16 +205,10 @@ public class DominoesDeck implements Serializable
         System.out.println("]");
     }
 
-    protected void printOutSet()
-    {
-        printSet(getRightSideSet());
-    }
-
     protected void printAvailableSet()
     {
         printSet(this.deck);
     }
-
 
 }
 

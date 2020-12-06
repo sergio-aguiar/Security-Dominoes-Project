@@ -646,7 +646,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), pseudonym);
+            outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), pseudonym, 
+            tableID);
         }
         catch (DMessageException e)
         {
