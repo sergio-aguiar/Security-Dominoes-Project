@@ -3,6 +3,7 @@ package DominoesClient;
 import DominoesMisc.DominoesMenus;
 import DominoesMisc.DominoesTable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -39,6 +40,7 @@ public class DCThread extends Thread
 
     private final String pseudonym;
     private final DCInterface dcInterface;
+    private final ArrayList<String> gamePieces;
 
     private int tableID;
 
@@ -48,6 +50,7 @@ public class DCThread extends Thread
         this.turnCondition = this.reentrantLock.newCondition();
         this.pseudonym = pseudonym;
         this.dcInterface = dcInterface;
+        this.gamePieces = new ArrayList<>();
         this.tableID = -1;
     }
 
@@ -268,18 +271,26 @@ public class DCThread extends Thread
                 {
                     case 1:
                         System.out.println("\n[CLIENT] Drawing a piece...");
+                        this.gamePieces.add(this.dcInterface.drawPiece(this.pseudonym, this.tableID));
+                        System.out.println(this.gamePieces.toString());
                         break;
                     case 2:
                         System.out.println("\n[CLIENT] Returning a piece...");
+                        // TODO: Finish returning
+                        System.out.println(this.gamePieces.toString());
                         break;
                     case 3:
                         System.out.println("\n[CLIENT] Swapping a piece...");
+                        // TODO: Finish swapping
+                        System.out.println(this.gamePieces.toString());
                         break;
                     case 4:
                         System.out.println("\n[CLIENT] Skipping a turn...");
+                        // TODO: Finish skipping
                         break;
                     case 5:
                         System.out.println("\n[CLIENT] Committing your hand...");
+                        // TODO: Finish committing
                         break;
                     default:
                         System.out.println("\n[CLIENT] Unexpected Error...");

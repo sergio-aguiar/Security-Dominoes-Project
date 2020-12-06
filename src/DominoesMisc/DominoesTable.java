@@ -1,7 +1,6 @@
 package DominoesMisc;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 public class DominoesTable implements Serializable
 {
@@ -10,8 +9,11 @@ public class DominoesTable implements Serializable
     private static final int maxPieces = 7;
 
     private final int id;
+    private final DominoesDeck deck;
     private final String[] players;
     private final boolean[] readyStates;
+    private final int[] playerPieceCount;
+    private final boolean[] bitCommits;
 
     private boolean started;
     private int turn;
@@ -21,23 +23,29 @@ public class DominoesTable implements Serializable
         if (!this.isValidPlayerCap(playerCap)) throw new DominoesTableException("Invalid player capacity value!");
 
         this.id = gID++;
-
+        this.deck = new DominoesDeck();
         this.players = new String[playerCap];
         this.players[0] = tableLeader;
         this.readyStates = new boolean[playerCap];
         this.readyStates[0] = true;
+        this.playerPieceCount = new int[playerCap];
+        this.playerPieceCount[0] = 0;
+        this.bitCommits = new boolean[playerCap];
+        this.bitCommits[0] = false;
 
         for (int i = 1; i < playerCap; i++)
         {
             this.players[i] = null;
             this.readyStates[i] = false;
+            this.playerPieceCount[i] = 0;
+            this.bitCommits[i] = false;
         }
 
         this.started = false;
         this.turn = 0;
     }
 
-    private static int getMaxPieces()
+    public static int getMaxPieces()
     {
         return maxPieces;
     }
@@ -70,19 +78,53 @@ public class DominoesTable implements Serializable
         return left;
     }
 
-    public void performTurn()
+    public void incrementTurn()
     {
         if (this.turn == this.players.length - 1) this.turn = 0;
         else this.turn++;
     }
 
+    public String distributionDrawPiece(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            if (this.playerPieceCount[i] < maxPieces)
+            {
+                this.playerPieceCount[i]++;
+                return this.deck.drawPiece();
+            }
+        return "Error";
+    }
+
+    public String distributionSwapPiece(String pseudonym, String piece)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            if (this.playerPieceCount[i] > 0) return this.deck.swapTile(piece);
+        return "Error";
+    }
+
+    public void distributionReturnPiece(String pseudonym, String piece)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            if (this.playerPieceCount[i] > 0)
+            {
+                this.playerPieceCount[i]--;
+                this.deck.returnTile(piece);
+            }
+    }
+
+    public boolean distributionCommit(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            if (this.playerPieceCount[i] == maxPieces)
+            {
+                this.bitCommits[i] = true;
+                return true;
+            }
+        return false;
+    }
+
     public boolean isTurn(String pseudonym)
     {
-        System.out.println("Turn: " + this.turn);
-        System.out.println("Players: " + Arrays.toString(this.players));
-        System.out.println("Players[Turn]: " + this.players[this.turn]);
-        System.out.println("Pseudonym: " + pseudonym);
-
         return this.players[this.turn].equals(pseudonym);
     }
 
@@ -118,6 +160,18 @@ public class DominoesTable implements Serializable
     public boolean hasStarted()
     {
         return this.started;
+    }
+
+    public boolean hasEnded()
+    {
+        // TODO: Add game termination
+        return false;
+    }
+
+    public boolean isDistributing()
+    {
+        for (boolean b : this.bitCommits) if (!b) return true;
+        return false;
     }
 
     public int getTurn()

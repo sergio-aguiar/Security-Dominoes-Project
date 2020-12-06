@@ -20,5 +20,5 @@ public interface DCInterface
     void returnPiece(String pseudonym, int tableID, String piece);
     String swapPiece(String pseudonym, int tableID, String piece);
     void skipTurn(String pseudonym, int tableID);
-    void commitHand(String pseudonym, int tableID, int bitCommitment);
+    boolean commitHand(String pseudonym, int tableID, String bitCommitment);
 }

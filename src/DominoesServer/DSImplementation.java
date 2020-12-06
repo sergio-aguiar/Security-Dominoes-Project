@@ -251,42 +251,142 @@ public class DSImplementation implements DCInterface
     @Override
     public boolean hasGameEnded(String pseudonym, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) result = table.hasEnded();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasGameEnded: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public boolean isDeckSorting(String pseudonym, int tableID)
     {
-        return false;
+        boolean result = true;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isDistributing();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isDeckSorting: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public String drawPiece(String pseudonym, int tableID)
     {
-        return null;
+        String result = "Error";
+        this.reentrantLock.lock();
+        try
+        {
+            result = this.dominoesTables.get(tableID).distributionDrawPiece(pseudonym);
+            this.dominoesTables.get(tableID).incrementTurn();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: drawPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public void returnPiece(String pseudonym, int tableID, String piece)
     {
-
+        this.reentrantLock.lock();
+        try
+        {
+            this.dominoesTables.get(tableID).distributionReturnPiece(pseudonym, piece);
+            this.dominoesTables.get(tableID).incrementTurn();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: returnPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
     public String swapPiece(String pseudonym, int tableID, String piece)
     {
-        return null;
+        String result = "Error";
+        this.reentrantLock.lock();
+        try
+        {
+            result = this.dominoesTables.get(tableID).distributionSwapPiece(pseudonym, piece);
+            this.dominoesTables.get(tableID).incrementTurn();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: swapPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public void skipTurn(String pseudonym, int tableID)
     {
-
+        this.reentrantLock.lock();
+        try
+        {
+            this.dominoesTables.get(tableID).incrementTurn();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: skipTurn: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
-    public void commitHand(String pseudonym, int tableID, int bitCommitment)
+    public boolean commitHand(String pseudonym, int tableID, String bitCommitment)
     {
-
+        // TODO: See how to do bit commitment.
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            this.dominoesTables.get(tableID).distributionCommit(pseudonym);
+            result = true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: commitHand: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 }
