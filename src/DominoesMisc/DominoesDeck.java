@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * The deck management system.
  * Manages Draw Swap and Insert
  * @author Ricardo Rodrigues Azevedo
- * @version 1.0
+ * @version 1.2
  * @since 2019-10-17
  */
 
@@ -32,8 +32,7 @@ public class DominoesDeck implements Serializable
         int count = 0;
         for (int i = 0; i < 7; i++) for (int j=i; j < 7; j++) this.deck[count++] = (i + "|" + j);
 
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-        shuffleSet(this.deck, r.nextInt(this.size - 1,this.size * 2), this.size);
+        shuffle();
     }
 
     private void shuffleCard(String[] set, int index, int newIndex, int maxSize)
@@ -75,12 +74,11 @@ public class DominoesDeck implements Serializable
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
     
-        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer);
-        shuffleSet(rightSide, random.nextInt(rightSideSize, 2* (rightSideSize + 1)), rightSideSize);
+        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer + 1);
 
         if (this.pointer + 1 >= 0) System.arraycopy(leftSide, 0, this.deck, 0, this.pointer + 1);
 
-        if (rightSideSize - (this.pointer + 1) >= 0)
+        if (rightSideSize - (this.pointer + 1) > 0)
             System.arraycopy(rightSide, this.pointer + 1,
                     this.deck, this.pointer + 1, rightSideSize - (this.pointer + 1));
     }
@@ -91,8 +89,6 @@ public class DominoesDeck implements Serializable
      */
     public String drawPiece()
     {
-        System.out.println("Size: " + this.size);
-
         if (isEmpty())
          return null;
 
@@ -111,7 +107,7 @@ public class DominoesDeck implements Serializable
     public String swapTile(String tile)
     {
         String tileToTake = getTile();
-        int indexOfOut = getOutTileIndex(tile);
+        int indexOfOut = getIndex(tile, this.deck);
         shuffleCard(this.deck, this.pointer, indexOfOut, this.size);
         splitShuffle();
 
@@ -125,7 +121,9 @@ public class DominoesDeck implements Serializable
     public void returnTile(String tile)
     {
         addTile(tile);
-        shuffle();
+        this.pointer++;
+        splitShuffle();
+
     }
 
     private void shuffle()
@@ -134,22 +132,17 @@ public class DominoesDeck implements Serializable
         shuffleSet(this.deck, random.nextInt(this.size - 1,this.size * 2), this.size);
     }
 
-    private int getOutTileIndex(String tile)
-    {
-        int indexOfOut = getIndex(tile, this.deck);
-        if (indexOfOut < this.pointer) return -1;       //TODO: Solução para caso de erro
-
-        return indexOfOut;
-    }
-
     private void addTile(String tile)
     {
-        int indexOfOut = getIndex(tile, getRightSideSet());
+        String[] rightSide = getRightSideSet();
+        int indexOfOut = getIndex(tile, rightSide);
 
-        if(indexOfOut < 0) return;
-        if(this.pointer + 1 >= this.size) shuffleCard(this.deck, this.pointer + 1, indexOfOut, this.size);
-
-        this.pointer++;
+        if(indexOfOut < 0){
+            System.err.println("Adição de um tile que n foi retirado(tile " + tile + ")");
+            System.exit(1);
+        };
+        if(this.pointer + 1 < this.size) 
+            shuffleCard(this.deck, this.pointer + 1, this.pointer + 1 + indexOfOut, this.size);
     }
 
     private String getTile()
@@ -159,7 +152,11 @@ public class DominoesDeck implements Serializable
 
     private int getIndex(String tile, String[] set)
     {
-        for (int i = 0; i < set.length ; i++) if (tile.equals(set[i])) return i;
+        for (int i = 0; i < set.length ; i++)
+        {
+            if (tile.equals(set[i]))
+                return i; 
+        } 
 
         //TODO: Send exception, tile already on set
         return -1;
@@ -203,13 +200,19 @@ public class DominoesDeck implements Serializable
     private void printSet(String[] set)
     {
         System.out.print("[");
-        for (String s : set) System.out.print(s + ";");
+        for (String s : set) System.out.print(s + "; ");
         System.out.println("]");
     }
 
+    // For debuging
     protected void printAvailableSet()
     {
-        printSet(this.deck);
+        printSet(getLeftSideSet());
+    }
+
+    protected void printNotAvailableSet()
+    {
+        printSet(getRightSideSet());
     }
 
 }
