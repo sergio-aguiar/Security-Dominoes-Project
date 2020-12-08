@@ -54,7 +54,7 @@ public class DominoesMenus
     {
         System.out.print("\n[Client] Piece Distribution Operations:\n"
                 + "1- Draw a piece\n"
-                + "2- Return a piece\n"
+                + "2- Return a random piece\n"
                 + "3- Swap a random piece\n"
                 + "4- Skip turn\n"
                 + "5- Commit hand\n"

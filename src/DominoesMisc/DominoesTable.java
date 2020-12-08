@@ -90,7 +90,9 @@ public class DominoesTable implements Serializable
             if (this.playerPieceCount[i] < maxPieces)
             {
                 this.playerPieceCount[i]++;
-                return this.deck.drawPiece();
+                String result = this.deck.drawPiece();
+                System.out.println("Table res: " + result);
+                return result;
             }
         return "Error";
     }
@@ -120,6 +122,12 @@ public class DominoesTable implements Serializable
                 this.bitCommits[i] = true;
                 return true;
             }
+        return false;
+    }
+
+    public boolean hasPlayerCommitted(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym)) return this.bitCommits[i];
         return false;
     }
 

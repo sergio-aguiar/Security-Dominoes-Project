@@ -91,6 +91,8 @@ public class DominoesDeck implements Serializable
      */
     public String drawPiece()
     {
+        System.out.println("Size: " + this.size);
+
         if (isEmpty())
          return null;
 
@@ -140,8 +142,8 @@ public class DominoesDeck implements Serializable
         return indexOfOut;
     }
 
-    private void addTile(String tile){
-
+    private void addTile(String tile)
+    {
         int indexOfOut = getIndex(tile, getRightSideSet());
 
         if(indexOfOut < 0) return;
@@ -150,8 +152,8 @@ public class DominoesDeck implements Serializable
         this.pointer++;
     }
 
-    private String getTile(){
-
+    private String getTile()
+    {
         return this.deck[this.pointer];
     }
 

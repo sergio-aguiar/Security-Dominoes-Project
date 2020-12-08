@@ -3,10 +3,8 @@ package DominoesClient;
 import DominoesMisc.DominoesMenus;
 import DominoesMisc.DominoesTable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -264,42 +262,66 @@ public class DCThread extends Thread
                 }
             }
 
-            if (this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
+            if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
             {
-                int option = clientPieceDistributionMenu();
-                switch (option)
+                if (this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
                 {
-                    case 1:
-                        System.out.println("\n[CLIENT] Drawing a piece...");
-                        this.gamePieces.add(this.dcInterface.drawPiece(this.pseudonym, this.tableID));
-                        System.out.println(this.gamePieces.toString());
-                        break;
-                    case 2:
-                        System.out.println("\n[CLIENT] Returning a piece...");
-                        // TODO: Finish returning
-                        System.out.println(this.gamePieces.toString());
-                        break;
-                    case 3:
-                        System.out.println("\n[CLIENT] Swapping a piece...");
-                        // TODO: Finish swapping
-                        System.out.println(this.gamePieces.toString());
-                        break;
-                    case 4:
-                        System.out.println("\n[CLIENT] Skipping a turn...");
-                        // TODO: Finish skipping
-                        break;
-                    case 5:
-                        System.out.println("\n[CLIENT] Committing your hand...");
-                        // TODO: Finish committing
-                        break;
-                    default:
-                        System.out.println("\n[CLIENT] Unexpected Error...");
-                        System.exit(703);
+                    int option = clientPieceDistributionMenu();
+                    switch (option)
+                    {
+                        case 1:
+                            System.out.println("\n[CLIENT] Drawing a piece...");
+                            String tile1 = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
+                            if (!tile1.equals("Error")) this.gamePieces.add(tile1);
+                            else System.out.println("\n[CLIENT] Could not draw a piece. Hand full.");
+                            System.out.println(this.gamePieces.toString());
+                            break;
+                        case 2:
+                            System.out.println("\n[CLIENT] Returning a piece...");
+                            if (this.gamePieces.size() > 0)
+                            {
+                                String tile2 = getTileToReturn();
+                                this.dcInterface.returnPiece(this.pseudonym, this.tableID, tile2);
+                                this.gamePieces.remove(tile2);
+                                System.out.println(this.gamePieces.toString());
+                            }
+                            else System.out.println("\n[CLIENT] There are no pieces to return.");
+                            break;
+                        case 3:
+                            System.out.println("\n[CLIENT] Swapping a piece...");
+                            if (this.gamePieces.size() > 0)
+                            {
+                                String tile3 = getTileToReturn();
+                                this.gamePieces.add(this.dcInterface.swapPiece(this.pseudonym, this.tableID, tile3));
+                                this.gamePieces.remove(tile3);
+                                System.out.println(this.gamePieces.toString());
+                            }
+                            else System.out.println("\n[CLIENT] There are no pieces to swap.");
+                            break;
+                        case 4:
+                            System.out.println("\n[CLIENT] Skipping a turn...");
+                            this.dcInterface.skipTurn(this.pseudonym, this.tableID);
+                            break;
+                        case 5:
+                            System.out.println("\n[CLIENT] Committing your hand...");
+                            // TODO: Finish committing
+                            if (!this.dcInterface.commitHand(this.pseudonym, this.tableID, "TMP"))
+                                System.out.println("\n[CLIENT You can only commit to full hands.");
+                            break;
+                        default:
+                            System.out.println("\n[CLIENT] Unexpected Error...");
+                            System.exit(703);
+                    }
+                }
+                else
+                {
+                    System.out.println("\n[CLIENT] Unexpected Error...");
+                    System.exit(703);
                 }
             }
             else
             {
-
+                // TODO: GAMEPLAY LOGIC
             }
         }
 
@@ -307,11 +329,16 @@ public class DCThread extends Thread
         //      if not my turn
         //          wait
         //      if my turn
-        //          if deck sorting
+        //          if deck sorting & not committed
         //              show deck sort menu
-        //          if game
+        //          if game & committed
         //              show game menu
         // show game ended menu
+    }
+
+    private String getTileToReturn()
+    {
+        return this.gamePieces.get(ThreadLocalRandom.current().nextInt(0,this.gamePieces.size()));
     }
 
     private int clientMainMenu()

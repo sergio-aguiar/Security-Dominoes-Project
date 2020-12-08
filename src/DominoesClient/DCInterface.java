@@ -21,4 +21,5 @@ public interface DCInterface
     String swapPiece(String pseudonym, int tableID, String piece);
     void skipTurn(String pseudonym, int tableID);
     boolean commitHand(String pseudonym, int tableID, String bitCommitment);
+    boolean hasPlayerCommitted(String pseudonym, int tableID);
 }

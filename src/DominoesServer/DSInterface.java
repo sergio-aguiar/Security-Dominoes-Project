@@ -41,6 +41,7 @@ public class DSInterface
             case 12:
             case 13:
             case 16:
+            case 18:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -129,7 +130,8 @@ public class DSInterface
             case 13:
                 String return13 = this.dsImplementation.drawPiece(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
-                outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), return13);
+                System.out.println("Interface: " + return13);
+                outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), (Object) return13);
                 break;
             case 14:
                 this.dsImplementation.returnPiece(inMessage.getPseudonym(),
@@ -139,7 +141,7 @@ public class DSInterface
             case 15:
                 String return15 = this.dsImplementation.swapPiece(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument());
-                outMessage = new DMessage(DMessage.MessageType.SWAP_PIECE_REQUEST.getMessageCode(), return15);
+                outMessage = new DMessage(DMessage.MessageType.SWAP_PIECE_REQUEST.getMessageCode(), (Object) return15);
                 break;
             case 16:
                 this.dsImplementation.skipTurn(inMessage.getPseudonym(), (int) inMessage.getFirstArgument());
@@ -149,6 +151,11 @@ public class DSInterface
                 boolean return17 = this.dsImplementation.commitHand(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument());
                 outMessage = new DMessage(DMessage.MessageType.COMMIT_HAND_REQUEST.getMessageCode(), return17);
+                break;
+            case 18:
+                boolean return18 = this.dsImplementation.hasPlayerCommitted(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.COMMIT_STATE_REQUEST.getMessageCode(), return18);
                 break;
         }
         return outMessage;

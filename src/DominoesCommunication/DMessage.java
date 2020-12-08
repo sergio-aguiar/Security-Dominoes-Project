@@ -22,7 +22,8 @@ public class DMessage implements Serializable
         RETURN_PIECE_REQUEST(14),
         SWAP_PIECE_REQUEST(15),
         SKIP_TURN_REQUEST(16),
-        COMMIT_HAND_REQUEST(17);
+        COMMIT_HAND_REQUEST(17),
+        COMMIT_STATE_REQUEST(18);
 
         private static final long serialVersionUID = 1102L;
 
