@@ -1,6 +1,7 @@
 package DominoesMisc;
 
 import java.io.Serializable;
+import java.util.HashSet;
 
 public class DominoesTable implements Serializable
 {
@@ -14,6 +15,7 @@ public class DominoesTable implements Serializable
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
     private final boolean[] bitCommits;
+    private final HashSet<Integer> leftToCommit;
 
     private boolean started;
     private int turn;
@@ -32,6 +34,7 @@ public class DominoesTable implements Serializable
         this.playerPieceCount[0] = 0;
         this.bitCommits = new boolean[playerCap];
         this.bitCommits[0] = false;
+        this.leftToCommit = new HashSet<>();
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -80,8 +83,22 @@ public class DominoesTable implements Serializable
 
     public void incrementTurn()
     {
-        if (this.turn == this.players.length - 1) this.turn = 0;
-        else this.turn++;
+        if (this.haveAllCommitted())
+        {
+            if (this.turn == this.players.length - 1) this.turn = 0;
+            else this.turn++;
+        }
+        else
+        {
+            if (this.turn == this.players.length - 1) this.turn = 0;
+            else this.turn++;
+
+            while (!this.leftToCommit.contains(this.turn))
+            {
+                if (this.turn == this.players.length - 1) this.turn = 0;
+                else this.turn++;
+            }
+        }
     }
 
     public String distributionDrawPiece(String pseudonym)
@@ -117,9 +134,10 @@ public class DominoesTable implements Serializable
     public boolean distributionCommit(String pseudonym)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
-            if (this.playerPieceCount[i] == maxPieces)
+            if (this.leftToCommit.contains(i)) if (this.playerPieceCount[i] == maxPieces)
             {
                 this.bitCommits[i] = true;
+                this.leftToCommit.remove(i);
                 return true;
             }
         return false;
@@ -129,6 +147,12 @@ public class DominoesTable implements Serializable
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym)) return this.bitCommits[i];
         return false;
+    }
+
+    public boolean haveAllCommitted()
+    {
+        for (boolean b : this.bitCommits) if (!b) return false;
+        return true;
     }
 
     public boolean isTurn(String pseudonym)
@@ -176,12 +200,6 @@ public class DominoesTable implements Serializable
         return false;
     }
 
-    public boolean isDistributing()
-    {
-        for (boolean b : this.bitCommits) if (!b) return true;
-        return false;
-    }
-
     public int getTurn()
     {
         return this.turn;
@@ -189,6 +207,7 @@ public class DominoesTable implements Serializable
 
     public void startGame()
     {
+        for (int i = 0; i < this.players.length; i++) this.leftToCommit.add(i);
         this.started = true;
     }
 

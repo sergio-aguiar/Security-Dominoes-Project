@@ -280,7 +280,7 @@ public class DSImplementation implements DCInterface
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isDistributing();
+                result = !table.haveAllCommitted();
         }
         catch (Exception e)
         {
@@ -304,7 +304,7 @@ public class DSImplementation implements DCInterface
             {
                 result = table.distributionDrawPiece(pseudonym);
                 System.out.println("Imp Res: " + result);
-                table.incrementTurn();
+                if (!result.equals("Error")) table.incrementTurn();
             }
         }
         catch (Exception e)
@@ -391,7 +391,11 @@ public class DSImplementation implements DCInterface
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
                 result = table.distributionCommit(pseudonym);
+                table.incrementTurn();
+            }
+
 
             // TODO: CHECK WHEN COMMITTING IF ALL HAVE DONE IT SO THE GAME CAN START
             // TODO: INCREMENT COMMIT TIL ONE HAS NOT
