@@ -103,7 +103,7 @@ public class DAIThread extends DCThread {
                         }
                     }
 
-                    while(!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
+                    if(!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
                     {
                         if(this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
                         {
@@ -127,8 +127,11 @@ public class DAIThread extends DCThread {
                         }                        
                     }
 
-                    this.dcInterface.skipTurn(this.pseudonym, this.tableID);
-                    System.out.println("[AICLIENT] skip turn");
+                    if(this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
+                    {
+                        this.dcInterface.skipTurn(this.pseudonym, this.tableID);
+                        System.out.println("[AICLIENT] skip turn");
+                    }
                 }
 
             }
