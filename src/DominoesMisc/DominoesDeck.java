@@ -35,7 +35,7 @@ public class DominoesDeck implements Serializable
         shuffle();
     }
 
-    private void shuffleCard(String[] set, int index, int newIndex, int maxSize)
+    private void swapTiles(String[] set, int index, int newIndex, int maxSize)
     {
         if(index < 0 || index > maxSize) return;
         if(newIndex < 0 || newIndex > maxSize) return;
@@ -56,12 +56,14 @@ public class DominoesDeck implements Serializable
 
     private void shuffleSet(String[] set,int times, int maxSize)
     {
+        if(maxSize < 1) return;
+
         for (int i=0; i < times; i++)
         {
             ThreadLocalRandom random = ThreadLocalRandom.current();
             int firstIndex = random.nextInt(0, maxSize);
             int secondIndex = random.nextInt(0, maxSize);
-            shuffleCard(set, firstIndex, secondIndex, maxSize);
+            swapTiles(set, firstIndex, secondIndex, maxSize);
         }
     }
 
@@ -74,7 +76,8 @@ public class DominoesDeck implements Serializable
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
     
-        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer + 1);
+        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer);
+        shuffleSet(rightSide, random.nextInt(rightSideSize, 2* (rightSideSize + 1)), rightSideSize);
 
         if (this.pointer + 1 >= 0) System.arraycopy(leftSide, 0, this.deck, 0, this.pointer + 1);
 
@@ -93,7 +96,6 @@ public class DominoesDeck implements Serializable
          return null;
 
         String tile = getTile();
-        this.pointer--;
         if(!isEmpty()) splitShuffle();
         
         return tile;
@@ -108,7 +110,7 @@ public class DominoesDeck implements Serializable
     {
         String tileToTake = getTile();
         int indexOfOut = getIndex(tile, this.deck);
-        shuffleCard(this.deck, this.pointer, indexOfOut, this.size);
+        swapTiles(this.deck, this.pointer, indexOfOut, this.size);
         splitShuffle();
 
         return tileToTake;
@@ -121,7 +123,6 @@ public class DominoesDeck implements Serializable
     public void returnTile(String tile)
     {
         addTile(tile);
-        this.pointer++;
         splitShuffle();
 
     }
@@ -137,17 +138,24 @@ public class DominoesDeck implements Serializable
         String[] rightSide = getRightSideSet();
         int indexOfOut = getIndex(tile, rightSide);
 
-        if(indexOfOut < 0){
+        if(indexOfOut < 0)
+        {
             System.err.println("Adição de um tile que n foi retirado(tile " + tile + ")");
             System.exit(1);
-        };
+        }
         if(this.pointer + 1 < this.size) 
-            shuffleCard(this.deck, this.pointer + 1, this.pointer + 1 + indexOfOut, this.size);
+            swapTiles(this.deck, this.pointer + 1, this.pointer + 1 + indexOfOut, this.size);
     }
 
     private String getTile()
     {
-        return this.deck[this.pointer];
+        String tile = this.deck[0];
+
+        swapTiles(this.deck, 0, this.pointer, this.size);
+
+        this.pointer--;
+
+        return tile;
     }
 
     private int getIndex(String tile, String[] set)
