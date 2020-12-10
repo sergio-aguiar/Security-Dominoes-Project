@@ -22,9 +22,7 @@ public class DSInterface
             case 1:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"playerCap\" was not given", inMessage);
-                if ((int) inMessage.getFirstArgument() != 2
-                        && (int) inMessage.getFirstArgument() != 4
-                        && (int) inMessage.getFirstArgument() != 7)
+                if ((int) inMessage.getFirstArgument() < 2 || (int) inMessage.getFirstArgument() > 4)
                     throw new DMessageException("Argument \"playerCap\" was given an incorrect value", inMessage);
                 break;
             case 2:
