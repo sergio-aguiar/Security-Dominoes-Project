@@ -126,8 +126,7 @@ public class DAIThread extends DCThread {
                             }
                         }                        
                     }
-
-                    if(this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
+                    else
                     {
                         this.dcInterface.skipTurn(this.pseudonym, this.tableID);
                         System.out.println("[AICLIENT] skip turn");
@@ -140,6 +139,6 @@ public class DAIThread extends DCThread {
 
     private static String generatePseudonym()
     {
-        return "AITHREAD- " + Thread.currentThread().getId();
+        return "AITHREAD - " + System.currentTimeMillis();
     }
 }
