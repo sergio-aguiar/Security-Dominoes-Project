@@ -67,7 +67,6 @@ public class DominoesMenus
                 + "1- Play a piece\n"
                 + "2- List game information\n"
                 + "3- Denounce cheating\n"
-                + "4- Exit\n"
                 + "Option: ");
     }
 }

@@ -1,6 +1,7 @@
 package DominoesServer;
 
 import DominoesClient.DCInterface;
+import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesTable;
 
 import java.util.ArrayList;
@@ -294,22 +295,18 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public String drawPiece(String pseudonym, int tableID)
+    public boolean canDraw(String pseudonym, int tableID)
     {
-        String result = "Error";
+        boolean result = true;
         this.reentrantLock.lock();
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.distributionDrawPiece(pseudonym);
-                System.out.println("Imp Res: " + result);
-                if (!result.equals("Error")) table.incrementTurn();
-            }
+                result = table.canDraw(pseudonym);
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: drawPiece: " + e.toString());
+            System.out.println("DSImplementation: isDeckEmpty: " + e.toString());
         }
         finally
         {
@@ -319,43 +316,43 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void returnPiece(String pseudonym, int tableID, String piece)
+    public DominoesDeck getDeck(String pseudonym, int tableID)
     {
+        DominoesDeck dDeck = null;
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.distributionReturnPiece(pseudonym, piece);
-                table.incrementTurn();
-            }
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dDeck = table.getDeck();
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: returnPiece: " + e.toString());
+            System.out.println("DSImplementation: getDeck: " + e.toString());
         }
         finally
         {
             this.reentrantLock.unlock();
         }
+        return dDeck;
     }
 
     @Override
-    public String swapPiece(String pseudonym, int tableID, String piece)
+    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif)
     {
-        String result = "Error";
+        boolean result = false;
         this.reentrantLock.lock();
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
-                result = table.distributionSwapPiece(pseudonym, piece);
+                table.setDeck(deck);
+                table.handleCardDif(pseudonym, cardDif);
+                result = true;
                 table.incrementTurn();
             }
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: swapPiece: " + e.toString());
+            System.out.println("DSImplementation: returnDeck: " + e.toString());
         }
         finally
         {
@@ -393,12 +390,8 @@ public class DSImplementation implements DCInterface
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
                 result = table.distributionCommit(pseudonym);
-                table.incrementTurn();
+                if (result) table.incrementTurn();
             }
-
-
-            // TODO: CHECK WHEN COMMITTING IF ALL HAVE DONE IT SO THE GAME CAN START
-            // TODO: INCREMENT COMMIT TIL ONE HAS NOT
         }
         catch (Exception e)
         {

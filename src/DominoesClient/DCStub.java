@@ -3,6 +3,7 @@ package DominoesClient;
 import DominoesCommunication.DCCommunication;
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
+import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesTable;
 
 public class DCStub implements DCInterface
@@ -625,7 +626,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public String drawPiece(String pseudonym, int tableID)
+    public boolean canDraw(String pseudonym, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -639,90 +640,47 @@ public class DCStub implements DCInterface
             }
             catch (InterruptedException e)
             {
-                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawPiece: " +
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: " +
                         e.toString());
             }
         }
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), pseudonym, 
-            tableID);
+            outMessage = new DMessage(DMessage.MessageType.CAN_DRAW_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawPiece: " +
-                    e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: "
+                    + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
         inMessage = (DMessage) dcCommunication.readObject();
 
-        if (inMessage.getMessageType() != DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode())
+        if (inMessage.getMessageType() != DMessage.MessageType.CAN_DRAW_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawPiece: incorrect " +
-                    "reply message!");
-
-            System.exit(704);
-        }
-
-        if (inMessage.noReturnInfo())
-        {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawPiece: no return " +
-                    "value!");
-
-            System.exit(704);
-        }
-        dcCommunication.close();
-
-        return (String) inMessage.getReturnInfo();
-    }
-
-    @Override
-    public void returnPiece(String pseudonym, int tableID, String piece)
-    {
-        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
-        DMessage inMessage;
-        DMessage outMessage = null;
-
-        while (!dcCommunication.open())
-        {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnPiece: " +
-                        e.toString());
-            }
-        }
-
-        try
-        {
-            outMessage = new DMessage(DMessage.MessageType.RETURN_PIECE_REQUEST.getMessageCode(), pseudonym, tableID,
-                    piece);
-        }
-        catch (DMessageException e)
-        {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnPiece: " +
-                    e.toString());
-        }
-
-        dcCommunication.writeObject(outMessage);
-        inMessage = (DMessage) dcCommunication.readObject();
-
-        if (inMessage.getMessageType() != DMessage.MessageType.RETURN_PIECE_REQUEST.getMessageCode())
-        {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnPiece: incorrect " +
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: incorrect " +
                     "reply message!");
 
             System.exit(706);
         }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: no return " +
+                    "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
-    public String swapPiece(String pseudonym, int tableID, String piece)
+    public DominoesDeck getDeck(String pseudonym, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -736,43 +694,93 @@ public class DCStub implements DCInterface
             }
             catch (InterruptedException e)
             {
-                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: swapPiece: " +
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeck: " +
                         e.toString());
             }
         }
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.SWAP_PIECE_REQUEST.getMessageCode(), pseudonym, tableID,
-                    piece);
+            outMessage = new DMessage(DMessage.MessageType.DECK_FETCH_REQUEST.getMessageCode(), pseudonym, tableID);
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: swapPiece: " +
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeck: " +
                     e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
         inMessage = (DMessage) dcCommunication.readObject();
 
-        if (inMessage.getMessageType() != DMessage.MessageType.SWAP_PIECE_REQUEST.getMessageCode())
+        if (inMessage.getMessageType() != DMessage.MessageType.DECK_FETCH_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: swapPiece: incorrect " +
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeck: incorrect " +
                     "reply message!");
 
-            System.exit(704);
+            System.exit(706);
         }
 
         if (inMessage.noReturnInfo())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: swapPiece: no return " +
+            return null;
+        }
+        dcCommunication.close();
+
+        return (DominoesDeck) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), pseudonym,
+                    tableID, deck, cardDif);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: incorrect " +
+                    "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: no return " +
                     "value!");
 
             System.exit(704);
         }
         dcCommunication.close();
 
-        return (String) inMessage.getReturnInfo();
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override

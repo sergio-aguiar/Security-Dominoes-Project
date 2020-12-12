@@ -18,9 +18,9 @@ public class DMessage implements Serializable
         TURN_CHECK_REQUEST(10),
         GAME_STATE_REQUEST(11),
         DISTRIBUTION_STATE_REQUEST(12),
-        DRAW_PIECE_REQUEST(13),
-        RETURN_PIECE_REQUEST(14),
-        SWAP_PIECE_REQUEST(15),
+        CAN_DRAW_REQUEST(13),
+        DECK_FETCH_REQUEST(14),
+        DECK_RETURN_REQUEST(15),
         SKIP_TURN_REQUEST(16),
         COMMIT_HAND_REQUEST(17),
         COMMIT_STATE_REQUEST(18);
@@ -59,6 +59,7 @@ public class DMessage implements Serializable
     private final Object returnInfo;
     private final Object firstArgument;
     private final Object secondArgument;
+    private final Object thirdArgument;
 
     public DMessage(int messageType) throws DMessageException
     {
@@ -67,6 +68,7 @@ public class DMessage implements Serializable
         this.returnInfo = null;
         this.firstArgument = null;
         this.secondArgument = null;
+        this.thirdArgument = null;
     }
 
     public DMessage(int messageType, String pseudonym) throws DMessageException
@@ -76,6 +78,7 @@ public class DMessage implements Serializable
         this.returnInfo = null;
         this.firstArgument = null;
         this.secondArgument = null;
+        this.thirdArgument = null;
     }
 
     public DMessage(int messageType, String pseudonym, Object firstArgument) throws DMessageException
@@ -85,6 +88,7 @@ public class DMessage implements Serializable
         this.returnInfo = null;
         this.firstArgument = firstArgument;
         this.secondArgument = null;
+        this.thirdArgument = null;
     }
 
     public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument)
@@ -95,6 +99,18 @@ public class DMessage implements Serializable
         this.returnInfo = null;
         this.firstArgument = firstArgument;
         this.secondArgument = secondArgument;
+        this.thirdArgument = null;
+    }
+
+    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument
+            , Object thirdArgument) throws DMessageException
+    {
+        this.messageType = messageType;
+        this.pseudonym = pseudonym;
+        this.returnInfo = null;
+        this.firstArgument = firstArgument;
+        this.secondArgument = secondArgument;
+        this.thirdArgument = thirdArgument;
     }
 
     public DMessage(int messageType, Object returnInfo) throws DMessageException
@@ -104,6 +120,7 @@ public class DMessage implements Serializable
         this.returnInfo = returnInfo;
         this.firstArgument = null;
         this.secondArgument = null;
+        this.thirdArgument = null;
     }
 
     public int getMessageType()
@@ -131,6 +148,12 @@ public class DMessage implements Serializable
         return this.secondArgument;
     }
 
+    public Object getThirdArgument()
+    {
+        return this.thirdArgument;
+    }
+
+
     public boolean noReturnInfo()
     {
         return this.returnInfo == null;
@@ -146,11 +169,14 @@ public class DMessage implements Serializable
         return this.secondArgument == null;
     }
 
+    public boolean noThirdArgument()
+    {
+        return this.thirdArgument == null;
+    }
+
     @Override
     public String toString()
     {
         return "DMessage{" + "messageType=" + messageType + ", returnInfo=" + returnInfo + '}';
-
-
     }
 }

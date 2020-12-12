@@ -1,5 +1,6 @@
 package DominoesClient;
 
+import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesTable;
 
 public interface DCInterface
@@ -16,9 +17,9 @@ public interface DCInterface
     boolean isPlayerTurn(String pseudonym, int tableID);
     boolean hasGameEnded(String pseudonym, int tableID);
     boolean isDeckSorting(String pseudonym, int tableID);
-    String drawPiece(String pseudonym, int tableID);
-    void returnPiece(String pseudonym, int tableID, String piece);
-    String swapPiece(String pseudonym, int tableID, String piece);
+    boolean canDraw(String pseudonym, int tableID);
+    DominoesDeck getDeck(String pseudonym, int tableID);
+    boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif);
     void skipTurn(String pseudonym, int tableID);
     boolean commitHand(String pseudonym, int tableID, String bitCommitment);
     boolean hasPlayerCommitted(String pseudonym, int tableID);

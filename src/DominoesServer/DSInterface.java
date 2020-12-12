@@ -2,6 +2,7 @@ package DominoesServer;
 
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
+import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesTable;
 
 public class DSInterface
@@ -38,6 +39,7 @@ public class DSInterface
             case 11:
             case 12:
             case 13:
+            case 14:
             case 16:
             case 18:
                 if (inMessage.noFirstArgument())
@@ -45,22 +47,25 @@ public class DSInterface
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 break;
-            case 14:
             case 15:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
-                    throw new DMessageException("Argument \"piece\" was not given.", inMessage);
-                String[] splitArg = ((String) inMessage.getSecondArgument()).split("\\|");
-                if (splitArg.length != 2 || splitArg[0].equals("") || splitArg[1].equals(""))
-                    throw new DMessageException("Argument \"piece\" was given an incorrect value", inMessage);
-                break;
+                    throw new DMessageException("Argument \"deck\" was not given.", inMessage);
+                if (inMessage.noThirdArgument())
+                    throw new DMessageException("Argument \"cardDif\" was not given.", inMessage);
+                if ((int) inMessage.getThirdArgument() < -1 || (int) inMessage.getThirdArgument() > 1)
+                    throw new DMessageException("Argument \"cardDif\" was given an incorrect value", inMessage);
             case 17:
                 if (inMessage.noFirstArgument())
+                    throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
+                if ((int) inMessage.getFirstArgument() < 0)
+                    throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
+                if (inMessage.noSecondArgument())
                     throw new DMessageException("Argument \"bitCommitment\" was not given.", inMessage);
-                if (inMessage.getFirstArgument().equals(""))
+                if (inMessage.getSecondArgument().equals(""))
                     throw new DMessageException("Argument \"bitCommitment\" was given an incorrect value", inMessage);
                 break;
             default:
@@ -126,20 +131,20 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.DISTRIBUTION_STATE_REQUEST.getMessageCode(), return12);
                 break;
             case 13:
-                String return13 = this.dsImplementation.drawPiece(inMessage.getPseudonym(),
+                boolean return13 = this.dsImplementation.canDraw(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
-                System.out.println("Interface: " + return13);
-                outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), (Object) return13);
+                outMessage = new DMessage(DMessage.MessageType.CAN_DRAW_REQUEST.getMessageCode(), return13);
                 break;
             case 14:
-                this.dsImplementation.returnPiece(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument());
-                outMessage = new DMessage(DMessage.MessageType.RETURN_PIECE_REQUEST.getMessageCode(), (Object) null);
+                DominoesDeck return14 = this.dsImplementation.getDeck(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DECK_FETCH_REQUEST.getMessageCode(), return14);
                 break;
             case 15:
-                String return15 = this.dsImplementation.swapPiece(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument());
-                outMessage = new DMessage(DMessage.MessageType.SWAP_PIECE_REQUEST.getMessageCode(), (Object) return15);
+                boolean return15 = this.dsImplementation.returnDeck(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (DominoesDeck) inMessage.getSecondArgument(),
+                        (int) inMessage.getThirdArgument());
+                outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), return15);
                 break;
             case 16:
                 this.dsImplementation.skipTurn(inMessage.getPseudonym(), (int) inMessage.getFirstArgument());

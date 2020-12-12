@@ -10,7 +10,7 @@ public class DominoesTable implements Serializable
     private static final int maxPieces = 7;
 
     private final int id;
-    private final DominoesDeck deck;
+    private DominoesDeck deck;
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
@@ -170,6 +170,11 @@ public class DominoesTable implements Serializable
         return this.players.length;
     }
 
+    public DominoesDeck getDeck()
+    {
+        return this.deck;
+    }
+
     public String[] getPlayers()
     {
         return this.players;
@@ -178,6 +183,11 @@ public class DominoesTable implements Serializable
     public boolean[] getReadyStates()
     {
         return this.readyStates;
+    }
+
+    public void setDeck(DominoesDeck deck)
+    {
+        this.deck = deck;
     }
 
     public void setReady(String pseudonym)
@@ -203,6 +213,22 @@ public class DominoesTable implements Serializable
     public int getTurn()
     {
         return this.turn;
+    }
+
+    public boolean canDraw(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+            return this.playerPieceCount[i] < maxPieces;
+        return false;
+    }
+
+    public void handleCardDif(String pseudonym, int cardDif)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+        {
+            this.playerPieceCount[i] += cardDif;
+            break;
+        }
     }
 
     public void startGame()

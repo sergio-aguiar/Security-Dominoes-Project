@@ -110,8 +110,8 @@ public class DAIThread extends DCThread {
                             if(this.gamePieces.size() < 7)
                             {
                                 System.out.println("[AICLIENT] drawing ...");
-                                String piece = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
-                                this.gamePieces.add(piece);
+                                // String piece = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
+                                // this.gamePieces.add(piece);
                                 System.out.println(this.gamePieces.toString());
                             }
                             else

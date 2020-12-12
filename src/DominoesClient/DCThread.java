@@ -1,5 +1,6 @@
 package DominoesClient;
 
+import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesMenus;
 import DominoesMisc.DominoesTable;
 
@@ -271,32 +272,67 @@ public class DCThread extends Thread
                     {
                         case 1:
                             System.out.println("\n[CLIENT] Drawing a piece...");
-                            String tile1 = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
-                            if (!tile1.equals("Error")) this.gamePieces.add(tile1);
+
+                            if (this.dcInterface.canDraw(this.pseudonym, this.tableID))
+                            {
+                                DominoesDeck deck1 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+
+                                String tile1 = deck1.drawPiece();
+                                if (tile1 != null) this.gamePieces.add(tile1);
+                                else System.out.println("\n[CLIENT] No pieces left to draw.");
+
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck1, 1))
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+
+                                System.out.println(this.gamePieces.toString());
+                            }
                             else System.out.println("\n[CLIENT] Could not draw a piece. Hand full.");
-                            System.out.println(this.gamePieces.toString());
+
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Returning a piece...");
                             if (this.gamePieces.size() > 0)
                             {
+                                DominoesDeck deck2 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+
                                 String tile2 = getTileToReturn();
-                                this.dcInterface.returnPiece(this.pseudonym, this.tableID, tile2);
+                                deck2.returnTile(tile2);
                                 this.gamePieces.remove(tile2);
+
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck2, -1))
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+
                                 System.out.println(this.gamePieces.toString());
                             }
                             else System.out.println("\n[CLIENT] There are no pieces to return.");
+
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Swapping a piece...");
                             if (this.gamePieces.size() > 0)
                             {
+                                DominoesDeck deck3 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+
                                 String tile3 = getTileToReturn();
-                                this.gamePieces.add(this.dcInterface.swapPiece(this.pseudonym, this.tableID, tile3));
+                                this.gamePieces.add(deck3.swapTile(tile3));
                                 this.gamePieces.remove(tile3);
+
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck3, 0))
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+
                                 System.out.println(this.gamePieces.toString());
                             }
                             else System.out.println("\n[CLIENT] There are no pieces to swap.");
+
                             break;
                         case 4:
                             System.out.println("\n[CLIENT] Skipping a turn...");
@@ -321,7 +357,24 @@ public class DCThread extends Thread
             }
             else
             {
-                // TODO: GAMEPLAY LOGIC
+                // TODO: GET GAME STATE
+
+                int option = clientGameMenu();
+                switch (option)
+                {
+                    case 1:
+                        System.out.println("\n[CLIENT] Playing a piece...");
+                        break;
+                    case 2:
+                        System.out.println("\n[CLIENT] Listing game information...");
+                        break;
+                    case 3:
+                        System.out.println("\n[CLIENT] Denouncing cheating...");
+                        break;
+                    default:
+                        System.out.println("\n[CLIENT] Unexpected Error...");
+                        System.exit(703);
+                }
             }
         }
 
@@ -395,6 +448,17 @@ public class DCThread extends Thread
         }
     }
 
+    private int clientGameMenu()
+    {
+        while (true)
+        {
+            DominoesMenus.clientGameMenu();
+
+            Integer option = tripleCaseMenuSwitch();
+            if (option != null) return option;
+        }
+    }
+
     private Integer quintupleCaseMenuSwitch()
     {
         int option = getMenuOption();
@@ -412,7 +476,7 @@ public class DCThread extends Thread
         return null;
     }
 
-    private int tripleCaseMenuSwitch()
+    private Integer tripleCaseMenuSwitch()
     {
         int option = getMenuOption();
         switch (option)
@@ -424,7 +488,7 @@ public class DCThread extends Thread
             default:
                 System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-3].");
         }
-        return -1;
+        return null;
     }
 
 
