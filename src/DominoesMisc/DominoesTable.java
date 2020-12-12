@@ -11,6 +11,7 @@ public class DominoesTable implements Serializable
 
     private final int id;
     private DominoesDeck deck;
+    private DominoesGameState gameState;
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
@@ -26,6 +27,7 @@ public class DominoesTable implements Serializable
 
         this.id = gID++;
         this.deck = new DominoesDeck();
+        this.gameState = new DominoesGameState();
         this.players = new String[playerCap];
         this.players[0] = tableLeader;
         this.readyStates = new boolean[playerCap];
