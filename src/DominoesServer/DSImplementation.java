@@ -306,7 +306,7 @@ public class DSImplementation implements DCInterface
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: isDeckEmpty: " + e.toString());
+            System.out.println("DSImplementation: canDraw: " + e.toString());
         }
         finally
         {
