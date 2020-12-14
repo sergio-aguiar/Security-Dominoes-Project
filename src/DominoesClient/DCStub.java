@@ -937,30 +937,256 @@ public class DCStub implements DCInterface
     @Override
     public boolean isHandlingStart(String pseudonym, int tableID)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.START_HANDLING_STATE_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.START_HANDLING_STATE_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: incorrect "
+                    + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: no return "
+                    + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public void stateHighestDouble(String pseudonym, int tableID, String piece)
     {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
 
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: stateHighestDouble: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode(), pseudonym, tableID,
+                    piece);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: stateHighestDouble: " +
+                    e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: stateHighestDouble: incorrect "
+                    + "reply message!");
+
+            System.exit(706);
+        }
     }
 
     @Override
     public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasDoubleCheckingEnded: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.DOUBLE_CHECKING_STATE_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasDoubleCheckingEnded: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.DOUBLE_CHECKING_STATE_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasDoubleCheckingEnded: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasDoubleCheckingEnded: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public boolean isRedistributionNeeded(String pseudonym, int tableID)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.REDISTRIBUTION_NEEDED_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.REDISTRIBUTION_NEEDED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public DominoesGameState getGameState(String pseudonym, int tableID)
     {
-        return null;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getGameState: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.GAME_STATE_FETCH_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getGameState: " +
+                    e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.GAME_STATE_FETCH_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getGameState: incorrect " +
+                    "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            return null;
+        }
+        dcCommunication.close();
+
+        return (DominoesGameState) inMessage.getReturnInfo();
     }
 }

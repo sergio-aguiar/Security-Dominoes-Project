@@ -3,6 +3,7 @@ package DominoesServer;
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.DominoesDeck;
+import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
 
 public class DSInterface
@@ -42,31 +43,48 @@ public class DSInterface
             case 14:
             case 16:
             case 18:
+            case 19:
+            case 21:
+            case 22:
+            case 23:
                 if (inMessage.noFirstArgument())
-                    throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 break;
             case 15:
                 if (inMessage.noFirstArgument())
-                    throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
-                    throw new DMessageException("Argument \"deck\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"deck\" was not given", inMessage);
                 if (inMessage.noThirdArgument())
-                    throw new DMessageException("Argument \"cardDif\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"cardDif\" was not given", inMessage);
                 if ((int) inMessage.getThirdArgument() < -1 || (int) inMessage.getThirdArgument() > 1)
                     throw new DMessageException("Argument \"cardDif\" was given an incorrect value", inMessage);
+                break;
             case 17:
                 if (inMessage.noFirstArgument())
-                    throw new DMessageException("Argument \"tableID\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
-                    throw new DMessageException("Argument \"bitCommitment\" was not given.", inMessage);
+                    throw new DMessageException("Argument \"bitCommitment\" was not given", inMessage);
                 if (inMessage.getSecondArgument().equals(""))
                     throw new DMessageException("Argument \"bitCommitment\" was given an incorrect value", inMessage);
+                break;
+            case 20:
+                if (inMessage.noFirstArgument())
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
+                if ((int) inMessage.getFirstArgument() < 0)
+                    throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
+                if (inMessage.noSecondArgument())
+                    throw new DMessageException("Argument \"piece\" was not given", inMessage);
+                String[] splitArg = ((String) inMessage.getSecondArgument()).split("\\|");
+                if (!inMessage.getSecondArgument().equals("None")
+                        && (splitArg.length != 2 || splitArg[0].equals("") || splitArg[1].equals("")))
+                    throw new DMessageException("Argument \"piece\" was given an incorrect value", inMessage);
                 break;
             default:
                 throw new DMessageException("Invalid message type: " + inMessage.getMessageType());
@@ -159,6 +177,34 @@ public class DSInterface
                 boolean return18 = this.dsImplementation.hasPlayerCommitted(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.COMMIT_STATE_REQUEST.getMessageCode(), return18);
+                break;
+            case 19:
+                boolean return19 = this.dsImplementation.isHandlingStart(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.START_HANDLING_STATE_REQUEST.getMessageCode(), return19);
+                break;
+            case 20:
+                this.dsImplementation.stateHighestDouble(inMessage.getPseudonym(), (int) inMessage.getFirstArgument(),
+                        (String) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode(), (Object) null);
+                break;
+            case 21:
+                boolean return21 = this.dsImplementation.hasDoubleCheckingEnded(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DOUBLE_CHECKING_STATE_REQUEST.getMessageCode(),
+                        return21);
+                break;
+            case 22:
+                boolean return22 = this.dsImplementation.isRedistributionNeeded(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.REDISTRIBUTION_NEEDED_REQUEST.getMessageCode(),
+                        return22);
+                break;
+            case 23:
+                DominoesGameState return23 = this.dsImplementation.getGameState(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.GAME_STATE_FETCH_REQUEST.getMessageCode(),
+                        return23);
                 break;
         }
         return outMessage;

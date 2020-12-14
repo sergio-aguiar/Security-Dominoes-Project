@@ -344,26 +344,32 @@ public class DCThread extends Thread
                             // TODO: Finish committing
                             if (!this.dcInterface.commitHand(this.pseudonym, this.tableID, "TMP"))
                                 System.out.println("\n[CLIENT You can only commit to full hands.");
+                            System.out.println("DONE WITH COMMITTING");
                             break;
                         default:
                             System.out.println("\n[CLIENT] Unexpected Error...");
                             System.exit(703);
                     }
+                    System.out.println("DONE WITH SWITCH!");
                 }
                 else
                 {
                     System.out.println("\n[CLIENT] Unexpected Error...");
                     System.exit(703);
                 }
+                System.out.println("RANDOMLY HERE!");
             }
             else
             {
+                System.out.println("GOT TO 1!");
                 if (this.dcInterface.isHandlingStart(this.pseudonym, this.tableID))
                 {
+                    System.out.println("GOT TO 2!");
                     this.dcInterface.stateHighestDouble(this.pseudonym, this.tableID, getHighestDouble());
 
                     while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.tableID))
                     {
+                        System.out.println("DOUBLE CHECK WAIT!");
                         this.reentrantLock.lock();
                         try
                         {
@@ -387,6 +393,7 @@ public class DCThread extends Thread
                 }
                 else
                 {
+                    System.out.println("GOT TO 3!");
                     DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
 
                     int option = clientGameMenu();
@@ -409,16 +416,6 @@ public class DCThread extends Thread
                 }
             }
         }
-
-        // while game not ended
-        //      if not my turn
-        //          wait
-        //      if my turn
-        //          if deck sorting & not committed
-        //              show deck sort menu
-        //          if game & committed
-        //              show game menu
-        // show game ended menu
     }
 
     private String getTileToReturn()
@@ -435,7 +432,7 @@ public class DCThread extends Thread
 
     private void resetDistribution()
     {
-
+        this.gamePieces.clear();
     }
 
     private int clientMainMenu()

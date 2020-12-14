@@ -1,6 +1,7 @@
 package DominoesMisc;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class DominoesTable implements Serializable
@@ -10,15 +11,19 @@ public class DominoesTable implements Serializable
     private static final int maxPieces = 7;
 
     private final int id;
+
     private DominoesDeck deck;
     private DominoesGameState gameState;
+
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
     private final boolean[] bitCommits;
+    private final String[] playerDoubles;
     private final HashSet<Integer> leftToCommit;
 
     private boolean started;
+    private int firstPlayer;
     private int turn;
 
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
@@ -36,6 +41,8 @@ public class DominoesTable implements Serializable
         this.playerPieceCount[0] = 0;
         this.bitCommits = new boolean[playerCap];
         this.bitCommits[0] = false;
+        this.playerDoubles = new String[playerCap];
+        this.playerDoubles[0] = null;
         this.leftToCommit = new HashSet<>();
 
         for (int i = 1; i < playerCap; i++)
@@ -44,9 +51,11 @@ public class DominoesTable implements Serializable
             this.readyStates[i] = false;
             this.playerPieceCount[i] = 0;
             this.bitCommits[i] = false;
+            this.playerDoubles[i] = null;
         }
 
         this.started = false;
+        this.firstPlayer = -1;
         this.turn = 0;
     }
 
@@ -187,6 +196,16 @@ public class DominoesTable implements Serializable
         return this.readyStates;
     }
 
+    public int getFirstPlayer()
+    {
+        return this.firstPlayer;
+    }
+
+    public DominoesGameState getGameState()
+    {
+        return this.gameState;
+    }
+
     public void setDeck(DominoesDeck deck)
     {
         this.deck = deck;
@@ -194,7 +213,7 @@ public class DominoesTable implements Serializable
 
     public void setReady(String pseudonym)
     {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
             this.readyStates[i] = true;
             break;
@@ -219,18 +238,55 @@ public class DominoesTable implements Serializable
 
     public boolean canDraw(String pseudonym)
     {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
             return this.playerPieceCount[i] < maxPieces;
         return false;
     }
 
     public void handleCardDif(String pseudonym, int cardDif)
     {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null && this.players[i].equals(pseudonym))
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
             this.playerPieceCount[i] += cardDif;
             break;
         }
+    }
+
+    public void setDouble(String pseudonym, String piece)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            this.playerDoubles[i] = piece;
+            if (areAllDoublesSubmitted()) setFirstPlayer();
+            break;
+        }
+    }
+
+    public boolean areAllDoublesSubmitted()
+    {
+        for (String piece : this.playerDoubles) if (piece == null) return false;
+        System.out.println("Player Doubles: " + Arrays.toString(this.playerDoubles));
+        return true;
+    }
+
+    private void setFirstPlayer()
+    {
+        HashSet<String> pieces = new HashSet<>(Arrays.asList(this.playerDoubles));
+        for (String piece : new String[]{"6|6", "5|5", "4|4", "3|3", "2|2", "1|1", "0|0"}) if (pieces.contains(piece))
+            for (int i = 0; i < this.playerDoubles.length; i++) if (this.playerDoubles[i].equals(piece))
+            {
+                if (this.firstPlayer == -1)
+                {
+                    this.firstPlayer = i;
+                    this.turn = i;
+                    System.out.println("First player: " + i + " with the piece " + this.playerDoubles[i]);
+                }
+            }
+    }
+
+    public boolean isRedistributionNeeded()
+    {
+        return this.firstPlayer != -1;
     }
 
     public void startGame()

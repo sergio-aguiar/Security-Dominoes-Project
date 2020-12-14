@@ -392,6 +392,9 @@ public class DSImplementation implements DCInterface
             {
                 result = table.distributionCommit(pseudonym);
                 if (result) table.incrementTurn();
+                System.out.println("Player: " + pseudonym + " committed: " + result);
+                System.out.println("Committed: " + table.hasPlayerCommitted(pseudonym));
+                System.out.println("All committed: " + table.haveAllCommitted());
             }
         }
         catch (Exception e)
@@ -429,30 +432,107 @@ public class DSImplementation implements DCInterface
     @Override
     public boolean isHandlingStart(String pseudonym, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.getFirstPlayer() == -1;
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isHandlingStart: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public void stateHighestDouble(String pseudonym, int tableID, String piece)
     {
-
+        this.reentrantLock.lock();
+        try
+        {
+            System.out.println("Player: " + pseudonym + " highest is " + piece);
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.incrementTurn();
+                table.setDouble(pseudonym, piece);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: stateHighestDouble: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
     public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isRedistributionNeeded();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasDoubleCheckingEnded: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public boolean isRedistributionNeeded(String pseudonym, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isRedistributionNeeded();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isRedistributionNeeded: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public DominoesGameState getGameState(String pseudonym, int tableID)
     {
-        return null;
+        DominoesGameState gameState = null;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                gameState = table.getGameState();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getGameState: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return gameState;
     }
 }

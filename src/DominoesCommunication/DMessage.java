@@ -23,7 +23,12 @@ public class DMessage implements Serializable
         DECK_RETURN_REQUEST(15),
         SKIP_TURN_REQUEST(16),
         COMMIT_HAND_REQUEST(17),
-        COMMIT_STATE_REQUEST(18);
+        COMMIT_STATE_REQUEST(18),
+        START_HANDLING_STATE_REQUEST(19),
+        DOUBLE_STATING_REQUEST(20),
+        DOUBLE_CHECKING_STATE_REQUEST(21),
+        REDISTRIBUTION_NEEDED_REQUEST(22),
+        GAME_STATE_FETCH_REQUEST(23);
 
         private static final long serialVersionUID = 1102L;
 
