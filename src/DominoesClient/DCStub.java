@@ -4,6 +4,7 @@ import DominoesCommunication.DCCommunication;
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.DominoesDeck;
+import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
 
 public class DCStub implements DCInterface
@@ -931,5 +932,35 @@ public class DCStub implements DCInterface
         dcCommunication.close();
 
         return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean isHandlingStart(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public void stateHighestDouble(String pseudonym, int tableID, String piece)
+    {
+
+    }
+
+    @Override
+    public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isRedistributionNeeded(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public DominoesGameState getGameState(String pseudonym, int tableID)
+    {
+        return null;
     }
 }

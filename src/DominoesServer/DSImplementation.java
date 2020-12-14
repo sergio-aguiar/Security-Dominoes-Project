@@ -2,6 +2,7 @@ package DominoesServer;
 
 import DominoesClient.DCInterface;
 import DominoesMisc.DominoesDeck;
+import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
 
 import java.util.ArrayList;
@@ -423,5 +424,35 @@ public class DSImplementation implements DCInterface
             this.reentrantLock.unlock();
         }
         return result;
+    }
+
+    @Override
+    public boolean isHandlingStart(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public void stateHighestDouble(String pseudonym, int tableID, String piece)
+    {
+
+    }
+
+    @Override
+    public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isRedistributionNeeded(String pseudonym, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public DominoesGameState getGameState(String pseudonym, int tableID)
+    {
+        return null;
     }
 }

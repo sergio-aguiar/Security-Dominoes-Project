@@ -1,9 +1,12 @@
 package DominoesMisc;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
-public class DominoesGameState
+public class DominoesGameState implements Serializable
 {
+    private static final long serialVersionUID = 1104L;
+
     private final HashSet<String> playedPieces;
     private final HashSet<String> endPoints;
 
@@ -32,5 +35,14 @@ public class DominoesGameState
     public HashSet<String> getEndPoints()
     {
         return endPoints;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "DominoesGameState{" +
+                "playedPieces=" + playedPieces +
+                ", endPoints=" + endPoints +
+                '}';
     }
 }

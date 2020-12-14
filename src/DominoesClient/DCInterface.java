@@ -1,6 +1,7 @@
 package DominoesClient;
 
 import DominoesMisc.DominoesDeck;
+import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
 
 public interface DCInterface
@@ -23,4 +24,9 @@ public interface DCInterface
     void skipTurn(String pseudonym, int tableID);
     boolean commitHand(String pseudonym, int tableID, String bitCommitment);
     boolean hasPlayerCommitted(String pseudonym, int tableID);
+    boolean isHandlingStart(String pseudonym, int tableID);
+    void stateHighestDouble(String pseudonym, int tableID, String piece);
+    boolean hasDoubleCheckingEnded(String pseudonym, int tableID);
+    boolean isRedistributionNeeded(String pseudonym, int tableID);
+    DominoesGameState getGameState(String pseudonym, int tableID);
 }

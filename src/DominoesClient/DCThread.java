@@ -1,6 +1,7 @@
 package DominoesClient;
 
 import DominoesMisc.DominoesDeck;
+import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesMenus;
 import DominoesMisc.DominoesTable;
 
@@ -357,23 +358,54 @@ public class DCThread extends Thread
             }
             else
             {
-                // TODO: GET GAME STATE
-
-                int option = clientGameMenu();
-                switch (option)
+                if (this.dcInterface.isHandlingStart(this.pseudonym, this.tableID))
                 {
-                    case 1:
-                        System.out.println("\n[CLIENT] Playing a piece...");
-                        break;
-                    case 2:
-                        System.out.println("\n[CLIENT] Listing game information...");
-                        break;
-                    case 3:
-                        System.out.println("\n[CLIENT] Denouncing cheating...");
-                        break;
-                    default:
-                        System.out.println("\n[CLIENT] Unexpected Error...");
-                        System.exit(703);
+                    this.dcInterface.stateHighestDouble(this.pseudonym, this.tableID, getHighestDouble());
+
+                    while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.tableID))
+                    {
+                        this.reentrantLock.lock();
+                        try
+                        {
+                            synchronized (this)
+                            {
+                                this.turnCondition.awaitNanos(100000);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println("DCThread: gameLogic: " + e.toString());
+                            System.exit(704);
+                        }
+                        finally
+                        {
+                            this.reentrantLock.unlock();
+                        }
+                    }
+
+                    if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.tableID)) resetDistribution();
+                }
+                else
+                {
+                    DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
+
+                    int option = clientGameMenu();
+                    switch (option)
+                    {
+                        case 1:
+                            System.out.println("\n[CLIENT] Playing a piece...");
+                            break;
+                        case 2:
+                            System.out.println("\n[CLIENT] Listing game information...");
+                            System.out.println(gameState.toString());
+                            break;
+                        case 3:
+                            System.out.println("\n[CLIENT] Denouncing cheating...");
+                            break;
+                        default:
+                            System.out.println("\n[CLIENT] Unexpected Error...");
+                            System.exit(703);
+                    }
                 }
             }
         }
@@ -392,6 +424,18 @@ public class DCThread extends Thread
     private String getTileToReturn()
     {
         return this.gamePieces.get(ThreadLocalRandom.current().nextInt(0,this.gamePieces.size()));
+    }
+
+    private String getHighestDouble()
+    {
+        for (String piece : new String[]{"6|6", "5|5", "4|4", "3|3", "2|2", "1|1", "0|0"})
+            if (this.gamePieces.contains(piece)) return piece;
+        return "None";
+    }
+
+    private void resetDistribution()
+    {
+
     }
 
     private int clientMainMenu()
