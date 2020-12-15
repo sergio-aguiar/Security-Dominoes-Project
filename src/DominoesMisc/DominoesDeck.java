@@ -92,10 +92,8 @@ public class DominoesDeck implements Serializable
      */
     public String drawPiece()
     {
-        if (isEmpty())
-         return null;
-
         String tile = getTile();
+        this.pointer--;
         if(!isEmpty()) splitShuffle();
         
         return tile;
@@ -109,8 +107,8 @@ public class DominoesDeck implements Serializable
     public String swapTile(String tile)
     {
         String tileToTake = getTile();
-        int indexOfOut = getIndex(tile, this.deck);
-        swapTiles(this.deck, this.pointer, indexOfOut, this.size);
+        int indexOfOut = getIndex(tile, getRightSideSet());
+        swapTiles(this.deck, this.pointer, this.pointer + 1 + indexOfOut, this.size);
         splitShuffle();
 
         return tileToTake;
@@ -123,6 +121,7 @@ public class DominoesDeck implements Serializable
     public void returnTile(String tile)
     {
         addTile(tile);
+        this.pointer++;
         splitShuffle();
 
     }
@@ -149,11 +148,16 @@ public class DominoesDeck implements Serializable
 
     private String getTile()
     {
+        if (isEmpty())
+        {
+            System.err.println("Deck vazio n pode retirar mais");
+            System.exit(1);
+            // return null;
+        }
+
         String tile = this.deck[0];
 
         swapTiles(this.deck, 0, this.pointer, this.size);
-
-        this.pointer--;
 
         return tile;
     }
@@ -162,11 +166,14 @@ public class DominoesDeck implements Serializable
     {
         for (int i = 0; i < set.length ; i++)
         {
+            // System.out.println(set[i]);
             if (tile.equals(set[i]))
+            {
                 return i; 
+            }
+                
         } 
 
-        //TODO: Send exception, tile already on set
         return -1;
     }
 
