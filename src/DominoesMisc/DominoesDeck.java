@@ -150,9 +150,9 @@ public class DominoesDeck implements Serializable
     {
         if (isEmpty())
         {
-            System.err.println("Deck vazio n pode retirar mais");
-            System.exit(1);
-            // return null;
+            // System.err.println("Deck vazio n pode retirar mais");
+            // System.exit(1);
+            return null;
         }
 
         String tile = this.deck[0];
@@ -166,7 +166,6 @@ public class DominoesDeck implements Serializable
     {
         for (int i = 0; i < set.length ; i++)
         {
-            // System.out.println(set[i]);
             if (tile.equals(set[i]))
             {
                 return i; 
