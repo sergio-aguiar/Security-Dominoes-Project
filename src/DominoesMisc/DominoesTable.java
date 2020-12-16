@@ -290,16 +290,6 @@ public class DominoesTable implements Serializable
         if (this.firstPlayer == -1) this.resetNeeded = true;
     }
 
-    /*
-    if (this.firstPlayer == -1)
-    {
-        Arrays.fill(this.playerDoubles, null);
-        Arrays.fill(this.bitCommits, false);
-        for (int j = 0; j < this.players.length; j++) this.leftToCommit.add(j);
-        this.turn = 0;
-    }
-    */
-
     public boolean isRedistributionNeeded(String pseudonym)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym)) this.leftToReset.remove(i);
