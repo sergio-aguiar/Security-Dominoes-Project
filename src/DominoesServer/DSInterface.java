@@ -47,6 +47,7 @@ public class DSInterface
             case 21:
             case 22:
             case 23:
+            case 24:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -205,6 +206,11 @@ public class DSInterface
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.GAME_STATE_FETCH_REQUEST.getMessageCode(),
                         return23);
+                break;
+            case 24:
+                boolean return24 = this.dsImplementation.isResetNeeded(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode(), return24);
                 break;
         }
         return outMessage;

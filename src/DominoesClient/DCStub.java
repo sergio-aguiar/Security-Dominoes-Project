@@ -1189,4 +1189,58 @@ public class DCStub implements DCInterface
 
         return (DominoesGameState) inMessage.getReturnInfo();
     }
+
+    @Override
+    public boolean isResetNeeded(String pseudonym, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
 }

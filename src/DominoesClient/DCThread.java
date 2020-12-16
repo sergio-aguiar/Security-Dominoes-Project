@@ -243,7 +243,8 @@ public class DCThread extends Thread
     {
         while (!this.dcInterface.hasGameEnded(this.pseudonym, this.tableID))
         {
-            while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID))
+            while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID)
+                    || this.dcInterface.isResetNeeded(this.pseudonym, this.tableID))
             {
                 this.reentrantLock.lock();
                 try
@@ -344,38 +345,33 @@ public class DCThread extends Thread
                             // TODO: Finish committing
                             if (!this.dcInterface.commitHand(this.pseudonym, this.tableID, "TMP"))
                                 System.out.println("\n[CLIENT You can only commit to full hands.");
-                            System.out.println("DONE WITH COMMITTING");
                             break;
                         default:
                             System.out.println("\n[CLIENT] Unexpected Error...");
                             System.exit(703);
                     }
-                    System.out.println("DONE WITH SWITCH!");
                 }
                 else
                 {
                     System.out.println("\n[CLIENT] Unexpected Error...");
                     System.exit(703);
                 }
-                System.out.println("RANDOMLY HERE!");
             }
             else
             {
-                System.out.println("GOT TO 1!");
                 if (this.dcInterface.isHandlingStart(this.pseudonym, this.tableID))
                 {
-                    System.out.println("GOT TO 2!");
                     this.dcInterface.stateHighestDouble(this.pseudonym, this.tableID, getHighestDouble());
 
                     while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.tableID))
                     {
-                        System.out.println("DOUBLE CHECK WAIT!");
                         this.reentrantLock.lock();
                         try
                         {
                             synchronized (this)
                             {
                                 this.turnCondition.awaitNanos(100000);
+
                             }
                         }
                         catch (Exception e)
@@ -393,7 +389,6 @@ public class DCThread extends Thread
                 }
                 else
                 {
-                    System.out.println("GOT TO 3!");
                     DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
 
                     int option = clientGameMenu();

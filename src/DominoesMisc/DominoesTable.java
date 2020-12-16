@@ -8,7 +8,7 @@ public class DominoesTable implements Serializable
 {
     private static final long serialVersionUID = 1103L;
     private static int gID = 0;
-    private static final int maxPieces = 7;
+    private static final int maxPieces = 6;
 
     private final int id;
 
@@ -21,9 +21,11 @@ public class DominoesTable implements Serializable
     private final boolean[] bitCommits;
     private final String[] playerDoubles;
     private final HashSet<Integer> leftToCommit;
+    private final HashSet<Integer> leftToReset;
 
     private boolean started;
     private int firstPlayer;
+    private boolean resetNeeded;
     private int turn;
 
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
@@ -44,6 +46,7 @@ public class DominoesTable implements Serializable
         this.playerDoubles = new String[playerCap];
         this.playerDoubles[0] = null;
         this.leftToCommit = new HashSet<>();
+        this.leftToReset = new HashSet<>();
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -56,6 +59,7 @@ public class DominoesTable implements Serializable
 
         this.started = false;
         this.firstPlayer = -1;
+        this.resetNeeded = false;
         this.turn = 0;
     }
 
@@ -282,16 +286,53 @@ public class DominoesTable implements Serializable
                     System.out.println("First player: " + i + " with the piece " + this.playerDoubles[i]);
                 }
             }
+
+        if (this.firstPlayer == -1)
+        {
+            this.resetNeeded = true;
+        }
     }
 
-    public boolean isRedistributionNeeded()
+    /*
+    if (this.firstPlayer == -1)
     {
-        return this.firstPlayer != -1;
+        Arrays.fill(this.playerDoubles, null);
+        Arrays.fill(this.bitCommits, false);
+        for (int j = 0; j < this.players.length; j++) this.leftToCommit.add(j);
+        this.turn = 0;
+    }
+    */
+
+    public boolean isRedistributionNeeded(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym)) this.leftToReset.remove(i);
+        if (this.leftToReset.isEmpty() && this.resetNeeded)
+        {
+            this.deck = new DominoesDeck();
+
+            Arrays.fill(this.playerPieceCount, 0);
+            Arrays.fill(this.bitCommits, false);
+            Arrays.fill(this.playerDoubles, null);
+
+            for (int j = 0; j < this.players.length; j++)
+            {
+                this.leftToCommit.add(j);
+                this.leftToReset.add(j);
+            }
+
+            this.turn = 0;
+            this.resetNeeded = false;
+        }
+        return this.firstPlayer == -1;
     }
 
     public void startGame()
     {
-        for (int i = 0; i < this.players.length; i++) this.leftToCommit.add(i);
+        for (int i = 0; i < this.players.length; i++)
+        {
+            this.leftToCommit.add(i);
+            this.leftToReset.add(i);
+        }
         this.started = true;
     }
 
@@ -299,6 +340,11 @@ public class DominoesTable implements Serializable
     {
         for (String player : this.players) if (player == null) return false;
         return true;
+    }
+
+    public boolean isResetNeeded()
+    {
+        return this.resetNeeded;
     }
 
     @Override

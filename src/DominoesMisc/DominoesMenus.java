@@ -69,4 +69,9 @@ public class DominoesMenus
                 + "3- Denounce cheating\n"
                 + "Option: ");
     }
+
+    public static void endPointMenu()
+    {
+
+    }
 }

@@ -1,6 +1,7 @@
 package DominoesMisc;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class DominoesGameState implements Serializable
@@ -8,33 +9,46 @@ public class DominoesGameState implements Serializable
     private static final long serialVersionUID = 1104L;
 
     private final HashSet<String> playedPieces;
-    private final HashSet<String> endPoints;
+    private final ArrayList<String> endPoints;
+
+    private int winner;
 
     public DominoesGameState()
     {
         this.playedPieces = new HashSet<>();
-        this.endPoints = new HashSet<>();
+        this.endPoints = new ArrayList<>();
+        this.winner = -1;
     }
 
     public boolean playPiece(String endPoint, String piece)
     {
+        boolean valid = this.endPoints.contains(endPoint);
         this.playedPieces.add(piece);
 
         String[] edges = piece.split("\\|");
-        if (!edges[0].equals(endPoint)) this.endPoints.add(edges[0]);
-        else this.endPoints.add(edges[1]);
-        
-        return this.endPoints.contains(endPoint);
+        if (edges[0].equals(endPoint))
+        {
+            if (edges[0].equals(edges[1])) this.endPoints.add(edges[0]);
+            this.endPoints.add(edges[1]);
+        }
+        else if (edges[1].equals(endPoint)) this.endPoints.add(edges[0]);
+
+        return valid;
     }
 
     public HashSet<String> getPlayedPieces()
     {
-        return playedPieces;
+        return this.playedPieces;
     }
 
-    public HashSet<String> getEndPoints()
+    public ArrayList<String> getEndPoints()
     {
-        return endPoints;
+        return this.endPoints;
+    }
+
+    public int getWinner()
+    {
+        return this.winner;
     }
 
     @Override

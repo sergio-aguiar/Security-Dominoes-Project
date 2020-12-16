@@ -481,7 +481,7 @@ public class DSImplementation implements DCInterface
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isRedistributionNeeded();
+                result = table.areAllDoublesSubmitted();
         }
         catch (Exception e)
         {
@@ -502,7 +502,7 @@ public class DSImplementation implements DCInterface
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isRedistributionNeeded();
+                result = table.isRedistributionNeeded(pseudonym);
         }
         catch (Exception e)
         {
@@ -534,5 +534,26 @@ public class DSImplementation implements DCInterface
             this.reentrantLock.unlock();
         }
         return gameState;
+    }
+
+    @Override
+    public boolean isResetNeeded(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isResetNeeded();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isResetNeeded: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 }

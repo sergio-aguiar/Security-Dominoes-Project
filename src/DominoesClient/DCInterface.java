@@ -29,4 +29,5 @@ public interface DCInterface
     boolean hasDoubleCheckingEnded(String pseudonym, int tableID);
     boolean isRedistributionNeeded(String pseudonym, int tableID);
     DominoesGameState getGameState(String pseudonym, int tableID);
+    boolean isResetNeeded(String pseudonym, int tableID);
 }
