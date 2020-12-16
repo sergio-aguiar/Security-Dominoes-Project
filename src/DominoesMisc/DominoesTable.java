@@ -287,10 +287,7 @@ public class DominoesTable implements Serializable
                 }
             }
 
-        if (this.firstPlayer == -1)
-        {
-            this.resetNeeded = true;
-        }
+        if (this.firstPlayer == -1) this.resetNeeded = true;
     }
 
     /*

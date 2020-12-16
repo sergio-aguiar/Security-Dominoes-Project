@@ -22,7 +22,7 @@ public class DCThread extends Thread
 
         private final String description;
 
-        private DCStates(String description)
+        DCStates(String description)
         {
             this.description = description;
         }
@@ -101,7 +101,6 @@ public class DCThread extends Thread
                                     if (this.dcInterface.startGame(this.pseudonym, this.tableID))
                                     {
                                         System.out.println("\n[CLIENT] Starting Game...");
-                                        // TODO: @Fabio, add game logic here
                                         gameLogic();
                                     }
                                     else
@@ -144,7 +143,7 @@ public class DCThread extends Thread
                     {
                         if (option1 == 3)
                         {
-                            int tableToJoin = -1;
+                            int tableToJoin;
 
                             do
                             {
@@ -194,7 +193,6 @@ public class DCThread extends Thread
 
                                 if (this.dcInterface.markAsReady(this.pseudonym, this.tableID))
                                 {
-                                    // TODO: @Fabio, add game logic here
                                     System.out.println("\n[CLIENT] Awaiting game Start...");
                                     gameLogic();
                                 }
@@ -371,7 +369,6 @@ public class DCThread extends Thread
                             synchronized (this)
                             {
                                 this.turnCondition.awaitNanos(100000);
-
                             }
                         }
                         catch (Exception e)
@@ -391,22 +388,25 @@ public class DCThread extends Thread
                 {
                     DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
 
-                    int option = clientGameMenu();
-                    switch (option)
+                    if (gameState.getWinner() == -1)
                     {
-                        case 1:
-                            System.out.println("\n[CLIENT] Playing a piece...");
-                            break;
-                        case 2:
-                            System.out.println("\n[CLIENT] Listing game information...");
-                            System.out.println(gameState.toString());
-                            break;
-                        case 3:
-                            System.out.println("\n[CLIENT] Denouncing cheating...");
-                            break;
-                        default:
-                            System.out.println("\n[CLIENT] Unexpected Error...");
-                            System.exit(703);
+                        int option = clientGameMenu();
+                        switch (option)
+                        {
+                            case 1:
+                                System.out.println("\n[CLIENT] Playing a piece...");
+                                break;
+                            case 2:
+                                System.out.println("\n[CLIENT] Listing game information...");
+                                System.out.println(gameState.toString());
+                                break;
+                            case 3:
+                                System.out.println("\n[CLIENT] Denouncing cheating...");
+                                break;
+                            default:
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
+                        }
                     }
                 }
             }
@@ -468,8 +468,8 @@ public class DCThread extends Thread
             if (leader) DominoesMenus.clientTableLeaderMenu();
             else DominoesMenus.clientTableGuestMenu();
 
-            int option = tripleCaseMenuSwitch();
-            if (option != -1) return option;
+            Integer option = tripleCaseMenuSwitch();
+            if (option != null) return option;
         }
     }
 
