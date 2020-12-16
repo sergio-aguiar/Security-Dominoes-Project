@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import DominoesClient.DCInterface;
 import DominoesClient.DCThread;
+import DominoesMisc.DominoesDeck;
 
 public class DAIThread extends DCThread {
 
@@ -17,6 +18,7 @@ public class DAIThread extends DCThread {
     private int tableID;
     private ReentrantLock reentrantLock;
     private Condition turnCondition;
+    private boolean gameStarted = false;
 
     public DAIThread(DCInterface dcInterface) {
         super(generatePseudonym(), dcInterface);
@@ -82,7 +84,8 @@ public class DAIThread extends DCThread {
             {
                 while(!this.dcInterface.hasGameEnded(this.pseudonym, this.tableID))
                 {
-                    while(!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID))
+                    while(!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID)
+                            || this.dcInterface.isResetNeeded(this.pseudonym, this.tableID))
                     {
                         this.reentrantLock.lock();
                         try
@@ -107,11 +110,22 @@ public class DAIThread extends DCThread {
                     {
                         if(this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
                         {
-                            if(this.gamePieces.size() < 7)
+                           
+                            if(this.dcInterface.canDraw(this.pseudonym, this.tableID))
                             {
                                 System.out.println("[AICLIENT] drawing ...");
-                                // String piece = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
-                                // this.gamePieces.add(piece);
+                                DominoesDeck deck1 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+
+                                String tile1 = deck1.drawPiece();
+                                if (tile1 != null) this.gamePieces.add(tile1);
+                                else System.out.println("\n[CLIENT] No pieces left to draw.");
+
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck1, 1))
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+
                                 System.out.println(this.gamePieces.toString());
                             }
                             else
@@ -124,13 +138,50 @@ public class DAIThread extends DCThread {
                                 else   
                                     System.out.println("[AICLIENT] couldn't commit hand");
                             }
+                        }
+                        else
+                        {
+                            System.out.println("\n[CLIENT] Unexpected Error...");
+                            System.exit(703);   
                         }                        
                     }
                     else
                     {
-                        this.dcInterface.skipTurn(this.pseudonym, this.tableID);
-                        System.out.println("[AICLIENT] skip turn");
-                    }
+                        if (this.dcInterface.isHandlingStart(this.pseudonym, this.tableID))
+                        {
+                            this.dcInterface.stateHighestDouble(this.pseudonym, this.tableID, getHighestDouble());
+
+                            while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.tableID))
+                            {
+                                this.reentrantLock.lock();
+                                try
+                                {
+                                    synchronized (this)
+                                    {
+                                        this.turnCondition.awaitNanos(100000);
+
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    System.out.println("DCThread: gameLogic: " + e.toString());
+                                    System.exit(704);
+                                }
+                                finally
+                                {
+                                    this.reentrantLock.unlock();
+                                }
+                            }
+
+                            if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.tableID)) resetDistribution();
+                        }
+                        else
+                        {
+                            //gameLogic
+                            this.dcInterface.skipTurn(this.pseudonym, this.tableID);
+                            //System.out.println("[AICLIENT] skip turn");   
+                        }
+                    }                     
                 }
 
             }
@@ -140,5 +191,17 @@ public class DAIThread extends DCThread {
     private static String generatePseudonym()
     {
         return "AITHREAD - " + System.currentTimeMillis();
+    }
+
+    private String getHighestDouble()
+    {
+        for (String piece : new String[]{"6|6", "5|5", "4|4", "3|3", "2|2", "1|1", "0|0"})
+            if (this.gamePieces.contains(piece)) return piece;
+        return "None";
+    }
+
+    private void resetDistribution()
+    {
+        this.gamePieces.clear();
     }
 }
