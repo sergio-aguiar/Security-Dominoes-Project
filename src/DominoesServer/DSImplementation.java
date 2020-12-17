@@ -556,4 +556,28 @@ public class DSImplementation implements DCInterface
         }
         return result;
     }
+
+    @Override
+    public boolean playPiece(String pseudonym, int tableID, String endPoint, String piece)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                result = table.playPiece(pseudonym, endPoint, piece);
+                if (result) table.incrementTurn();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: playPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
 }

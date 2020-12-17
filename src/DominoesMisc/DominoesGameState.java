@@ -10,20 +10,24 @@ public class DominoesGameState implements Serializable
 
     private final HashSet<String> playedPieces;
     private final ArrayList<String> endPoints;
+    private final ArrayList<ArrayList<String>> pastMoves;
 
     private int winner;
 
-    public DominoesGameState()
+    public DominoesGameState(int playerCap)
     {
         this.playedPieces = new HashSet<>();
         this.endPoints = new ArrayList<>();
+        this.pastMoves = new ArrayList<>();
+        for (int i = 0; i < playerCap; i++) this.pastMoves.add(new ArrayList<>());
         this.winner = -1;
     }
 
-    public boolean playPiece(String endPoint, String piece)
+    public boolean playPiece(String endPoint, String piece, int player)
     {
         boolean valid = this.endPoints.contains(endPoint);
         this.playedPieces.add(piece);
+        this.pastMoves.get(player).add(piece);
 
         String[] edges = piece.split("\\|");
         if (edges[0].equals(endPoint))
@@ -46,6 +50,11 @@ public class DominoesGameState implements Serializable
         return this.endPoints;
     }
 
+    public ArrayList<ArrayList<String>> getPastMoves()
+    {
+        return pastMoves;
+    }
+
     public int getWinner()
     {
         return this.winner;
@@ -55,8 +64,9 @@ public class DominoesGameState implements Serializable
     public String toString()
     {
         return "DominoesGameState{" +
-                "playedPieces=" + playedPieces +
-                ", endPoints=" + endPoints +
+                "playedPieces=" + this.playedPieces +
+                ", endPoints=" + this.endPoints +
+                ", playedPieces" + this.playedPieces +
                 '}';
     }
 }

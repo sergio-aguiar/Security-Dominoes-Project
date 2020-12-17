@@ -395,12 +395,29 @@ public class DCThread extends Thread
                         {
                             case 1:
                                 System.out.println("\n[CLIENT] Playing a piece...");
+
+                                // TODO: FORCE THE 1ST PIECE TO BE PLAYED
+
+                                String[] tmpEndPoints = gameState.getEndPoints().toArray(new String[0]);
+                                int endPoint = endPointMenu(tmpEndPoints);
+                                int piece = piecesMenu(gamePieces.toArray(new String[0]));
+
+                                if (this.dcInterface.playPiece(this.pseudonym, this.tableID, tmpEndPoints[endPoint],
+                                        this.gamePieces.get(piece))) this.gamePieces.remove(piece);
+                                else System.out.println("\n[CLIENT] Error playing the piece.");
+
+                                System.out.println(this.gamePieces.toString());
+
                                 break;
                             case 2:
+                                System.out.println("\n[CLIENT] Drawing a piece...");
+
+                                break;
+                            case 3:
                                 System.out.println("\n[CLIENT] Listing game information...");
                                 System.out.println(gameState.toString());
                                 break;
-                            case 3:
+                            case 4:
                                 System.out.println("\n[CLIENT] Denouncing cheating...");
                                 break;
                             default:
@@ -447,17 +464,8 @@ public class DCThread extends Thread
         {
             DominoesMenus.clientPlayerCapMenu();
 
-            int option = getMenuOption();
-            switch (option)
-            {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    return option;
-                default:
-                    System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-4].");
-            }
+            Integer option = quadrupleCaseMenuSwitch();
+            if (option != null) return option;
         }
     }
 
@@ -490,8 +498,34 @@ public class DCThread extends Thread
         {
             DominoesMenus.clientGameMenu();
 
-            Integer option = tripleCaseMenuSwitch();
+            Integer option = quintupleCaseMenuSwitch();
             if (option != null) return option;
+        }
+    }
+
+    private int endPointMenu(String[] endPoints)
+    {
+        while (true)
+        {
+            DominoesMenus.endPointMenu(endPoints);
+
+            int option = getMenuOption();
+            if (option >= 1 && option <= endPoints.length) return option;
+            else System.out.println("\n[CLIENT] Invalid option.\n" +
+                    "[CLIENT] Must be a number within range [1-" + endPoints.length + "].");
+        }
+    }
+
+    private int piecesMenu(String[] pieces)
+    {
+        while (true)
+        {
+            DominoesMenus.piecesMenu(pieces);
+
+            int option = getMenuOption();
+            if (option >= 1 && option <= pieces.length) return option;
+            else System.out.println("\n[CLIENT] Invalid option.\n" +
+                    "[CLIENT] Must be a number within range [1-" + pieces.length + "].");
         }
     }
 
@@ -508,6 +542,22 @@ public class DCThread extends Thread
                 return option;
             default:
                 System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-5].");
+        }
+        return null;
+    }
+
+    private Integer quadrupleCaseMenuSwitch()
+    {
+        int option = getMenuOption();
+        switch (option)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                return option;
+            default:
+                System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-4].");
         }
         return null;
     }

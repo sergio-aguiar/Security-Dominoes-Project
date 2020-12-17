@@ -30,4 +30,5 @@ public interface DCInterface
     boolean isRedistributionNeeded(String pseudonym, int tableID);
     DominoesGameState getGameState(String pseudonym, int tableID);
     boolean isResetNeeded(String pseudonym, int tableID);
+    boolean playPiece(String pseudonym, int tableID, String endPoint, String piece);
 }

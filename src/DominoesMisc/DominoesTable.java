@@ -22,6 +22,7 @@ public class DominoesTable implements Serializable
     private final String[] playerDoubles;
     private final HashSet<Integer> leftToCommit;
     private final HashSet<Integer> leftToReset;
+    private final boolean[] illegalMoves;
 
     private boolean started;
     private int firstPlayer;
@@ -34,7 +35,7 @@ public class DominoesTable implements Serializable
 
         this.id = gID++;
         this.deck = new DominoesDeck();
-        this.gameState = new DominoesGameState();
+        this.gameState = new DominoesGameState(playerCap);
         this.players = new String[playerCap];
         this.players[0] = tableLeader;
         this.readyStates = new boolean[playerCap];
@@ -47,6 +48,8 @@ public class DominoesTable implements Serializable
         this.playerDoubles[0] = null;
         this.leftToCommit = new HashSet<>();
         this.leftToReset = new HashSet<>();
+        this.illegalMoves = new boolean[playerCap];
+        this.illegalMoves[0] = false;
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -55,6 +58,7 @@ public class DominoesTable implements Serializable
             this.playerPieceCount[i] = 0;
             this.bitCommits[i] = false;
             this.playerDoubles[i] = null;
+            this.illegalMoves[i] = false;
         }
 
         this.started = false;
@@ -311,6 +315,16 @@ public class DominoesTable implements Serializable
             this.resetNeeded = false;
         }
         return this.firstPlayer == -1;
+    }
+
+    public boolean playPiece(String pseudonym, String endPoint, String piece)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            this.illegalMoves[i] = this.illegalMoves[i] || this.gameState.playPiece(endPoint, piece, i);
+            return true;
+        }
+        return false;
     }
 
     public void startGame()

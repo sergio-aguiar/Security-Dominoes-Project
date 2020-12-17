@@ -1,5 +1,7 @@
 package DominoesMisc;
 
+import java.util.ArrayList;
+
 public class DominoesMenus
 {
     public static void clientInitMenu()
@@ -65,13 +67,26 @@ public class DominoesMenus
     {
         System.out.print("\n[Client] Game Operations:\n"
                 + "1- Play a piece\n"
-                + "2- List game information\n"
-                + "3- Denounce cheating\n"
+                + "2- Draw a piece\n"
+                + "3- List game information\n"
+                + "4- Denounce cheating\n"
+                + "5- Skip Turn\n"
                 + "Option: ");
     }
 
-    public static void endPointMenu()
+    public static void endPointMenu(String[] endPoints)
     {
+        System.out.print("\n[CLIENT] Piece Placement Spot:");
 
+        for (int i = 0; i < endPoints.length; i++) System.out.print("\n" + (i + 1) + "- " + endPoints[i]);
+        System.out.print("\nOption: ");
+    }
+
+    public static void piecesMenu(String[] pieces)
+    {
+        System.out.print("\n[CLIENT] Piece Selection:");
+
+        for (int i = 0; i < pieces.length; i++) System.out.print("\n" + (i + 1) + "- " + pieces[i]);
+        System.out.print("\nOption: ");
     }
 }

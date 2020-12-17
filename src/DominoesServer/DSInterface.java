@@ -82,9 +82,31 @@ public class DSInterface
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
                     throw new DMessageException("Argument \"piece\" was not given", inMessage);
-                String[] splitArg = ((String) inMessage.getSecondArgument()).split("\\|");
+                String[] splitArg1 = ((String) inMessage.getSecondArgument()).split("\\|");
                 if (!inMessage.getSecondArgument().equals("None")
-                        && (splitArg.length != 2 || splitArg[0].equals("") || splitArg[1].equals("")))
+                        && (splitArg1.length != 2 || splitArg1[0].equals("") || splitArg1[1].equals("")))
+                    throw new DMessageException("Argument \"piece\" was given an incorrect value", inMessage);
+                break;
+            case 25:
+                if (inMessage.noFirstArgument())
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
+                if ((int) inMessage.getFirstArgument() < 0)
+                    throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
+                if (inMessage.noSecondArgument())
+                    throw new DMessageException("Argument \"endPoint\" was not given", inMessage);
+                if (!inMessage.getFirstArgument().equals("0")
+                        && !inMessage.getFirstArgument().equals("1")
+                        && !inMessage.getFirstArgument().equals("2")
+                        && !inMessage.getFirstArgument().equals("3")
+                        && !inMessage.getFirstArgument().equals("4")
+                        && !inMessage.getFirstArgument().equals("5")
+                        && !inMessage.getFirstArgument().equals("6"))
+                    throw new DMessageException("Argument \"endPoint\" was given an incorrect value", inMessage);
+                if (inMessage.noThirdArgument())
+                    throw new DMessageException("Argument \"piece\" was not given", inMessage);
+                String[] splitArg2 = ((String) inMessage.getThirdArgument()).split("\\|");
+                if (!inMessage.getSecondArgument().equals("None")
+                        && (splitArg2.length != 2 || splitArg2[0].equals("") || splitArg2[1].equals("")))
                     throw new DMessageException("Argument \"piece\" was given an incorrect value", inMessage);
                 break;
             default:
@@ -211,6 +233,12 @@ public class DSInterface
                 boolean return24 = this.dsImplementation.isResetNeeded(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode(), return24);
+                break;
+            case 25:
+                boolean return25 = this.dsImplementation.playPiece(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument(),
+                        (String) inMessage.getThirdArgument());
+                outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), return25);
                 break;
         }
         return outMessage;
