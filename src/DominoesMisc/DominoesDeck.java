@@ -8,14 +8,13 @@ import java.util.concurrent.ThreadLocalRandom;
  * Manages Draw Swap and Insert
  * @author Ricardo Rodrigues Azevedo
  * @version 1.2
- * @since 2019-10-17
+ * @since 2020-10-17
  */
 
 public class DominoesDeck implements Serializable
 {
     private static final long serialVersionUID = 1104L;
     private final String[] deck;
-    // private String[] outSet;
     private final int size = 28;
     private int pointer = this.size - 1;
 
