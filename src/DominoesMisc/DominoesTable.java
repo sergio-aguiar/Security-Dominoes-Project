@@ -317,11 +317,15 @@ public class DominoesTable implements Serializable
         return this.firstPlayer == -1;
     }
 
-    public boolean playPiece(String pseudonym, String endPoint, String piece)
+    public boolean playPiece(String pseudonym, String targetEndPoint, String piece, String pieceEndPoint)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
-            this.illegalMoves[i] = this.illegalMoves[i] || this.gameState.playPiece(endPoint, piece, i);
+            System.out.println("DST: play piece: " + targetEndPoint + " ," + piece + " ," + pieceEndPoint);
+            if (targetEndPoint.equals("First") && !this.gameState.getPlayedPieces().isEmpty()) return false;
+            this.illegalMoves[i] = !this.gameState.playPiece(targetEndPoint, piece, pieceEndPoint, i)
+                    || this.illegalMoves[i];
+            System.out.println("DST: play piece: " + true);
             return true;
         }
         return false;

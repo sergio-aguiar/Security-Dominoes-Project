@@ -1245,7 +1245,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean playPiece(String pseudonym, int tableID, String endPoint, String piece)
+    public boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1267,7 +1267,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), pseudonym,
-                    tableID, endPoint, piece);
+                    tableID, targetEndPoint, piece, pieceEndPoint);
         }
         catch (DMessageException e)
         {

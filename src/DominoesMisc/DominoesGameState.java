@@ -23,19 +23,100 @@ public class DominoesGameState implements Serializable
         this.winner = -1;
     }
 
-    public boolean playPiece(String endPoint, String piece, int player)
+    public boolean playPiece(String targetEndPoint, String piece, String pieceEndPoint,  int player)
     {
-        boolean valid = this.endPoints.contains(endPoint);
+        boolean valid = false;
+
+        System.out.println("\npiece: " + piece);
+        System.out.println("targetEP: " + targetEndPoint);
+        System.out.println("pieceEP: " + pieceEndPoint);
+
+        if (targetEndPoint.equals("First") && this.playedPieces.isEmpty())
+        {
+            String[] edges = piece.split("\\|");
+
+            if (!edges[0].equals(edges[1]))
+            {
+                System.out.println("GOT TO 1!");
+
+                valid = false;
+                this.endPoints.add(edges[0]);
+                this.endPoints.add(edges[1]);
+            }
+            else
+            {
+                System.out.println("GOT TO 2!");
+
+                valid = true;
+                for (int i = 0; i < 4; i++) this.endPoints.add(edges[0]);
+            }
+        }
+        else if (targetEndPoint.equals("First"))
+        {
+            System.out.println("\n[CLIENT] Unexpected Error...");
+            System.exit(703);
+        }
+        else
+        {
+            valid = this.endPoints.contains(targetEndPoint)
+                    && targetEndPoint.equals(pieceEndPoint)
+                    && piece.contains(targetEndPoint);
+
+            String[] edges = piece.split("\\|");
+
+            if (valid)
+            {
+                if (edges[0].equals(edges[1]))
+                {
+                    this.endPoints.add(edges[0]);
+                    this.endPoints.add(edges[1]);
+                }
+                else
+                {
+                    if (edges[0].equals(targetEndPoint))
+                    {
+                        this.endPoints.remove(edges[0]);
+                        this.endPoints.add(edges[1]);
+                    }
+                    else
+                    {
+                        this.endPoints.remove(edges[1]);
+                        this.endPoints.add(edges[0]);
+                    }
+                }
+            }
+            else
+            {
+                if (edges[0].equals(edges[1]))
+                {
+                    if (!this.endPoints.contains(edges[0]))
+                    {
+                        this.endPoints.remove(0);
+                        this.endPoints.add(edges[0]);
+                    }
+                    this.endPoints.add(edges[0]);
+                    this.endPoints.add(edges[0]);
+                }
+                else
+                {
+                    if (!this.endPoints.contains(targetEndPoint)) this.endPoints.remove(0);
+                    else this.endPoints.remove(targetEndPoint);
+
+                    if (edges[0].equals(pieceEndPoint)) this.endPoints.add(edges[1]);
+                    else if (edges[1].equals(pieceEndPoint)) this.endPoints.add(edges[0]);
+                    else
+                    {
+                        System.out.println("\n[CLIENT] Unexpected Error...");
+                        System.exit(703);
+                    }
+                }
+            }
+        }
+        
         this.playedPieces.add(piece);
         this.pastMoves.get(player).add(piece);
 
-        String[] edges = piece.split("\\|");
-        if (edges[0].equals(endPoint))
-        {
-            if (edges[0].equals(edges[1])) this.endPoints.add(edges[0]);
-            this.endPoints.add(edges[1]);
-        }
-        else if (edges[1].equals(endPoint)) this.endPoints.add(edges[0]);
+        System.out.println("DSG: play piece: " + targetEndPoint + " ," + piece + " ," + valid);
 
         return valid;
     }
@@ -66,7 +147,7 @@ public class DominoesGameState implements Serializable
         return "DominoesGameState{" +
                 "playedPieces=" + this.playedPieces +
                 ", endPoints=" + this.endPoints +
-                ", playedPieces" + this.playedPieces +
+                ", pastMoves" + this.pastMoves +
                 '}';
     }
 }

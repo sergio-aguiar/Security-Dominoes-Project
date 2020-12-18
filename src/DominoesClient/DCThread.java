@@ -388,41 +388,58 @@ public class DCThread extends Thread
                 {
                     DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
 
-                    if (gameState.getWinner() == -1)
+                    System.out.println(gameState.toString());
+                    if (gameState.getPlayedPieces().isEmpty())
                     {
-                        int option = clientGameMenu();
-                        switch (option)
+                        String highestDouble = getHighestDouble();
+                        if (this.dcInterface.playPiece(this.pseudonym, this.tableID, "First",
+                                highestDouble, highestDouble.split("//|")[0]))
+                            this.gamePieces.remove(highestDouble);
+                        else System.out.println("\n[CLIENT] Error playing the piece.");
+                    }
+                    else
+                    {
+                        if (gameState.getWinner() == -1)
                         {
-                            case 1:
-                                System.out.println("\n[CLIENT] Playing a piece...");
+                            int option = clientGameMenu();
+                            switch (option)
+                            {
+                                case 1:
+                                    System.out.println("\n[CLIENT] Playing a piece...");
 
-                                // TODO: FORCE THE 1ST PIECE TO BE PLAYED
+                                    String[] tmpEndPoints = gameState.getEndPoints().toArray(new String[0]);
+                                    int endPoint = endPointMenu(tmpEndPoints);
+                                    int piece = piecesMenu(gamePieces.toArray(new String[0])) - 1;
 
-                                String[] tmpEndPoints = gameState.getEndPoints().toArray(new String[0]);
-                                int endPoint = endPointMenu(tmpEndPoints);
-                                int piece = piecesMenu(gamePieces.toArray(new String[0]));
+                                    String[] pieceEndPoints = this.gamePieces.get(piece).split("\\|");
+                                    int pieceEndPoint = pieceEndPointsMenu(pieceEndPoints);
 
-                                if (this.dcInterface.playPiece(this.pseudonym, this.tableID, tmpEndPoints[endPoint],
-                                        this.gamePieces.get(piece))) this.gamePieces.remove(piece);
-                                else System.out.println("\n[CLIENT] Error playing the piece.");
+                                    if (this.dcInterface.playPiece(this.pseudonym, this.tableID, tmpEndPoints[endPoint],
+                                            this.gamePieces.get(piece),  pieceEndPoints[pieceEndPoint - 1]))
+                                        this.gamePieces.remove(piece);
+                                    else System.out.println("\n[CLIENT] Error playing the piece.");
 
-                                System.out.println(this.gamePieces.toString());
+                                    System.out.println(this.gamePieces.toString());
 
-                                break;
-                            case 2:
-                                System.out.println("\n[CLIENT] Drawing a piece...");
+                                    break;
+                                case 2:
+                                    System.out.println("\n[CLIENT] Drawing a piece...");
 
-                                break;
-                            case 3:
-                                System.out.println("\n[CLIENT] Listing game information...");
-                                System.out.println(gameState.toString());
-                                break;
-                            case 4:
-                                System.out.println("\n[CLIENT] Denouncing cheating...");
-                                break;
-                            default:
-                                System.out.println("\n[CLIENT] Unexpected Error...");
-                                System.exit(703);
+                                    break;
+                                case 3:
+                                    System.out.println("\n[CLIENT] Listing game information...");
+                                    System.out.println(gameState.toString());
+                                    break;
+                                case 4:
+                                    System.out.println("\n[CLIENT] Denouncing cheating...");
+                                    break;
+                                case 5:
+                                    System.out.println("\n[CLIENT] Skipping turn...");
+                                    break;
+                                default:
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                            }
                         }
                     }
                 }
@@ -526,6 +543,18 @@ public class DCThread extends Thread
             if (option >= 1 && option <= pieces.length) return option;
             else System.out.println("\n[CLIENT] Invalid option.\n" +
                     "[CLIENT] Must be a number within range [1-" + pieces.length + "].");
+        }
+    }
+
+    private int pieceEndPointsMenu(String[] pieceEndPoints)
+    {
+        while (true)
+        {
+            DominoesMenus.pieceEndPointMenu(pieceEndPoints);
+
+            int option = getMenuOption();
+            if (option == 1 || option == 2) return option;
+            else System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-2].");
         }
     }
 

@@ -558,7 +558,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean playPiece(String pseudonym, int tableID, String endPoint, String piece)
+    public boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -566,7 +566,9 @@ public class DSImplementation implements DCInterface
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
-                result = table.playPiece(pseudonym, endPoint, piece);
+                System.out.println("DSI: play piece: " + targetEndPoint + " ," + piece + " ," + pieceEndPoint);
+                result = table.playPiece(pseudonym, targetEndPoint, piece, pieceEndPoint);
+                System.out.println("DSI: play piece: " + result);
                 if (result) table.incrementTurn();
             }
         }

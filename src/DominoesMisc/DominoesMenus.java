@@ -89,4 +89,12 @@ public class DominoesMenus
         for (int i = 0; i < pieces.length; i++) System.out.print("\n" + (i + 1) + "- " + pieces[i]);
         System.out.print("\nOption: ");
     }
+
+    public static void pieceEndPointMenu(String[] pieceEndPoints)
+    {
+        System.out.print("\n[CLIENT] End to Match:");
+
+        for (int i = 0; i < pieceEndPoints.length; i++) System.out.print("\n" + (i + 1) + "- " + pieceEndPoints[i]);
+        System.out.print("\nOption: ");
+    }
 }
