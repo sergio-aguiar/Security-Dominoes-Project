@@ -30,7 +30,8 @@ public class DMessage implements Serializable
         REDISTRIBUTION_NEEDED_REQUEST(22),
         GAME_STATE_FETCH_REQUEST(23),
         RESET_NEEDED_REQUEST(24),
-        PLAY_PIECE_REQUEST(25);
+        PLAY_PIECE_REQUEST(25),
+        DRAW_PIECE_REQUEST(26);
 
         private static final long serialVersionUID = 1102L;
 

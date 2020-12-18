@@ -582,4 +582,29 @@ public class DSImplementation implements DCInterface
         }
         return result;
     }
+
+    @Override
+    public String drawCard(String pseudonym, int tableID)
+    {
+        String result = "Error";
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                result = table.drawPiece(pseudonym);
+                if (result == null) result = "Error";
+            }
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: playPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
 }

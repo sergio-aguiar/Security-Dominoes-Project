@@ -228,6 +228,9 @@ public class DCThread extends Thread
                     this.tableID = -1;
                     break;
                 case 5:
+                    System.out.println("\n[CLIENT] Showing score...");
+                    break;
+                case 6:
                     System.out.println("\n[CLIENT] Shutting down...");
                     System.exit(702);
                 default:
@@ -425,6 +428,12 @@ public class DCThread extends Thread
                                 case 2:
                                     System.out.println("\n[CLIENT] Drawing a piece...");
 
+                                    String drawnPiece = this.dcInterface.drawCard(this.pseudonym, this.tableID);
+                                    if (!drawnPiece.equals("Error")) this.gamePieces.add(drawnPiece);
+                                    else System.out.println("\n[CLIENT] Failed to draw a piece. None remaining.");
+
+                                    System.out.println(this.gamePieces.toString());
+
                                     break;
                                 case 3:
                                     System.out.println("\n[CLIENT] Listing game information...");
@@ -435,6 +444,7 @@ public class DCThread extends Thread
                                     break;
                                 case 5:
                                     System.out.println("\n[CLIENT] Skipping turn...");
+                                    this.dcInterface.skipTurn(this.pseudonym, this.tableID);
                                     break;
                                 default:
                                     System.out.println("\n[CLIENT] Unexpected Error...");
@@ -470,7 +480,7 @@ public class DCThread extends Thread
         {
             DominoesMenus.clientMainMenu();
 
-            Integer option = quintupleCaseMenuSwitch();
+            Integer option = sextupleCaseMenuSwitch();
             if (option != null) return option;
         }
     }
@@ -556,6 +566,24 @@ public class DCThread extends Thread
             if (option == 1 || option == 2) return option;
             else System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-2].");
         }
+    }
+
+    private Integer sextupleCaseMenuSwitch()
+    {
+        int option = getMenuOption();
+        switch (option)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                return option;
+            default:
+                System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-6].");
+        }
+        return null;
     }
 
     private Integer quintupleCaseMenuSwitch()

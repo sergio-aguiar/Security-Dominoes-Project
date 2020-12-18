@@ -20,7 +20,8 @@ public class DominoesMenus
                 + "2- List available tables\n"
                 + "3- Join table\n"
                 + "4- Join random table\n"
-                + "5- Exit\n"
+                + "5- Check Score\n"
+                + "6- Exit\n"
                 + "Option: ");
     }
 

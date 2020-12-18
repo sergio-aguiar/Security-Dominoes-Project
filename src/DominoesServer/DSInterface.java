@@ -48,6 +48,7 @@ public class DSInterface
             case 22:
             case 23:
             case 24:
+            case 26:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -251,6 +252,10 @@ public class DSInterface
                         (String) inMessage.getThirdArgument(), (String) inMessage.getFourthArgument());
                 outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), return25);
                 break;
+            case 26:
+                String return26 = this.dsImplementation.drawCard(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), (Object) return26);
         }
         return outMessage;
     }

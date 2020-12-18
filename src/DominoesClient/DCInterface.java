@@ -31,4 +31,5 @@ public interface DCInterface
     DominoesGameState getGameState(String pseudonym, int tableID);
     boolean isResetNeeded(String pseudonym, int tableID);
     boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint);
+    String drawCard(String pseudonym, int tableID);
 }

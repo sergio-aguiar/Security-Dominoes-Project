@@ -133,6 +133,16 @@ public class DominoesTable implements Serializable
         return "Error";
     }
 
+    public String drawPiece(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            this.playerPieceCount[i]++;
+            return this.deck.drawPiece();
+        }
+        return "Error";
+    }
+
     public String distributionSwapPiece(String pseudonym, String piece)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
