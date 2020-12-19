@@ -1,6 +1,7 @@
 package DominoesServer;
 
 import DominoesClient.DCInterface;
+import DominoesMisc.DominoesCommitData;
 import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
@@ -381,20 +382,16 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean commitHand(String pseudonym, int tableID, String bitCommitment)
+    public boolean commitHand(String pseudonym, int tableID, DominoesCommitData commitData)
     {
-        // TODO: See how to do bit commitment.
         boolean result = false;
         this.reentrantLock.lock();
         try
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
-                result = table.distributionCommit(pseudonym);
+                result = table.distributionCommit(pseudonym, commitData);
                 if (result) table.incrementTurn();
-                System.out.println("Player: " + pseudonym + " committed: " + result);
-                System.out.println("Committed: " + table.hasPlayerCommitted(pseudonym));
-                System.out.println("All committed: " + table.haveAllCommitted());
             }
         }
         catch (Exception e)
@@ -595,11 +592,98 @@ public class DSImplementation implements DCInterface
                 result = table.drawPiece(pseudonym);
                 if (result == null) result = "Error";
             }
-
         }
         catch (Exception e)
         {
             System.out.println("DSImplementation: playPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public void denounceCheating(String pseudonym, int tableID)
+    {
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.denounceCheating();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: denounceCheating: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+    }
+
+    @Override
+    public boolean isHandlingCheating(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isHandlingCheating();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: playPiece: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                result = table.updateCommit(pseudonym, commitData);
+                if (result) table.incrementTurn();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: updateCommitment: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.setCommitGenData(commitData);
+                result = true;
+                table.incrementTurn();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: sendCommitData: " + e.toString());
         }
         finally
         {

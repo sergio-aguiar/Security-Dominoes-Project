@@ -2,6 +2,7 @@ package DominoesServer;
 
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
+import DominoesMisc.DominoesCommitData;
 import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
@@ -49,6 +50,8 @@ public class DSInterface
             case 23:
             case 24:
             case 26:
+            case 27:
+            case 28:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -67,14 +70,14 @@ public class DSInterface
                     throw new DMessageException("Argument \"cardDif\" was given an incorrect value", inMessage);
                 break;
             case 17:
+            case 29:
+            case 30:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
-                    throw new DMessageException("Argument \"bitCommitment\" was not given", inMessage);
-                if (inMessage.getSecondArgument().equals(""))
-                    throw new DMessageException("Argument \"bitCommitment\" was given an incorrect value", inMessage);
+                    throw new DMessageException("Argument \"commitData\" was not given", inMessage);
                 break;
             case 20:
                 if (inMessage.noFirstArgument())
@@ -205,7 +208,7 @@ public class DSInterface
                 break;
             case 17:
                 boolean return17 = this.dsImplementation.commitHand(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument(), (String) inMessage.getSecondArgument());
+                        (int) inMessage.getFirstArgument(), (DominoesCommitData) inMessage.getSecondArgument());
                 outMessage = new DMessage(DMessage.MessageType.COMMIT_HAND_REQUEST.getMessageCode(), return17);
                 break;
             case 18:
@@ -256,6 +259,27 @@ public class DSInterface
                 String return26 = this.dsImplementation.drawCard(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), (Object) return26);
+                break;
+            case 27:
+                this.dsImplementation.denounceCheating(inMessage.getPseudonym(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DENOUNCE_CHEATING_REQUEST.getMessageCode(),
+                        (Object) null);
+                break;
+            case 28:
+                boolean return28 = this.dsImplementation.isHandlingCheating(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.CHEAT_HANDLING_STATE_REQUEST.getMessageCode(), return28);
+                break;
+            case 29:
+                boolean return29 = this.dsImplementation.updateCommitment(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (DominoesCommitData) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode(), return29);
+                break;
+            case 30:
+                this.dsImplementation.sendCommitData(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (DominoesCommitData) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode(),
+                        (Object) null);
         }
         return outMessage;
     }

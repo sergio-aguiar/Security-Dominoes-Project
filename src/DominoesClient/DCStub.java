@@ -3,6 +3,7 @@ package DominoesClient;
 import DominoesCommunication.DCCommunication;
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
+import DominoesMisc.DominoesCommitData;
 import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
@@ -827,7 +828,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean commitHand(String pseudonym, int tableID, String bitCommitment)
+    public boolean commitHand(String pseudonym, int tableID, DominoesCommitData commitData)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -849,7 +850,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.COMMIT_HAND_REQUEST.getMessageCode(), pseudonym, tableID,
-                    bitCommitment);
+                    commitData);
         }
         catch (DMessageException e)
         {
@@ -1347,5 +1348,210 @@ public class DCStub implements DCInterface
         dcCommunication.close();
 
         return (String) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public void denounceCheating(String pseudonym, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: denounceCheating: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.DENOUNCE_CHEATING_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: denounceCheating: " +
+                    e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.DENOUNCE_CHEATING_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: denounceCheating: incorrect "
+                    + "reply message!");
+
+            System.exit(706);
+        }
+    }
+
+    @Override
+    public boolean isHandlingCheating(String pseudonym, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.CHEAT_HANDLING_STATE_REQUEST.getMessageCode(), pseudonym,
+                    tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.CHEAT_HANDLING_STATE_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode(), pseudonym,
+                    tableID, commitData);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode(), pseudonym,
+                    tableID, commitData);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 }

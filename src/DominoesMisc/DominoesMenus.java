@@ -1,7 +1,5 @@
 package DominoesMisc;
 
-import java.util.ArrayList;
-
 public class DominoesMenus
 {
     public static void clientInitMenu()
@@ -97,5 +95,13 @@ public class DominoesMenus
 
         for (int i = 0; i < pieceEndPoints.length; i++) System.out.print("\n" + (i + 1) + "- " + pieceEndPoints[i]);
         System.out.print("\nOption: ");
+    }
+
+    public static void denounceCheatingMenu()
+    {
+        System.out.print("\n[Client] This will end the current game and can NOT be undone. Proceed:\n"
+                + "1- Yes\n"
+                + "2- No\n"
+                + "Option: ");
     }
 }

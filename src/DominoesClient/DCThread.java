@@ -1,9 +1,6 @@
 package DominoesClient;
 
-import DominoesMisc.DominoesDeck;
-import DominoesMisc.DominoesGameState;
-import DominoesMisc.DominoesMenus;
-import DominoesMisc.DominoesTable;
+import DominoesMisc.*;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -44,6 +41,10 @@ public class DCThread extends Thread
 
     private int tableID;
 
+    private int bitCommitRandom1;
+    private int bitCommitRandom2;
+    private String[] committedPieces;
+
     public DCThread(String pseudonym, DCInterface dcInterface)
     {
         this.reentrantLock = new ReentrantLock(true);
@@ -52,6 +53,8 @@ public class DCThread extends Thread
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
         this.tableID = -1;
+        randomizeCommitData();
+        this.committedPieces = null;
     }
 
     @Override
@@ -102,6 +105,7 @@ public class DCThread extends Thread
                                     {
                                         System.out.println("\n[CLIENT] Starting Game...");
                                         gameLogic();
+                                        exit2 = true;
                                     }
                                     else
                                     {
@@ -195,6 +199,7 @@ public class DCThread extends Thread
                                 {
                                     System.out.println("\n[CLIENT] Awaiting game Start...");
                                     gameLogic();
+                                    exit3 = true;
                                 }
                                 else
                                 {
@@ -244,8 +249,10 @@ public class DCThread extends Thread
     {
         while (!this.dcInterface.hasGameEnded(this.pseudonym, this.tableID))
         {
-            while (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID)
-                    || this.dcInterface.isResetNeeded(this.pseudonym, this.tableID))
+            System.out.println("\nBACK UP HERE");
+            while ((!this.dcInterface.hasGameEnded(this.pseudonym,this.tableID)
+                    && (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID)
+                    || this.dcInterface.isResetNeeded(this.pseudonym, this.tableID))))
             {
                 this.reentrantLock.lock();
                 try
@@ -265,6 +272,8 @@ public class DCThread extends Thread
                     this.reentrantLock.unlock();
                 }
             }
+
+            if (this.dcInterface.hasGameEnded(this.pseudonym, this.tableID)) break;
 
             if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
             {
@@ -343,9 +352,17 @@ public class DCThread extends Thread
                             break;
                         case 5:
                             System.out.println("\n[CLIENT] Committing your hand...");
-                            // TODO: Finish committing
-                            if (!this.dcInterface.commitHand(this.pseudonym, this.tableID, "TMP"))
-                                System.out.println("\n[CLIENT You can only commit to full hands.");
+
+                            int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
+                                    this.bitCommitRandom2, this.gamePieces.toArray(new String[0]));
+
+                            DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
+                                    bitCommitment);
+
+                            if (this.dcInterface.commitHand(this.pseudonym, this.tableID, commitData))
+                                this.committedPieces = this.gamePieces.toArray(new String[0]);
+                            else System.out.println("\n[CLIENT You can only commit to full hands.");
+
                             break;
                         default:
                             System.out.println("\n[CLIENT] Unexpected Error...");
@@ -432,6 +449,18 @@ public class DCThread extends Thread
                                     if (!drawnPiece.equals("Error")) this.gamePieces.add(drawnPiece);
                                     else System.out.println("\n[CLIENT] Failed to draw a piece. None remaining.");
 
+                                    randomizeCommitData();
+
+                                    int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
+                                            this.bitCommitRandom2, this.gamePieces.toArray(new String[0]));
+
+                                    DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
+                                            bitCommitment);
+
+                                    if (this.dcInterface.updateCommitment(this.pseudonym, this.tableID, commitData))
+                                        this.committedPieces = this.gamePieces.toArray(new String[0]);
+                                    else System.out.println("\n[CLIENT You can only commit to full hands.");
+
                                     System.out.println(this.gamePieces.toString());
 
                                     break;
@@ -441,6 +470,10 @@ public class DCThread extends Thread
                                     break;
                                 case 4:
                                     System.out.println("\n[CLIENT] Denouncing cheating...");
+
+                                    if (denounceCheatingMenu() == 1)
+                                        this.dcInterface.denounceCheating(this.pseudonym, this.tableID);
+
                                     break;
                                 case 5:
                                     System.out.println("\n[CLIENT] Skipping turn...");
@@ -454,6 +487,18 @@ public class DCThread extends Thread
                     }
                 }
             }
+        }
+
+        if (this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID))
+        {
+            DominoesCommitData commitData = new DominoesCommitData(this.gamePieces.toArray(new String[0]),
+                    this.bitCommitRandom2);
+
+            this.dcInterface.sendCommitData(this.pseudonym, this.tableID, commitData);
+        }
+        else
+        {
+            System.out.println("\nGAME ENDED AND POINT STUFF!");
         }
     }
 
@@ -483,6 +528,12 @@ public class DCThread extends Thread
             Integer option = sextupleCaseMenuSwitch();
             if (option != null) return option;
         }
+    }
+
+    private void randomizeCommitData()
+    {
+        this.bitCommitRandom1 = ThreadLocalRandom.current().nextInt(0,32);
+        this.bitCommitRandom2 = ThreadLocalRandom.current().nextInt(0,32);
     }
 
     private int clientPlayerCapMenu()
@@ -562,9 +613,19 @@ public class DCThread extends Thread
         {
             DominoesMenus.pieceEndPointMenu(pieceEndPoints);
 
-            int option = getMenuOption();
-            if (option == 1 || option == 2) return option;
-            else System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-2].");
+            Integer option = doubleCaseMenuSwitch();
+            if (option != null) return option;
+        }
+    }
+
+    private int denounceCheatingMenu()
+    {
+        while (true)
+        {
+            DominoesMenus.denounceCheatingMenu();
+
+            Integer option = doubleCaseMenuSwitch();
+            if (option != null) return option;
         }
     }
 
@@ -634,6 +695,19 @@ public class DCThread extends Thread
         return null;
     }
 
+    private Integer doubleCaseMenuSwitch()
+    {
+        int option = getMenuOption();
+        switch (option)
+        {
+            case 1:
+            case 2:
+                return option;
+            default:
+                System.out.println("\n[CLIENT] Invalid option.\n[CLIENT] Must be a number within range [1-2].");
+        }
+        return null;
+    }
 
     private static int getMenuOption()
     {

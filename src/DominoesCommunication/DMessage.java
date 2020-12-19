@@ -31,7 +31,11 @@ public class DMessage implements Serializable
         GAME_STATE_FETCH_REQUEST(23),
         RESET_NEEDED_REQUEST(24),
         PLAY_PIECE_REQUEST(25),
-        DRAW_PIECE_REQUEST(26);
+        DRAW_PIECE_REQUEST(26),
+        DENOUNCE_CHEATING_REQUEST(27),
+        CHEAT_HANDLING_STATE_REQUEST(28),
+        COMMIT_UPDATE_REQUEST(29),
+        SEND_COMMIT_DATA_REQUEST(30);
 
         private static final long serialVersionUID = 1102L;
 

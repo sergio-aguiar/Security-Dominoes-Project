@@ -1,5 +1,6 @@
 package DominoesClient;
 
+import DominoesMisc.DominoesCommitData;
 import DominoesMisc.DominoesDeck;
 import DominoesMisc.DominoesGameState;
 import DominoesMisc.DominoesTable;
@@ -22,7 +23,7 @@ public interface DCInterface
     DominoesDeck getDeck(String pseudonym, int tableID);
     boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif);
     void skipTurn(String pseudonym, int tableID);
-    boolean commitHand(String pseudonym, int tableID, String bitCommitment);
+    boolean commitHand(String pseudonym, int tableID, DominoesCommitData commitData);
     boolean hasPlayerCommitted(String pseudonym, int tableID);
     boolean isHandlingStart(String pseudonym, int tableID);
     void stateHighestDouble(String pseudonym, int tableID, String piece);
@@ -32,4 +33,8 @@ public interface DCInterface
     boolean isResetNeeded(String pseudonym, int tableID);
     boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint);
     String drawCard(String pseudonym, int tableID);
+    void denounceCheating(String pseudonym, int tableID);
+    boolean isHandlingCheating(String pseudonym, int tableID);
+    boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData);
+    boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData);
 }

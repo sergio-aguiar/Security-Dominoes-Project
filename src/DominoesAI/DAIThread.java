@@ -131,12 +131,15 @@ public class DAIThread extends DCThread {
                             else
                             {
                                 System.out.println("[AICLIENT] commiting hand ...");
-                                if(this.dcInterface.commitHand(this.pseudonym, this.tableID, "TMP"))
-                                {
-                                    System.out.println("[AICLIENT] hand commited");
-                                }                                
-                                else   
-                                    System.out.println("[AICLIENT] couldn't commit hand");
+
+                                // TODO: FIX BIT COMMIT
+
+                                //if(this.dcInterface.commitHand(this.pseudonym, this.tableID, 0))
+                                //{
+                                //    System.out.println("[AICLIENT] hand commited");
+                                //}
+                                //else
+                                //    System.out.println("[AICLIENT] couldn't commit hand");
                             }
                         }
                         else

@@ -11,22 +11,24 @@ public class DominoesTable implements Serializable
     private static final int maxPieces = 6;
 
     private final int id;
-
     private DominoesDeck deck;
-    private DominoesGameState gameState;
-
+    private final DominoesGameState gameState;
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
-    private final boolean[] bitCommits;
+    private final boolean[] bitCommitment;
+    private final DominoesCommitData[] commitData;
     private final String[] playerDoubles;
     private final HashSet<Integer> leftToCommit;
     private final HashSet<Integer> leftToReset;
     private final boolean[] illegalMoves;
 
     private boolean started;
+    private boolean ended;
     private int firstPlayer;
     private boolean resetNeeded;
+    private boolean handlingCheating;
+    private DominoesCommitData commitGenData;
     private int turn;
 
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
@@ -42,8 +44,10 @@ public class DominoesTable implements Serializable
         this.readyStates[0] = true;
         this.playerPieceCount = new int[playerCap];
         this.playerPieceCount[0] = 0;
-        this.bitCommits = new boolean[playerCap];
-        this.bitCommits[0] = false;
+        this.bitCommitment = new boolean[playerCap];
+        this.bitCommitment[0] = false;
+        this.commitData = new DominoesCommitData[playerCap];
+        this.commitData[0] = null;
         this.playerDoubles = new String[playerCap];
         this.playerDoubles[0] = null;
         this.leftToCommit = new HashSet<>();
@@ -56,14 +60,18 @@ public class DominoesTable implements Serializable
             this.players[i] = null;
             this.readyStates[i] = false;
             this.playerPieceCount[i] = 0;
-            this.bitCommits[i] = false;
+            this.bitCommitment[i] = false;
+            this.commitData[i] = null;
             this.playerDoubles[i] = null;
             this.illegalMoves[i] = false;
         }
 
         this.started = false;
+        this.ended = false;
         this.firstPlayer = -1;
         this.resetNeeded = false;
+        this.handlingCheating = false;
+        this.commitGenData = null;
         this.turn = 0;
     }
 
@@ -160,33 +168,50 @@ public class DominoesTable implements Serializable
             }
     }
 
-    public boolean distributionCommit(String pseudonym)
+    public boolean distributionCommit(String pseudonym, DominoesCommitData commitData)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
             if (this.leftToCommit.contains(i)) if (this.playerPieceCount[i] == maxPieces)
             {
-                this.bitCommits[i] = true;
+                this.bitCommitment[i] = true;
+                this.commitData[i] = commitData;
                 this.leftToCommit.remove(i);
                 return true;
             }
         return false;
     }
 
+    public boolean updateCommit(String pseudonym, DominoesCommitData commitData)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            this.commitData[i] = commitData;
+            return true;
+        }
+        return false;
+    }
+
     public boolean hasPlayerCommitted(String pseudonym)
     {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym)) return this.bitCommits[i];
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            return this.bitCommitment[i];
         return false;
     }
 
     public boolean haveAllCommitted()
     {
-        for (boolean b : this.bitCommits) if (!b) return false;
+        for (boolean b : this.bitCommitment) if (!b) return false;
         return true;
     }
 
     public boolean isTurn(String pseudonym)
     {
         return this.players[this.turn].equals(pseudonym);
+    }
+
+    public boolean isHandlingCheating()
+    {
+        return this.handlingCheating;
     }
 
     public int getId()
@@ -245,8 +270,7 @@ public class DominoesTable implements Serializable
 
     public boolean hasEnded()
     {
-        // TODO: Add game termination
-        return false;
+        return this.ended;
     }
 
     public int getTurn()
@@ -312,7 +336,7 @@ public class DominoesTable implements Serializable
             this.deck = new DominoesDeck();
 
             Arrays.fill(this.playerPieceCount, 0);
-            Arrays.fill(this.bitCommits, false);
+            Arrays.fill(this.bitCommitment, false);
             Arrays.fill(this.playerDoubles, null);
 
             for (int j = 0; j < this.players.length; j++)
@@ -333,8 +357,12 @@ public class DominoesTable implements Serializable
         {
             System.out.println("DST: play piece: " + targetEndPoint + " ," + piece + " ," + pieceEndPoint);
             if (targetEndPoint.equals("First") && !this.gameState.getPlayedPieces().isEmpty()) return false;
+
+            boolean alreadyPlayed = this.gameState.getPlayedPieces().contains(piece);
             this.illegalMoves[i] = !this.gameState.playPiece(targetEndPoint, piece, pieceEndPoint, i)
+                    || alreadyPlayed
                     || this.illegalMoves[i];
+
             System.out.println("DST: play piece: " + true);
             return true;
         }
@@ -349,6 +377,17 @@ public class DominoesTable implements Serializable
             this.leftToReset.add(i);
         }
         this.started = true;
+    }
+
+    public void denounceCheating()
+    {
+        this.ended = true;
+        this.handlingCheating = true;
+    }
+
+    public void setCommitGenData(DominoesCommitData commitGenData)
+    {
+        this.commitGenData = commitGenData;
     }
 
     public boolean isFull()
