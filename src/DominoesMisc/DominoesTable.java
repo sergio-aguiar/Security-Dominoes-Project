@@ -13,6 +13,7 @@ public class DominoesTable implements Serializable
     private final int id;
     private DominoesDeck deck;
     private final DominoesGameState gameState;
+    private final DominoesAccountingInfo accountingInfo;
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
@@ -22,13 +23,15 @@ public class DominoesTable implements Serializable
     private final HashSet<Integer> leftToCommit;
     private final HashSet<Integer> leftToReset;
     private final boolean[] illegalMoves;
+    private final DominoesCommitData[] commitGenData;
+    private final Object[] decisionMade;
 
     private boolean started;
     private boolean ended;
     private int firstPlayer;
     private boolean resetNeeded;
     private boolean handlingCheating;
-    private DominoesCommitData commitGenData;
+    private boolean handlingAccounting;
     private int turn;
 
     public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
@@ -38,6 +41,7 @@ public class DominoesTable implements Serializable
         this.id = gID++;
         this.deck = new DominoesDeck();
         this.gameState = new DominoesGameState(playerCap);
+        this.accountingInfo = new DominoesAccountingInfo(playerCap);
         this.players = new String[playerCap];
         this.players[0] = tableLeader;
         this.readyStates = new boolean[playerCap];
@@ -54,6 +58,10 @@ public class DominoesTable implements Serializable
         this.leftToReset = new HashSet<>();
         this.illegalMoves = new boolean[playerCap];
         this.illegalMoves[0] = false;
+        this.commitGenData = new DominoesCommitData[playerCap];
+        this.commitGenData[0] = null;
+        this.decisionMade = new Object[playerCap];
+        this.decisionMade[0] = null;
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -64,6 +72,8 @@ public class DominoesTable implements Serializable
             this.commitData[i] = null;
             this.playerDoubles[i] = null;
             this.illegalMoves[i] = false;
+            this.commitGenData[i] = null;
+            this.decisionMade[i] = null;
         }
 
         this.started = false;
@@ -71,13 +81,8 @@ public class DominoesTable implements Serializable
         this.firstPlayer = -1;
         this.resetNeeded = false;
         this.handlingCheating = false;
-        this.commitGenData = null;
+        this.handlingAccounting = false;
         this.turn = 0;
-    }
-
-    public static int getMaxPieces()
-    {
-        return maxPieces;
     }
 
     private boolean isValidPlayerCap(int playerCap)
@@ -214,6 +219,11 @@ public class DominoesTable implements Serializable
         return this.handlingCheating;
     }
 
+    public boolean isHandlingAccounting()
+    {
+        return this.handlingAccounting;
+    }
+
     public int getId()
     {
         return this.id;
@@ -247,6 +257,11 @@ public class DominoesTable implements Serializable
     public DominoesGameState getGameState()
     {
         return this.gameState;
+    }
+
+    public DominoesAccountingInfo getAccountingInfo()
+    {
+        return this.accountingInfo;
     }
 
     public void setDeck(DominoesDeck deck)
@@ -355,7 +370,6 @@ public class DominoesTable implements Serializable
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
-            System.out.println("DST: play piece: " + targetEndPoint + " ," + piece + " ," + pieceEndPoint);
             if (targetEndPoint.equals("First") && !this.gameState.getPlayedPieces().isEmpty()) return false;
 
             boolean alreadyPlayed = this.gameState.getPlayedPieces().contains(piece);
@@ -363,7 +377,15 @@ public class DominoesTable implements Serializable
                     || alreadyPlayed
                     || this.illegalMoves[i];
 
-            System.out.println("DST: play piece: " + true);
+            this.playerPieceCount[i]--;
+            if (this.playerPieceCount[i] == 0)
+            {
+                this.gameState.setWinner(i);
+                this.ended = true;
+                this.handlingAccounting = true;
+                calcAllAccounting();
+            }
+
             return true;
         }
         return false;
@@ -385,9 +407,106 @@ public class DominoesTable implements Serializable
         this.handlingCheating = true;
     }
 
-    public void setCommitGenData(DominoesCommitData commitGenData)
+    public void setCommitGenData(String pseudonym, DominoesCommitData commitGenData)
     {
-        this.commitGenData = commitGenData;
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            this.commitGenData[i] = commitGenData;
+
+            boolean allCommitted = true;
+            for (DominoesCommitData commitData : this.commitGenData) if (commitData == null)
+            {
+                allCommitted = false;
+                break;
+            }
+
+            if (allCommitted)
+            {
+                computeCheaters();
+                calcAllAccounting();
+
+                this.handlingCheating = false;
+                this.handlingAccounting = true;
+            }
+        }
+    }
+
+    public void setDecisionMade(String pseudonym, boolean decision)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.decisionMade[i] = decision;
+    }
+
+    public boolean haveAllDecided()
+    {
+        for (Object decision : this.decisionMade) if (decision == null) return false;
+        return true;
+    }
+
+    public boolean haveAllAgreedToAccounting()
+    {
+        for (Object decision : this.decisionMade) if (!((boolean) decision)) return false;
+        return true;
+    }
+
+    public boolean hasSentCommitData(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            return this.commitGenData[i] != null;
+        return false;
+    }
+
+    public void computeCheaters()
+    {
+        System.out.println(Arrays.toString(this.illegalMoves));
+        System.out.println(this.gameState.isCheater(0));
+        System.out.println(this.gameState.isCheater(1));
+
+        for (int i = 0; i < this.players.length; i++)
+        {
+            if (this.illegalMoves[i])
+            {
+                this.gameState.setCheater(i);
+                System.out.println("Setting player " + i + " as a cheater!");
+                System.out.println(this.gameState.isCheater(i));
+                break;
+            }
+
+            if (this.commitData[i].hasBitCommitment()
+                    && this.commitData[i].hasRandom1()
+                    && this.commitGenData[i].hasRandom2()
+                    && this.commitGenData[i].hasPieces())
+            {
+                if (this.commitData[i].getBitCommitment() != DominoesCommitData.generateHash(
+                        this.commitData[i].getRandom1(), this.commitGenData[i].getRandom2(),
+                        this.commitGenData[i].getPieces())) this.gameState.setCheater(i);
+            }
+            else this.gameState.setCheater(i);
+        }
+    }
+
+    private int calcAccountingResult(String pseudonym)
+    {
+        int result = 0;
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+        {
+            if (this.gameState.getWinner() == i)
+                for (int pieceCount : this.playerPieceCount) result += pieceCount;
+            else if (this.gameState.getWinner() == -1)
+            {
+                if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+            }
+            else result -= this.playerPieceCount[i];
+
+            System.out.print("\nPlayer " + this.players[i] + " result: " + result);
+        }
+        return result;
+    }
+
+    private void calcAllAccounting()
+    {
+        for (int i = 0; i < this.players.length; i++)
+            this.accountingInfo.setAccountingInfo(i, this.players[i], calcAccountingResult(this.players[i]));
     }
 
     public boolean isFull()

@@ -1,9 +1,6 @@
 package DominoesClient;
 
-import DominoesMisc.DominoesCommitData;
-import DominoesMisc.DominoesDeck;
-import DominoesMisc.DominoesGameState;
-import DominoesMisc.DominoesTable;
+import DominoesMisc.*;
 
 public interface DCInterface
 {
@@ -37,4 +34,10 @@ public interface DCInterface
     boolean isHandlingCheating(String pseudonym, int tableID);
     boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData);
     boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData);
+    boolean hasSentCommitData(String pseudonym, int tableID);
+    boolean isHandlingAccounting(String pseudonym, int tableID);
+    DominoesAccountingInfo getAccountingInfo(String pseudonym, int tableID);
+    boolean sendAccountingDecision(String pseudonym, int tableID, boolean decision);
+    boolean allSentDecision(String pseudonym, int tableID);
+    boolean allAgreedToAccounting(String pseudonym, int tableID);
 }

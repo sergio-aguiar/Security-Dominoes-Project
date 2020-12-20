@@ -1,10 +1,7 @@
 package DominoesServer;
 
 import DominoesClient.DCInterface;
-import DominoesMisc.DominoesCommitData;
-import DominoesMisc.DominoesDeck;
-import DominoesMisc.DominoesGameState;
-import DominoesMisc.DominoesTable;
+import DominoesMisc.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -563,9 +560,7 @@ public class DSImplementation implements DCInterface
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
-                System.out.println("DSI: play piece: " + targetEndPoint + " ," + piece + " ," + pieceEndPoint);
                 result = table.playPiece(pseudonym, targetEndPoint, piece, pieceEndPoint);
-                System.out.println("DSI: play piece: " + result);
                 if (result) table.incrementTurn();
             }
         }
@@ -676,7 +671,7 @@ public class DSImplementation implements DCInterface
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
-                table.setCommitGenData(commitData);
+                table.setCommitGenData(pseudonym, commitData);
                 result = true;
                 table.incrementTurn();
             }
@@ -684,6 +679,135 @@ public class DSImplementation implements DCInterface
         catch (Exception e)
         {
             System.out.println("DSImplementation: sendCommitData: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasSentCommitData(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.hasSentCommitData(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasSentCommitData: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isHandlingAccounting(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isHandlingAccounting();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isHandlingAccounting: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public DominoesAccountingInfo getAccountingInfo(String pseudonym, int tableID)
+    {
+        DominoesAccountingInfo accountingInfo = null;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                accountingInfo = table.getAccountingInfo();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getAccountingInfo: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return accountingInfo;
+    }
+
+    @Override
+    public boolean sendAccountingDecision(String pseudonym, int tableID, boolean decision)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.setDecisionMade(pseudonym, decision);
+                result = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: sendAccountingDecision: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean allSentDecision(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.haveAllDecided();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: allSentDecision: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean allAgreedToAccounting(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.haveAllAgreedToAccounting();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: allAgreedToAccounting: " + e.toString());
         }
         finally
         {

@@ -35,7 +35,13 @@ public class DMessage implements Serializable
         DENOUNCE_CHEATING_REQUEST(27),
         CHEAT_HANDLING_STATE_REQUEST(28),
         COMMIT_UPDATE_REQUEST(29),
-        SEND_COMMIT_DATA_REQUEST(30);
+        SEND_COMMIT_DATA_REQUEST(30),
+        HAS_SENT_COMMIT_REQUEST(31),
+        IS_HANDLING_ACCOUNT_REQUEST(32),
+        ACCOUNTING_INFO_REQUEST(33),
+        ACCOUNTING_DECISION_REQUEST(34),
+        ALL_DECISIONS_REQUEST(35),
+        ALL_AGREED_REQUEST(36);
 
         private static final long serialVersionUID = 1102L;
 

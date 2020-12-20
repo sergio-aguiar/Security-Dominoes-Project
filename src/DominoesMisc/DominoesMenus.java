@@ -104,4 +104,12 @@ public class DominoesMenus
                 + "2- No\n"
                 + "Option: ");
     }
+
+    public static void accountingMenu(DominoesAccountingInfo accountingInfo)
+    {
+        System.out.print("\n[Client] Accept game outcome:\n"
+                + "1- Yes\n"
+                + "2- No\n"
+                + "Option: ");
+    }
 }

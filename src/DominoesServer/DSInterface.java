@@ -2,10 +2,7 @@ package DominoesServer;
 
 import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
-import DominoesMisc.DominoesCommitData;
-import DominoesMisc.DominoesDeck;
-import DominoesMisc.DominoesGameState;
-import DominoesMisc.DominoesTable;
+import DominoesMisc.*;
 
 public class DSInterface
 {
@@ -52,6 +49,11 @@ public class DSInterface
             case 26:
             case 27:
             case 28:
+            case 31:
+            case 32:
+            case 33:
+            case 35:
+            case 36:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -123,6 +125,14 @@ public class DSInterface
                         && !inMessage.getFourthArgument().equals("5")
                         && !inMessage.getFourthArgument().equals("6"))
                     throw new DMessageException("Argument \"pieceEndPoint\" was given an incorrect value", inMessage);
+                break;
+            case 34:
+                if (inMessage.noFirstArgument())
+                    throw new DMessageException("Argument \"tableID\" was not given", inMessage);
+                if ((int) inMessage.getFirstArgument() < 0)
+                    throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
+                if (inMessage.noSecondArgument())
+                    throw new DMessageException("Argument \"decision\" was not given", inMessage);
                 break;
             default:
                 throw new DMessageException("Invalid message type: " + inMessage.getMessageType());
@@ -276,10 +286,40 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode(), return29);
                 break;
             case 30:
-                this.dsImplementation.sendCommitData(inMessage.getPseudonym(),
+                boolean return30 = this.dsImplementation.sendCommitData(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument(), (DominoesCommitData) inMessage.getSecondArgument());
-                outMessage = new DMessage(DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode(),
-                        (Object) null);
+                outMessage = new DMessage(DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode(), return30);
+                break;
+            case 31:
+                boolean return31 = this.dsImplementation.hasSentCommitData(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAS_SENT_COMMIT_REQUEST.getMessageCode(), return31);
+                break;
+            case 32:
+                boolean return32 = this.dsImplementation.isHandlingAccounting(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.IS_HANDLING_ACCOUNT_REQUEST.getMessageCode(), return32);
+                break;
+            case 33:
+                DominoesAccountingInfo return33 = this.dsImplementation.getAccountingInfo(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.ACCOUNTING_INFO_REQUEST.getMessageCode(), return33);
+                break;
+            case 34:
+                boolean return34 = this.dsImplementation.sendAccountingDecision(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (boolean) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.ACCOUNTING_DECISION_REQUEST.getMessageCode(), return34);
+                break;
+            case 35:
+                boolean return35 = this.dsImplementation.allSentDecision(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.ALL_DECISIONS_REQUEST.getMessageCode(), return35);
+                break;
+            case 36:
+                boolean return36 = this.dsImplementation.allAgreedToAccounting(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.ALL_AGREED_REQUEST.getMessageCode(), return36);
+                break;
         }
         return outMessage;
     }

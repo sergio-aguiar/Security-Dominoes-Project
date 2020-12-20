@@ -11,6 +11,7 @@ public class DominoesGameState implements Serializable
     private final HashSet<String> playedPieces;
     private final ArrayList<String> endPoints;
     private final ArrayList<ArrayList<String>> pastMoves;
+    private final boolean[] cheaters;
 
     private int winner;
 
@@ -19,7 +20,14 @@ public class DominoesGameState implements Serializable
         this.playedPieces = new HashSet<>();
         this.endPoints = new ArrayList<>();
         this.pastMoves = new ArrayList<>();
-        for (int i = 0; i < playerCap; i++) this.pastMoves.add(new ArrayList<>());
+        this.cheaters = new boolean[playerCap];
+
+        for (int i = 0; i < playerCap; i++)
+        {
+            this.pastMoves.add(new ArrayList<>());
+            this.cheaters[i] = false;
+        }
+
         this.winner = -1;
     }
 
@@ -139,6 +147,21 @@ public class DominoesGameState implements Serializable
     public int getWinner()
     {
         return this.winner;
+    }
+
+    public void setWinner(int winner)
+    {
+        this.winner = winner;
+    }
+
+    public void setCheater(int player)
+    {
+        this.cheaters[player] = true;
+    }
+
+    public boolean isCheater(int player)
+    {
+        return this.cheaters[player];
     }
 
     @Override
