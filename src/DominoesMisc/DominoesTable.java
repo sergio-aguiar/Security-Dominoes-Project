@@ -1,10 +1,9 @@
 package DominoesMisc;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class DominoesTable implements Serializable
+public class DominoesTable
 {
     private static final long serialVersionUID = 1103L;
     private static int gID = 0;
@@ -523,13 +522,29 @@ public class DominoesTable implements Serializable
     @Override
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder("Table ID = " + this.id + "\n");
-        for (int i = 0; i < this.players.length; i++) if (this.players[i] != null)
-        {
-            toReturn.append((this.readyStates[i]) ? "<READY>" : "<NOT READY>");
-            toReturn.append(" ").append(this.players[i]).append("\n");
-        }
-
-        return toReturn.toString();
+        return "DominoesTable{" +
+                "id=" + this.id +
+                ", deck=" + this.deck +
+                ", gameState=" + this.gameState +
+                ", accountingInfo=" + this.accountingInfo +
+                ", players=" + Arrays.toString(this.players) +
+                ", readyStates=" + Arrays.toString(this.readyStates) +
+                ", playerPieceCount=" + Arrays.toString(this.playerPieceCount) +
+                ", bitCommitment=" + Arrays.toString(this.bitCommitment) +
+                ", commitData=" + Arrays.toString(this.commitData) +
+                ", playerDoubles=" + Arrays.toString(this.playerDoubles) +
+                ", leftToCommit=" + this.leftToCommit +
+                ", leftToReset=" + this.leftToReset +
+                ", illegalMoves=" + Arrays.toString(this.illegalMoves) +
+                ", commitGenData=" + Arrays.toString(this.commitGenData) +
+                ", decisionMade=" + Arrays.toString(this.decisionMade) +
+                ", started=" + this.started +
+                ", ended=" + this.ended +
+                ", firstPlayer=" + this.firstPlayer +
+                ", resetNeeded=" + this.resetNeeded +
+                ", handlingCheating=" + this.handlingCheating +
+                ", handlingAccounting=" + this.handlingAccounting +
+                ", turn=" + this.turn +
+                '}';
     }
 }

@@ -41,18 +41,21 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTable[] listAvailableTables()
+    public DominoesTableInfo[] listAvailableTables()
     {
-        DominoesTable[] tables;
+        DominoesTableInfo[] tables;
         this.reentrantLock.lock();
         try
         {
-            tables = this.dominoesTables.toArray(new DominoesTable[0]);
+            tables = new DominoesTableInfo[this.dominoesTables.size()];
+            for (int i = 0; i < this.dominoesTables.size(); i++)
+                tables[i] = new DominoesTableInfo(this.dominoesTables.get(i).getId(),
+                        this.dominoesTables.get(i).getPlayers(), this.dominoesTables.get(i).getReadyStates());
         }
         catch (Exception e)
         {
             System.out.println("DSImplementation: listAvailableTables: " + e.toString());
-            tables = new DominoesTable[0];
+            tables = new DominoesTableInfo[0];
         }
         finally
         {
@@ -186,13 +189,14 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTable listTableInfo(String pseudonym, int tableID)
+    public DominoesTableInfo listTableInfo(String pseudonym, int tableID)
     {
-        DominoesTable dTable = null;
+        DominoesTableInfo dTable = null;
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dTable = table;
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                dTable = new DominoesTableInfo(table.getId(), table.getPlayers(), table.getReadyStates());
         }
         catch (Exception e)
         {

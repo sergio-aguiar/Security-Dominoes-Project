@@ -5,13 +5,13 @@ import DominoesMisc.*;
 public interface DCInterface
 {
     int createTable(String pseudonym, int playerCap);
-    DominoesTable[] listAvailableTables();
+    DominoesTableInfo[] listAvailableTables();
     boolean joinTable(String pseudonym, int tableID);
     int joinRandomTable(String pseudonym);
     boolean startGame(String pseudonym, int tableID);
     void disbandTable(String pseudonym, int tableID);
     boolean markAsReady(String pseudonym, int tableID);
-    DominoesTable listTableInfo(String pseudonym, int tableID);
+    DominoesTableInfo listTableInfo(String pseudonym, int tableID);
     void leaveTable(String pseudonym, int tableID);
     boolean isPlayerTurn(String pseudonym, int tableID);
     boolean hasGameEnded(String pseudonym, int tableID);

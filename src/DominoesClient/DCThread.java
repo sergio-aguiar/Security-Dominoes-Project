@@ -133,11 +133,11 @@ public class DCThread extends Thread
                     }
                     break;
                 case 2:
-                    System.out.println("\n[CLIENT] Fetching available dominoes tables...");
+                    System.out.print("\n[CLIENT] Fetching available dominoes tables...");
 
-                    DominoesTable[] tmpTables = this.dcInterface.listAvailableTables();
+                    DominoesTableInfo[] tmpTables = this.dcInterface.listAvailableTables();
                     if (tmpTables.length == 0) System.out.println("[CLIENT] No available tables found.");
-                    else for (DominoesTable table : tmpTables) System.out.print("\n" + table.toString());
+                    else for (DominoesTableInfo table : tmpTables) System.out.print("\n" + table.toString());
 
                     break;
                 case 3:
@@ -209,9 +209,10 @@ public class DCThread extends Thread
                                 break;
                             case 2:
                                 System.out.println("\n[CLIENT] Listing Table Information...");
-                                DominoesTable tmpTable = this.dcInterface.listTableInfo(this.pseudonym, this.tableID);
+                                DominoesTableInfo tmpTable = this.dcInterface.listTableInfo(this.pseudonym,
+                                        this.tableID);
 
-                                if (tmpTable != null) System.out.print(tmpTable.toString());
+                                if (tmpTable != null) System.out.println(tmpTable.toString());
                                 else
                                 {
                                     System.out.println("[CLIENT] The table was disbanded.");
@@ -234,6 +235,9 @@ public class DCThread extends Thread
                     break;
                 case 5:
                     System.out.println("\n[CLIENT] Showing score...");
+
+                    // TODO: SHOW SCORE
+
                     break;
                 case 6:
                     System.out.println("\n[CLIENT] Shutting down...");
@@ -494,6 +498,18 @@ public class DCThread extends Thread
 
         System.out.println("\n[CLIENT] BEFORE CHEAT HANDLING!");
 
+        if (!this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID))
+        {
+            DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
+            DominoesTableInfo dominoesTable = this.dcInterface.listTableInfo(this.pseudonym, this.tableID);
+
+            System.out.println(gameState.toString());
+            System.out.println(dominoesTable.toString());
+
+            if (protestMenu(dominoesTable.getPlayers()[gameState.getWinner()]) == 1)
+                this.dcInterface.denounceCheating(this.pseudonym, this.tableID);
+        }
+
         while (this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID)
                 && !this.dcInterface.hasSentCommitData(this.pseudonym, this.tableID))
         {
@@ -566,7 +582,13 @@ public class DCThread extends Thread
 
                 break;
             }
+            else
+            {
+                System.out.println("\n[CLIENT] Not every member agreed to the accounting. Game terminating...");
+            }
         }
+
+        this.dcInterface.disbandTable(this.pseudonym, this.tableID);
         gameOver();
     }
 
@@ -587,17 +609,6 @@ public class DCThread extends Thread
         this.gamePieces.clear();
     }
 
-    private int clientMainMenu()
-    {
-        while (true)
-        {
-            DominoesMenus.clientMainMenu();
-
-            Integer option = sextupleCaseMenuSwitch();
-            if (option != null) return option;
-        }
-    }
-
     private void randomizeCommitData()
     {
         this.bitCommitRandom1 = ThreadLocalRandom.current().nextInt(0,32);
@@ -610,6 +621,17 @@ public class DCThread extends Thread
         this.tableID = -1;
         randomizeCommitData();
         this.committedPieces = null;
+    }
+
+    private int clientMainMenu()
+    {
+        while (true)
+        {
+            DominoesMenus.clientMainMenu();
+
+            Integer option = sextupleCaseMenuSwitch();
+            if (option != null) return option;
+        }
     }
 
     private int clientPlayerCapMenu()
@@ -710,6 +732,17 @@ public class DCThread extends Thread
         while (true)
         {
             DominoesMenus.accountingMenu(accountingInfo);
+
+            Integer option = doubleCaseMenuSwitch();
+            if (option != null) return option;
+        }
+    }
+
+    private int protestMenu(String winner)
+    {
+        while (true)
+        {
+            DominoesMenus.protestMenu(winner);
 
             Integer option = doubleCaseMenuSwitch();
             if (option != null) return option;

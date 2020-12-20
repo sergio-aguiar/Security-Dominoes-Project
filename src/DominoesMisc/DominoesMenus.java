@@ -112,4 +112,12 @@ public class DominoesMenus
                 + "2- No\n"
                 + "Option: ");
     }
+
+    public static void protestMenu(String winner)
+    {
+        System.out.print("\n[Client] The game is over and " + winner + " has won. Check for cheating:\n"
+                + "1- Yes\n"
+                + "2- No\n"
+                + "Option: ");
+    }
 }

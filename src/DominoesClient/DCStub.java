@@ -70,7 +70,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesTable[] listAvailableTables()
+    public DominoesTableInfo[] listAvailableTables()
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -119,7 +119,7 @@ public class DCStub implements DCInterface
         }
         dcCommunication.close();
 
-        return (DominoesTable[]) inMessage.getReturnInfo();
+        return (DominoesTableInfo[]) inMessage.getReturnInfo();
     }
 
     @Override
@@ -374,7 +374,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesTable listTableInfo(String pseudonym, int tableID)
+    public DominoesTableInfo listTableInfo(String pseudonym, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -421,7 +421,7 @@ public class DCStub implements DCInterface
         }
         dcCommunication.close();
 
-        return (DominoesTable) inMessage.getReturnInfo();
+        return (DominoesTableInfo) inMessage.getReturnInfo();
     }
 
     @Override

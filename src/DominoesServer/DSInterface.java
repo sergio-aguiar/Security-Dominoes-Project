@@ -146,7 +146,7 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return1);
                 break;
             case 2:
-                DominoesTable[] return2 = this.dsImplementation.listAvailableTables();
+                DominoesTableInfo[] return2 = this.dsImplementation.listAvailableTables();
                 outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode(), return2);
                 break;
             case 3:
@@ -159,7 +159,7 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode(), return4);
                 break;
             case 5:
-                DominoesTable return5 = this.dsImplementation.listTableInfo(inMessage.getPseudonym(),
+                DominoesTableInfo return5 = this.dsImplementation.listTableInfo(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.LIST_TABLE_INFO_REQUEST.getMessageCode(), return5);
                 break;
