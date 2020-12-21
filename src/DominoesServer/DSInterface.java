@@ -54,6 +54,8 @@ public class DSInterface
             case 33:
             case 35:
             case 36:
+            case 37:
+            case 38:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -319,6 +321,15 @@ public class DSInterface
                 boolean return36 = this.dsImplementation.allAgreedToAccounting(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.ALL_AGREED_REQUEST.getMessageCode(), return36);
+                break;
+            case 37:
+                this.dsImplementation.passedProtestMenu(inMessage.getPseudonym(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.PROTEST_PASSED_REQUEST.getMessageCode(), (Object) null);
+                break;
+            case 38:
+                boolean return37 = this.dsImplementation.allPassedProtestMenu(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.PROTEST_CHECK_REQUEST.getMessageCode(), return37);
                 break;
         }
         return outMessage;

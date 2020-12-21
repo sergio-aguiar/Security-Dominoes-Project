@@ -609,7 +609,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.denounceCheating();
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                table.denounceCheating(pseudonym);
         }
         catch (Exception e)
         {
@@ -812,6 +813,46 @@ public class DSImplementation implements DCInterface
         catch (Exception e)
         {
             System.out.println("DSImplementation: allAgreedToAccounting: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public void passedProtestMenu(String pseudonym, int tableID)
+    {
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                table.passedProtest(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: passedProtestMenu: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+    }
+
+    @Override
+    public boolean allPassedProtestMenu(String pseudonym, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.haveAllPassedProtest();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: allPassedProtestMenu: " + e.toString());
         }
         finally
         {

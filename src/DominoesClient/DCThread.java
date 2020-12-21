@@ -136,7 +136,7 @@ public class DCThread extends Thread
                     System.out.print("\n[CLIENT] Fetching available dominoes tables...");
 
                     DominoesTableInfo[] tmpTables = this.dcInterface.listAvailableTables();
-                    if (tmpTables.length == 0) System.out.println("[CLIENT] No available tables found.");
+                    if (tmpTables.length == 0) System.out.println("\n[CLIENT] No available tables found.");
                     else for (DominoesTableInfo table : tmpTables) System.out.print("\n" + table.toString());
 
                     break;
@@ -510,6 +510,28 @@ public class DCThread extends Thread
                 this.dcInterface.denounceCheating(this.pseudonym, this.tableID);
         }
 
+        this.dcInterface.passedProtestMenu(this.pseudonym, this.tableID);
+        while (!this.dcInterface.allPassedProtestMenu(this.pseudonym, this.tableID))
+        {
+            this.reentrantLock.lock();
+            try
+            {
+                synchronized (this)
+                {
+                    this.turnCondition.awaitNanos(100000);
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("DCThread: gameLogic: " + e.toString());
+                System.exit(709);
+            }
+            finally
+            {
+                this.reentrantLock.unlock();
+            }
+        }
+
         while (this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID)
                 && !this.dcInterface.hasSentCommitData(this.pseudonym, this.tableID))
         {
@@ -585,6 +607,7 @@ public class DCThread extends Thread
             else
             {
                 System.out.println("\n[CLIENT] Not every member agreed to the accounting. Game terminating...");
+                break;
             }
         }
 

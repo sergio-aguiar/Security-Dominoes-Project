@@ -41,7 +41,9 @@ public class DMessage implements Serializable
         ACCOUNTING_INFO_REQUEST(33),
         ACCOUNTING_DECISION_REQUEST(34),
         ALL_DECISIONS_REQUEST(35),
-        ALL_AGREED_REQUEST(36);
+        ALL_AGREED_REQUEST(36),
+        PROTEST_PASSED_REQUEST(37),
+        PROTEST_CHECK_REQUEST(38);
 
         private static final long serialVersionUID = 1102L;
 

@@ -24,6 +24,7 @@ public class DominoesTable
     private final boolean[] illegalMoves;
     private final DominoesCommitData[] commitGenData;
     private final Object[] decisionMade;
+    private final boolean[] havePassedProtest;
 
     private boolean started;
     private boolean ended;
@@ -61,6 +62,8 @@ public class DominoesTable
         this.commitGenData[0] = null;
         this.decisionMade = new Object[playerCap];
         this.decisionMade[0] = null;
+        this.havePassedProtest = new boolean[playerCap];
+        this.havePassedProtest[0] = false;
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -73,6 +76,7 @@ public class DominoesTable
             this.illegalMoves[i] = false;
             this.commitGenData[i] = null;
             this.decisionMade[i] = null;
+            this.havePassedProtest[i] = false;
         }
 
         this.started = false;
@@ -470,7 +474,7 @@ public class DominoesTable
                 this.gameState.setCheater(i);
                 System.out.println("Setting player " + i + " as a cheater!");
                 System.out.println(this.gameState.isCheater(i));
-                break;
+                continue;
             }
 
             if (this.commitData[i].hasBitCommitment()
@@ -495,30 +499,37 @@ public class DominoesTable
             {
                 if (this.gameState.getDenounced() == i)
                 {
-                    if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+                    System.out.println("\nTHERE ARE NO CHEATERS! AND DENOUNCED BY " + i);
+                    for (int pieceCount : this.playerPieceCount) result -= pieceCount;
                 }
                 else if (this.gameState.getWinner() == i)
                 {
+                    System.out.println("\nTHERE ARE CHEATERS! AND WON BY " + i);
                     for (int pieceCount : this.playerPieceCount) result += pieceCount;
                 }
                 else if (this.gameState.getWinner() != -1)
                 {
+                    System.out.println("\nTHERE ARE CHEATERS! AND NOT WON BY " + i);
                     result -= this.playerPieceCount[i];
                 }
             }
             else
             {
-                if (this.gameState.getWinner() == i)
+                System.out.println("\nIS CHEATER: " +this.gameState.isCheater(i));
+                if (this.gameState.isCheater(i))
                 {
+                    System.out.println("\nTHERE ARE CHEATERS! AND ONE IS " + i);
+                    for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+                }
+                else if (this.gameState.getWinner() == i)
+                {
+                    System.out.println("\nTHERE ARE CHEATERS! AND WON BY " + i);
                     for (int pieceCount : this.playerPieceCount) result += pieceCount;
                 }
                 else if (this.gameState.getWinner() != -1)
                 {
+                    System.out.println("\nTHERE ARE CHEATERS! AND NOT WON BY " + i);
                     result -= this.playerPieceCount[i];
-                }
-                else
-                {
-                    if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
                 }
             }
 
@@ -537,6 +548,18 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++) if (this.gameState.isCheater(i)) return true;
         return false;
+    }
+
+    public void passedProtest(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.havePassedProtest[i] = true;
+    }
+
+    public boolean haveAllPassedProtest()
+    {
+        for (int i = 0; i < this.players.length; i++) if (!this.havePassedProtest[i]) return false;
+        return true;
     }
 
     public boolean isFull()

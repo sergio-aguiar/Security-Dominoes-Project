@@ -40,4 +40,6 @@ public interface DCInterface
     boolean sendAccountingDecision(String pseudonym, int tableID, boolean decision);
     boolean allSentDecision(String pseudonym, int tableID);
     boolean allAgreedToAccounting(String pseudonym, int tableID);
+    void passedProtestMenu(String pseudonym, int tableID);
+    boolean allPassedProtestMenu(String pseudonym, int tableID);
 }
