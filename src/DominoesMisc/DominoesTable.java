@@ -400,10 +400,12 @@ public class DominoesTable
         this.started = true;
     }
 
-    public void denounceCheating()
+    public void denounceCheating(String pseudonym)
     {
         this.ended = true;
         this.handlingCheating = true;
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.gameState.setDenounced(i);
     }
 
     public void setCommitGenData(String pseudonym, DominoesCommitData commitGenData)
@@ -489,13 +491,36 @@ public class DominoesTable
         int result = 0;
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
-            if (this.gameState.getWinner() == i)
-                for (int pieceCount : this.playerPieceCount) result += pieceCount;
-            else if (this.gameState.getWinner() == -1)
+            if (!areThereCheaters())
             {
-                if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+                if (this.gameState.getDenounced() == i)
+                {
+                    if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+                }
+                else if (this.gameState.getWinner() == i)
+                {
+                    for (int pieceCount : this.playerPieceCount) result += pieceCount;
+                }
+                else if (this.gameState.getWinner() != -1)
+                {
+                    result -= this.playerPieceCount[i];
+                }
             }
-            else result -= this.playerPieceCount[i];
+            else
+            {
+                if (this.gameState.getWinner() == i)
+                {
+                    for (int pieceCount : this.playerPieceCount) result += pieceCount;
+                }
+                else if (this.gameState.getWinner() != -1)
+                {
+                    result -= this.playerPieceCount[i];
+                }
+                else
+                {
+                    if (this.gameState.isCheater(i)) for (int pieceCount : this.playerPieceCount) result -= pieceCount;
+                }
+            }
 
             System.out.print("\nPlayer " + this.players[i] + " result: " + result);
         }
@@ -506,6 +531,12 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++)
             this.accountingInfo.setAccountingInfo(i, this.players[i], calcAccountingResult(this.players[i]));
+    }
+
+    private boolean areThereCheaters()
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.gameState.isCheater(i)) return true;
+        return false;
     }
 
     public boolean isFull()

@@ -14,6 +14,7 @@ public class DominoesGameState implements Serializable
     private final boolean[] cheaters;
 
     private int winner;
+    private int denounced;
 
     public DominoesGameState(int playerCap)
     {
@@ -29,6 +30,7 @@ public class DominoesGameState implements Serializable
         }
 
         this.winner = -1;
+        this.denounced = -1;
     }
 
     public boolean playPiece(String targetEndPoint, String piece, String pieceEndPoint,  int player)
@@ -141,7 +143,7 @@ public class DominoesGameState implements Serializable
 
     public ArrayList<ArrayList<String>> getPastMoves()
     {
-        return pastMoves;
+        return this.pastMoves;
     }
 
     public int getWinner()
@@ -149,9 +151,19 @@ public class DominoesGameState implements Serializable
         return this.winner;
     }
 
+    public int getDenounced()
+    {
+        return this.denounced;
+    }
+
     public void setWinner(int winner)
     {
         this.winner = winner;
+    }
+
+    public void setDenounced(int denounced)
+    {
+        this.denounced = denounced;
     }
 
     public void setCheater(int player)
