@@ -438,9 +438,12 @@ public class DCThread extends Thread
                                     String[] pieceEndPoints = this.gamePieces.get(piece).split("\\|");
                                     int pieceEndPoint = pieceEndPointsMenu(pieceEndPoints);
 
-                                    if (this.dcInterface.playPiece(this.pseudonym, this.tableID, tmpEndPoints[endPoint],
-                                            this.gamePieces.get(piece),  pieceEndPoints[pieceEndPoint - 1]))
+                                    if (this.dcInterface.playPiece(this.pseudonym, this.tableID,
+                                            tmpEndPoints[endPoint - 1], this.gamePieces.get(piece),
+                                            pieceEndPoints[pieceEndPoint - 1]))
+                                    {
                                         this.gamePieces.remove(piece);
+                                    }
                                     else System.out.println("\n[CLIENT] Error playing the piece.");
 
                                     System.out.println(this.gamePieces.toString());

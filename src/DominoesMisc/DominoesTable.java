@@ -497,7 +497,7 @@ public class DominoesTable
         {
             if (!areThereCheaters())
             {
-                if (this.gameState.getDenounced() == i)
+                if (this.gameState.getDenounced()[i])
                 {
                     System.out.println("\nTHERE ARE NO CHEATERS! AND DENOUNCED BY " + i);
                     for (int pieceCount : this.playerPieceCount) result -= pieceCount;
