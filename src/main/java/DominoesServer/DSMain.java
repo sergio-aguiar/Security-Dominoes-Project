@@ -1,6 +1,7 @@
 package DominoesServer;
 
 import DominoesCommunication.DSCommunication;
+import DominoesDatabase.DSQLiteConnection;
 
 import java.net.SocketTimeoutException;
 
@@ -11,6 +12,8 @@ public class DSMain
 
     public static void main(String[] args)
     {
+        DSQLiteConnection.forceStart();
+
         DSImplementation dsImplementation = new DSImplementation();
         DSInterface dsInterface = new DSInterface(dsImplementation);
         DSProxy dsProxy;
