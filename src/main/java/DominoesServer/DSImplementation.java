@@ -1,6 +1,7 @@
 package DominoesServer;
 
 import DominoesClient.DCInterface;
+import DominoesDatabase.DSQLiteConnection;
 import DominoesMisc.*;
 
 import java.util.ArrayList;
@@ -18,13 +19,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public int createTable(String pseudonym, int playerCap)
+    public int createTable(String pseudonym, int playerCap, byte[] publicKey)
     {
         int tableID;
         this.reentrantLock.lock();
         try
         {
-            DominoesTable table = new DominoesTable(playerCap, pseudonym);
+            DominoesTable table = new DominoesTable(playerCap, pseudonym, publicKey);
             tableID = table.getId();
             this.dominoesTables.add(table);
         }
@@ -853,6 +854,91 @@ public class DSImplementation implements DCInterface
         catch (Exception e)
         {
             System.out.println("DSImplementation: allPassedProtestMenu: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isUserRegistered(String pseudonym)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            result = DSQLiteConnection.isUserRegistered(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isUserRegistered: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean registerUser(String pseudonym)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            DSQLiteConnection.registerUser(pseudonym);
+            result = true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isUserRegistered: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] greetServer(String pseudonym, int tableID ,byte[] publicKey)
+    {
+        byte[] result;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                table.reportPlayerKey(pseudonym, publicKey);
+            result = publicKey;
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: greetServer: " + e.toString());
+            result = new byte[0];
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] getServerPublicKey(String pseudonym, int tableID)
+    {
+        byte[] result = new byte[0];
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.getTablePublicKey();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getServerPublicKey: " + e.toString());
         }
         finally
         {

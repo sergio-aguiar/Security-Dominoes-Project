@@ -43,7 +43,11 @@ public class DMessage implements Serializable
         ALL_DECISIONS_REQUEST(35),
         ALL_AGREED_REQUEST(36),
         PROTEST_PASSED_REQUEST(37),
-        PROTEST_CHECK_REQUEST(38);
+        PROTEST_CHECK_REQUEST(38),
+        CHECK_USER_REGISTER_REQUEST(39),
+        REGISTER_USER_REQUEST(40),
+        GREET_SERVER_REQUEST(41),
+        SERVER_KEY_REQUEST(42);
 
         private static final long serialVersionUID = 1102L;
 

@@ -1,6 +1,7 @@
 package DominoesClient;
 
 import DominoesMisc.*;
+import DominoesSecurity.DominoesCryptoAsym;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,22 +37,32 @@ public class DCThread extends Thread
     private final Condition turnCondition;
 
     private final String pseudonym;
+    private final int sessionID;
     private final DCInterface dcInterface;
     private final ArrayList<String> gamePieces;
+    private final byte[] sessionPrivateKey;
+    private final byte[] sessionPublicKey;
 
     private int tableID;
+    private byte[] tablePublicKey;
 
     private int bitCommitRandom1;
     private int bitCommitRandom2;
     private ArrayList<String> committedPieces;
 
-    public DCThread(String pseudonym, DCInterface dcInterface)
+    public DCThread(String pseudonym, int sessionID , DCInterface dcInterface)
     {
         this.reentrantLock = new ReentrantLock(true);
         this.turnCondition = this.reentrantLock.newCondition();
         this.pseudonym = pseudonym;
+        this.sessionID = sessionID;
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
+
+        Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
+        this.sessionPrivateKey = keys.get("private");
+        this.sessionPublicKey = keys.get("public");
+
         this.tableID = -1;
         randomizeCommitData();
         this.committedPieces = null;
@@ -61,6 +72,8 @@ public class DCThread extends Thread
     public void run()
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
+
+        if (!this.dcInterface.isUserRegistered(this.pseudonym)) this.dcInterface.registerUser(this.pseudonym);
 
         while (true)
         {
@@ -74,15 +87,18 @@ public class DCThread extends Thread
                     {
                         case 1:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 2);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 2,
+                                    this.sessionPublicKey);
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 3);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 3,
+                                    this.sessionPublicKey);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4,
+                                    this.sessionPublicKey);
                             break;
                         case 4:
                             exit1 = true;
@@ -91,6 +107,8 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Unexpected Error...");
                             System.exit(703);
                     }
+
+                    getTableKey();
 
                     if (!exit1)
                     {
@@ -185,6 +203,30 @@ public class DCThread extends Thread
                     }
 
                     if (noTables) break;
+
+                    while (this.sessionPublicKey != this.dcInterface.greetServer(this.pseudonym, this.tableID,
+                            this.sessionPublicKey))
+                    {
+                        this.reentrantLock.lock();
+                        try
+                        {
+                            synchronized (this)
+                            {
+                                this.turnCondition.awaitNanos(100000);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println("DCThread: gameLogic: " + e.toString());
+                            System.exit(7019);
+                        }
+                        finally
+                        {
+                            this.reentrantLock.unlock();
+                        }
+                    }
+
+                    getTableKey();
 
                     boolean exit3 = false;
                     do
@@ -647,6 +689,11 @@ public class DCThread extends Thread
         this.tableID = -1;
         randomizeCommitData();
         this.committedPieces = null;
+    }
+
+    private void getTableKey()
+    {
+        this.tablePublicKey = this.dcInterface.getServerPublicKey(this.pseudonym, this.tableID);
     }
 
     private int clientMainMenu()

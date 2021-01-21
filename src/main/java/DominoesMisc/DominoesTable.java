@@ -1,7 +1,10 @@
 package DominoesMisc;
 
+import DominoesSecurity.DominoesCryptoAsym;
+
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 
 public class DominoesTable
 {
@@ -26,6 +29,11 @@ public class DominoesTable
     private final Object[] decisionMade;
     private final boolean[] havePassedProtest;
 
+    private final byte[][] playerPublicKeys;
+
+    private final byte[] tablePrivateKey;
+    private final byte[] tablePublicKey;
+
     private boolean started;
     private boolean ended;
     private int firstPlayer;
@@ -34,7 +42,7 @@ public class DominoesTable
     private boolean handlingAccounting;
     private int turn;
 
-    public DominoesTable(int playerCap, String tableLeader) throws DominoesTableException
+    public DominoesTable(int playerCap, String tableLeader, byte[] leaderPublicKey) throws DominoesTableException
     {
         if (!this.isValidPlayerCap(playerCap)) throw new DominoesTableException("Invalid player capacity value!");
 
@@ -64,6 +72,8 @@ public class DominoesTable
         this.decisionMade[0] = null;
         this.havePassedProtest = new boolean[playerCap];
         this.havePassedProtest[0] = false;
+        this.playerPublicKeys = new byte[playerCap][];
+        this.playerPublicKeys[0] = leaderPublicKey;
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -77,7 +87,12 @@ public class DominoesTable
             this.commitGenData[i] = null;
             this.decisionMade[i] = null;
             this.havePassedProtest[i] = false;
+            this.playerPublicKeys[i] = null;
         }
+
+        Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
+        this.tablePrivateKey = keys.get("private");
+        this.tablePublicKey = keys.get("public");
 
         this.started = false;
         this.ended = false;
@@ -560,6 +575,17 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++) if (!this.havePassedProtest[i]) return false;
         return true;
+    }
+
+    public void reportPlayerKey(String pseudonym, byte[] publicKey)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.playerPublicKeys[i] = publicKey;
+    }
+
+    public byte[] getTablePublicKey()
+    {
+        return this.tablePublicKey;
     }
 
     public boolean isFull()

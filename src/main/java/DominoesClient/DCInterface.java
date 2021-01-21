@@ -4,7 +4,7 @@ import DominoesMisc.*;
 
 public interface DCInterface
 {
-    int createTable(String pseudonym, int playerCap);
+    int createTable(String pseudonym, int playerCap, byte[] publicKey);
     DominoesTableInfo[] listAvailableTables();
     boolean joinTable(String pseudonym, int tableID);
     int joinRandomTable(String pseudonym);
@@ -42,4 +42,9 @@ public interface DCInterface
     boolean allAgreedToAccounting(String pseudonym, int tableID);
     void passedProtestMenu(String pseudonym, int tableID);
     boolean allPassedProtestMenu(String pseudonym, int tableID);
+
+    boolean isUserRegistered(String pseudonym);
+    boolean registerUser(String pseudonym);
+    byte[] greetServer(String pseudonym, int tableID, byte[] publicKey);
+    byte[] getServerPublicKey(String pseudonym, int tableID);
 }

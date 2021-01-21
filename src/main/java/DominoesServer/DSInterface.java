@@ -28,6 +28,9 @@ public class DSInterface
             case 2:
             case 4:
             case 5:
+            case 39:
+            case 40:
+            case 42:
                 break;
             case 3:
             case 6:
@@ -56,6 +59,7 @@ public class DSInterface
             case 36:
             case 37:
             case 38:
+            case 41:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -144,7 +148,7 @@ public class DSInterface
         {
             case 1:
                 int return1 = this.dsImplementation.createTable(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument());
+                        (int) inMessage.getFirstArgument(), (byte[]) inMessage.getSecondArgument());
                 outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return1);
                 break;
             case 2:
@@ -327,9 +331,27 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.PROTEST_PASSED_REQUEST.getMessageCode(), (Object) null);
                 break;
             case 38:
-                boolean return37 = this.dsImplementation.allPassedProtestMenu(inMessage.getPseudonym(),
+                boolean return38 = this.dsImplementation.allPassedProtestMenu(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
-                outMessage = new DMessage(DMessage.MessageType.PROTEST_CHECK_REQUEST.getMessageCode(), return37);
+                outMessage = new DMessage(DMessage.MessageType.PROTEST_CHECK_REQUEST.getMessageCode(), return38);
+                break;
+            case 39:
+                boolean return39 = this.dsImplementation.isUserRegistered(inMessage.getPseudonym());
+                outMessage = new DMessage(DMessage.MessageType.CHECK_USER_REGISTER_REQUEST.getMessageCode(), return39);
+                break;
+            case 40:
+                boolean return40 = this.dsImplementation.registerUser(inMessage.getPseudonym());
+                outMessage = new DMessage(DMessage.MessageType.REGISTER_USER_REQUEST.getMessageCode(), return40);
+                break;
+            case 41:
+                byte[] return41 = this.dsImplementation.greetServer(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument(), (byte[]) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.GREET_SERVER_REQUEST.getMessageCode(), return41);
+                break;
+            case 42:
+                byte[] return42 = this.dsImplementation.getServerPublicKey(inMessage.getPseudonym(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode(), return42);
                 break;
         }
         return outMessage;

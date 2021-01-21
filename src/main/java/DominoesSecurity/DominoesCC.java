@@ -30,7 +30,7 @@ public class DominoesCC {
 
     static{
         provider = Security.getProvider("SunPKCS11");
-        provider = provider.configure("src/DominoesSecurity/CitizenCard.cfg");
+        provider = provider.configure("src/main/java/DominoesSecurity/CitizenCard.cfg");
         Security.addProvider(provider);
 
         try {
@@ -91,7 +91,7 @@ public class DominoesCC {
         return cert.getSerialNumber().intValue();
     }
 
-    private static X509Certificate getCert() {
+    public static X509Certificate getCert() {
 
         X509Certificate cert = null;
         try {
