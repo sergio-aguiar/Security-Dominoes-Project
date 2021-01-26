@@ -12,7 +12,7 @@ public class DominoesGameState implements Serializable
     private final ArrayList<String> endPoints;
     private final ArrayList<ArrayList<String>> pastMoves;
     private final boolean[] cheaters;
-    private final boolean denounced[];
+    private final boolean[] denounced;
 
     private int winner;
 

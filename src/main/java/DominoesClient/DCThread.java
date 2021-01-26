@@ -2,7 +2,9 @@ package DominoesClient;
 
 import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
+import DominoesSecurity.DominoesSignature;
 
+import java.security.Key;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Condition;
@@ -37,25 +39,33 @@ public class DCThread extends Thread
     private final Condition turnCondition;
 
     private final String pseudonym;
-    private final int sessionID;
+    private final Key privateKey;
+    private final Key publicKey;
     private final DCInterface dcInterface;
     private final ArrayList<String> gamePieces;
     private final byte[] sessionPrivateKey;
     private final byte[] sessionPublicKey;
 
     private int tableID;
+    private int sessionID;
+    private byte[] signedSessionID;
+    private byte[] cipheredSignedSessionID;
     private byte[] tablePublicKey;
 
     private int bitCommitRandom1;
     private int bitCommitRandom2;
     private ArrayList<String> committedPieces;
 
-    public DCThread(String pseudonym, int sessionID , DCInterface dcInterface)
+    public DCThread(String pseudonym, Key privateKey, Key publicKey, int sessionID, DCInterface dcInterface)
     {
         this.reentrantLock = new ReentrantLock(true);
         this.turnCondition = this.reentrantLock.newCondition();
         this.pseudonym = pseudonym;
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
         this.sessionID = sessionID;
+        this.signedSessionID = signSessionID();
+        this.cipheredSignedSessionID = null;
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
 
@@ -73,8 +83,6 @@ public class DCThread extends Thread
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
 
-        if (!this.dcInterface.isUserRegistered(this.pseudonym)) this.dcInterface.registerUser(this.pseudonym);
-
         while (true)
         {
             int option1 = clientMainMenu();
@@ -87,18 +95,18 @@ public class DCThread extends Thread
                     {
                         case 1:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 2,
-                                    this.sessionPublicKey);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
+                                    2, this.sessionPublicKey);
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 3,
-                                    this.sessionPublicKey);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
+                                    3, this.sessionPublicKey);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
-                            this.tableID = this.dcInterface.createTable(this.pseudonym, 4,
-                                    this.sessionPublicKey);
+                            this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
+                                    4, this.sessionPublicKey);
                             break;
                         case 4:
                             exit1 = true;
@@ -108,7 +116,8 @@ public class DCThread extends Thread
                             System.exit(703);
                     }
 
-                    getTableKey();
+                    establishSession();
+                    System.out.println("Table key: " + Arrays.toString(this.tablePublicKey));
 
                     if (!exit1)
                     {
@@ -226,7 +235,8 @@ public class DCThread extends Thread
                         }
                     }
 
-                    getTableKey();
+                    establishSession();
+                    System.out.println("Table key: " + Arrays.toString(this.tablePublicKey));
 
                     boolean exit3 = false;
                     do
@@ -494,7 +504,7 @@ public class DCThread extends Thread
                                 case 2:
                                     System.out.println("\n[CLIENT] Drawing a piece...");
 
-                                    String drawnPiece = this.dcInterface.drawCard(this.pseudonym, this.tableID);
+                                    String drawnPiece = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
                                     if (!drawnPiece.equals("Error"))
                                     {
                                         this.gamePieces.add(drawnPiece);
@@ -691,9 +701,36 @@ public class DCThread extends Thread
         this.committedPieces = null;
     }
 
-    private void getTableKey()
+    private void establishSession()
     {
         this.tablePublicKey = this.dcInterface.getServerPublicKey(this.pseudonym, this.tableID);
+        this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.tablePublicKey);
+
+        while (!this.dcInterface.sendSessionID(this.pseudonym, this.tableID, this.cipheredSignedSessionID))
+        {
+            this.reentrantLock.lock();
+            try
+            {
+                synchronized (this)
+                {
+                    this.turnCondition.awaitNanos(100000);
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("DCThread: establishSession: " + e.toString());
+                System.exit(707);
+            }
+            finally
+            {
+                this.reentrantLock.unlock();
+            }
+        }
+    }
+
+    private byte[] signSessionID()
+    {
+        return DominoesSignature.sign(this.sessionID, this.privateKey);
     }
 
     private int clientMainMenu()

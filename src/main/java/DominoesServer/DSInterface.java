@@ -148,7 +148,8 @@ public class DSInterface
         {
             case 1:
                 int return1 = this.dsImplementation.createTable(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument(), (byte[]) inMessage.getSecondArgument());
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
+                        (byte[]) inMessage.getSecondArgument());
                 outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return1);
                 break;
             case 2:
@@ -272,7 +273,7 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), return25);
                 break;
             case 26:
-                String return26 = this.dsImplementation.drawCard(inMessage.getPseudonym(),
+                String return26 = this.dsImplementation.drawPiece(inMessage.getPseudonym(),
                         (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), (Object) return26);
                 break;

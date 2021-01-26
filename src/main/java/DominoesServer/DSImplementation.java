@@ -3,6 +3,7 @@ package DominoesServer;
 import DominoesClient.DCInterface;
 import DominoesDatabase.DSQLiteConnection;
 import DominoesMisc.*;
+import DominoesSecurity.DominoesCryptoAsym;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,13 +20,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public int createTable(String pseudonym, int playerCap, byte[] publicKey)
+    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap, byte[] publicKey)
     {
         int tableID;
         this.reentrantLock.lock();
         try
         {
-            DominoesTable table = new DominoesTable(playerCap, pseudonym, publicKey);
+            DominoesTable table = new DominoesTable(playerCap, pseudonym, publicKey, cipheredSessionID);
             tableID = table.getId();
             this.dominoesTables.add(table);
         }
@@ -340,7 +341,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif)
+    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int pieceDif)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -349,7 +350,7 @@ public class DSImplementation implements DCInterface
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
                 table.setDeck(deck);
-                table.handleCardDif(pseudonym, cardDif);
+                table.handleCardDif(pseudonym, pieceDif);
                 result = true;
                 table.incrementTurn();
             }
@@ -581,7 +582,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public String drawCard(String pseudonym, int tableID)
+    public String drawPiece(String pseudonym, int tableID)
     {
         String result = "Error";
         this.reentrantLock.lock();
@@ -863,13 +864,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isUserRegistered(String pseudonym)
+    public boolean isUserRegistered(String user)
     {
         boolean result = false;
         this.reentrantLock.lock();
         try
         {
-            result = DSQLiteConnection.isUserRegistered(pseudonym);
+            result = DSQLiteConnection.isUserRegistered(user);
         }
         catch (Exception e)
         {
@@ -883,13 +884,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean registerUser(String pseudonym)
+    public boolean registerUser(String user)
     {
         boolean result = false;
         this.reentrantLock.lock();
         try
         {
-            DSQLiteConnection.registerUser(pseudonym);
+            DSQLiteConnection.registerUser(user);
             result = true;
         }
         catch (Exception e)
@@ -935,6 +936,30 @@ public class DSImplementation implements DCInterface
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                 result = table.getTablePublicKey();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getServerPublicKey: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean sendSessionID(String pseudonym, int tableID, byte[] cipheredSessionID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.reportPlayerSessionID(pseudonym, cipheredSessionID);
+                result = true;
+            }
         }
         catch (Exception e)
         {

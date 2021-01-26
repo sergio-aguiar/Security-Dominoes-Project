@@ -21,7 +21,7 @@ public class DAIThread extends DCThread {
     private boolean gameStarted = false;
 
     public DAIThread(DCInterface dcInterface) {
-        super(generatePseudonym(), dcInterface);
+        super(generatePseudonym(), 1, dcInterface);
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
         this.tableID = -1;

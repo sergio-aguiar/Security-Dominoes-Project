@@ -17,7 +17,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public int createTable(String pseudonym, int playerCap, byte[] publicKey)
+    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap, byte[] publicKey)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -39,7 +39,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), pseudonym, playerCap,
-                    publicKey);
+                    publicKey, cipheredSessionID);
         }
         catch (DMessageException e)
         {
@@ -730,7 +730,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int cardDif)
+    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int pieceDif)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -752,7 +752,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), pseudonym, tableID,
-                    deck, cardDif);
+                    deck, pieceDif);
         }
         catch (DMessageException e)
         {
@@ -1296,7 +1296,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public String drawCard(String pseudonym, int tableID)
+    public String drawPiece(String pseudonym, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1974,7 +1974,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isUserRegistered(String pseudonym)
+    public boolean isUserRegistered(String user)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1995,7 +1995,7 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.CHECK_USER_REGISTER_REQUEST.getMessageCode(), pseudonym);
+            outMessage = new DMessage(DMessage.MessageType.CHECK_USER_REGISTER_REQUEST.getMessageCode(), user);
         }
         catch (DMessageException e)
         {
@@ -2027,7 +2027,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean registerUser(String pseudonym)
+    public boolean registerUser(String user)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2048,7 +2048,7 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.REGISTER_USER_REQUEST.getMessageCode(), pseudonym);
+            outMessage = new DMessage(DMessage.MessageType.REGISTER_USER_REQUEST.getMessageCode(), user);
         }
         catch (DMessageException e)
         {
@@ -2184,5 +2184,59 @@ public class DCStub implements DCInterface
         dcCommunication.close();
 
         return (byte[]) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean sendSessionID(String pseudonym, int tableID, byte[] cipheredSessionID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), pseudonym, tableID,
+                    cipheredSessionID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 }

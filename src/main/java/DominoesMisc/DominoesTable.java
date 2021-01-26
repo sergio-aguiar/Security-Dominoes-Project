@@ -30,6 +30,7 @@ public class DominoesTable
     private final boolean[] havePassedProtest;
 
     private final byte[][] playerPublicKeys;
+    private final byte[][] playerSessionIDs;
 
     private final byte[] tablePrivateKey;
     private final byte[] tablePublicKey;
@@ -42,7 +43,8 @@ public class DominoesTable
     private boolean handlingAccounting;
     private int turn;
 
-    public DominoesTable(int playerCap, String tableLeader, byte[] leaderPublicKey) throws DominoesTableException
+    public DominoesTable(int playerCap, String tableLeader, byte[] leaderPublicKey, byte[] leaderSessionID)
+            throws DominoesTableException
     {
         if (!this.isValidPlayerCap(playerCap)) throw new DominoesTableException("Invalid player capacity value!");
 
@@ -74,6 +76,8 @@ public class DominoesTable
         this.havePassedProtest[0] = false;
         this.playerPublicKeys = new byte[playerCap][];
         this.playerPublicKeys[0] = leaderPublicKey;
+        this.playerSessionIDs = new byte[playerCap][];
+        this.playerSessionIDs[0] = leaderSessionID;
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -88,6 +92,7 @@ public class DominoesTable
             this.decisionMade[i] = null;
             this.havePassedProtest[i] = false;
             this.playerPublicKeys[i] = null;
+            this.playerSessionIDs[i] = null;
         }
 
         Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
@@ -581,6 +586,13 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
             this.playerPublicKeys[i] = publicKey;
+    }
+
+    public void reportPlayerSessionID(String pseudonym, byte[] cipheredSessionID)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.playerSessionIDs[i] = (byte[]) DominoesCryptoAsym.AsymDecipher(cipheredSessionID,
+                    this.tablePrivateKey);
     }
 
     public byte[] getTablePublicKey()
