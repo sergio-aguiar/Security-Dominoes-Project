@@ -127,7 +127,8 @@ public class DCThread extends Thread
                             switch (option3)
                             {
                                 case 1:
-                                    if (this.dcInterface.startGame(this.pseudonym, this.tableID))
+                                    if (this.dcInterface.startGame(this.pseudonym, this.cipheredSignedSessionID,
+                                            this.tableID))
                                     {
                                         System.out.println("\n[CLIENT] Starting Game...");
                                         gameLogic();
@@ -142,11 +143,13 @@ public class DCThread extends Thread
                                 case 2:
                                     System.out.println("\n[CLIENT] Fetching Table Information...");
                                     System.out.print(
-                                            this.dcInterface.listTableInfo(this.pseudonym, this.tableID).toString());
+                                            this.dcInterface.listTableInfo(this.pseudonym, this.cipheredSignedSessionID,
+                                                    this.tableID).toString());
                                     break;
                                 case 3:
                                     System.out.println("\n[CLIENT] Disbanding Table...");
-                                    this.dcInterface.disbandTable(this.pseudonym, this.tableID);
+                                    this.dcInterface.disbandTable(this.pseudonym, this.cipheredSignedSessionID,
+                                            this.tableID);
                                     this.tableID = -1;
                                     exit2 = true;
                                     break;
@@ -185,7 +188,7 @@ public class DCThread extends Thread
                             }
                             while (tableToJoin < 0);
 
-                            if (this.dcInterface.joinTable(this.pseudonym, tableToJoin))
+                            if (this.dcInterface.joinTable(this.pseudonym, this.cipheredSignedSessionID, tableToJoin))
                             {
                                 System.out.println("\n[CLIENT] Joining dominoes table #" + tableToJoin + "...");
                                 this.tableID = tableToJoin;
@@ -200,7 +203,8 @@ public class DCThread extends Thread
                         else
                         {
                             System.out.println("\n[CLIENT] Joining a random dominoes table...");
-                            this.tableID = this.dcInterface.joinRandomTable(this.pseudonym);
+                            this.tableID = this.dcInterface.joinRandomTable(this.pseudonym,
+                                    this.cipheredSignedSessionID);
 
                             if (this.tableID == -1)
                             {
@@ -222,7 +226,8 @@ public class DCThread extends Thread
                             case 1:
                                 System.out.print("\n[CLIENT] Marking self as ready...");
 
-                                if (this.dcInterface.markAsReady(this.pseudonym, this.tableID))
+                                if (this.dcInterface.markAsReady(this.pseudonym, this.cipheredSignedSessionID,
+                                        this.tableID))
                                 {
                                     System.out.println("\n[CLIENT] Awaiting game Start...");
                                     gameLogic();
@@ -237,7 +242,7 @@ public class DCThread extends Thread
                             case 2:
                                 System.out.println("\n[CLIENT] Listing Table Information...");
                                 DominoesTableInfo tmpTable = this.dcInterface.listTableInfo(this.pseudonym,
-                                        this.tableID);
+                                        this.cipheredSignedSessionID, this.tableID);
 
                                 if (tmpTable != null) System.out.println(tmpTable.toString());
                                 else
@@ -248,7 +253,7 @@ public class DCThread extends Thread
                                 break;
                             case 3:
                                 System.out.println("\n[CLIENT] Leaving Table...");
-                                this.dcInterface.leaveTable(this.pseudonym, this.tableID);
+                                this.dcInterface.leaveTable(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
                                 exit3 = true;
                                 break;
                             default:
@@ -278,12 +283,12 @@ public class DCThread extends Thread
 
     private void gameLogic()
     {
-        while (!this.dcInterface.hasGameEnded(this.pseudonym, this.tableID))
+        while (!this.dcInterface.hasGameEnded(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
             System.out.println("\nBACK UP HERE");
-            while ((!this.dcInterface.hasGameEnded(this.pseudonym,this.tableID)
-                    && (!this.dcInterface.isPlayerTurn(this.pseudonym, this.tableID)
-                    || this.dcInterface.isResetNeeded(this.pseudonym, this.tableID))))
+            while ((!this.dcInterface.hasGameEnded(this.pseudonym, this.cipheredSignedSessionID, this.tableID)
+                    && (!this.dcInterface.isPlayerTurn(this.pseudonym, this.cipheredSignedSessionID, this.tableID)
+                    || this.dcInterface.isResetNeeded(this.pseudonym, this.cipheredSignedSessionID, this.tableID))))
             {
                 this.reentrantLock.lock();
                 try
@@ -304,11 +309,11 @@ public class DCThread extends Thread
                 }
             }
 
-            if (this.dcInterface.hasGameEnded(this.pseudonym, this.tableID)) break;
+            if (this.dcInterface.hasGameEnded(this.pseudonym, this.cipheredSignedSessionID ,this.tableID)) break;
 
-            if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.tableID))
+            if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
-                if (this.dcInterface.isDeckSorting(this.pseudonym, this.tableID))
+                if (this.dcInterface.isDeckSorting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                 {
                     int option = clientPieceDistributionMenu();
                     switch (option)
@@ -316,15 +321,17 @@ public class DCThread extends Thread
                         case 1:
                             System.out.println("\n[CLIENT] Drawing a piece...");
 
-                            if (this.dcInterface.canDraw(this.pseudonym, this.tableID))
+                            if (this.dcInterface.canDraw(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                             {
-                                DominoesDeck deck1 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+                                DominoesDeck deck1 = this.dcInterface.getDeck(this.pseudonym,
+                                        this.cipheredSignedSessionID, this.tableID);
 
                                 String tile1 = deck1.drawPiece();
                                 if (tile1 != null) this.gamePieces.add(tile1);
                                 else System.out.println("\n[CLIENT] No pieces left to draw.");
 
-                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck1, 1))
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                                        this.tableID, deck1, 1))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -339,13 +346,15 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Returning a piece...");
                             if (this.gamePieces.size() > 0)
                             {
-                                DominoesDeck deck2 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+                                DominoesDeck deck2 = this.dcInterface.getDeck(this.pseudonym,
+                                        this.cipheredSignedSessionID, this.tableID);
 
                                 String tile2 = getTileToReturn();
                                 deck2.returnTile(tile2);
                                 this.gamePieces.remove(tile2);
 
-                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck2, -1))
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                                        this.tableID, deck2, -1))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -360,13 +369,15 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Swapping a piece...");
                             if (this.gamePieces.size() > 0)
                             {
-                                DominoesDeck deck3 = this.dcInterface.getDeck(this.pseudonym, this.tableID);
+                                DominoesDeck deck3 = this.dcInterface.getDeck(this.pseudonym,
+                                        this.cipheredSignedSessionID, this.tableID);
 
                                 String tile3 = getTileToReturn();
                                 this.gamePieces.add(deck3.swapTile(tile3));
                                 this.gamePieces.remove(tile3);
 
-                                if (!this.dcInterface.returnDeck(this.pseudonym, this.tableID, deck3, 0))
+                                if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                                        this.tableID, deck3, 0))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -379,7 +390,7 @@ public class DCThread extends Thread
                             break;
                         case 4:
                             System.out.println("\n[CLIENT] Skipping a turn...");
-                            this.dcInterface.skipTurn(this.pseudonym, this.tableID);
+                            this.dcInterface.skipTurn(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
                             break;
                         case 5:
                             System.out.println("\n[CLIENT] Committing your hand...");
@@ -390,7 +401,8 @@ public class DCThread extends Thread
                             DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
                                     bitCommitment);
 
-                            if (this.dcInterface.commitHand(this.pseudonym, this.tableID, commitData))
+                            if (this.dcInterface.commitHand(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                                    commitData))
                                 this.committedPieces = new ArrayList<>(this.gamePieces);
                             else System.out.println("\n[CLIENT You can only commit to full hands.");
 
@@ -408,11 +420,13 @@ public class DCThread extends Thread
             }
             else
             {
-                if (this.dcInterface.isHandlingStart(this.pseudonym, this.tableID))
+                if (this.dcInterface.isHandlingStart(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                 {
-                    this.dcInterface.stateHighestDouble(this.pseudonym, this.tableID, getHighestDouble());
+                    this.dcInterface.stateHighestDouble(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                            getHighestDouble());
 
-                    while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.tableID))
+                    while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID))
                     {
                         this.reentrantLock.lock();
                         try
@@ -433,18 +447,20 @@ public class DCThread extends Thread
                         }
                     }
 
-                    if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.tableID)) resetDistribution();
+                    if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID)) resetDistribution();
                 }
                 else
                 {
-                    DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
+                    DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID);
 
                     System.out.println(gameState.toString());
                     if (gameState.getPlayedPieces().isEmpty())
                     {
                         String highestDouble = getHighestDouble();
-                        if (this.dcInterface.playPiece(this.pseudonym, this.tableID, "First",
-                                highestDouble, highestDouble.split("//|")[0]))
+                        if (this.dcInterface.playPiece(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                                "First", highestDouble, highestDouble.split("//|")[0]))
                             this.gamePieces.remove(highestDouble);
                         else System.out.println("\n[CLIENT] Error playing the piece.");
                     }
@@ -465,8 +481,8 @@ public class DCThread extends Thread
                                     String[] pieceEndPoints = this.gamePieces.get(piece).split("\\|");
                                     int pieceEndPoint = pieceEndPointsMenu(pieceEndPoints);
 
-                                    if (this.dcInterface.playPiece(this.pseudonym, this.tableID,
-                                            tmpEndPoints[endPoint - 1], this.gamePieces.get(piece),
+                                    if (this.dcInterface.playPiece(this.pseudonym, this.cipheredSignedSessionID,
+                                            this.tableID, tmpEndPoints[endPoint - 1], this.gamePieces.get(piece),
                                             pieceEndPoints[pieceEndPoint - 1]))
                                     {
                                         this.gamePieces.remove(piece);
@@ -479,7 +495,8 @@ public class DCThread extends Thread
                                 case 2:
                                     System.out.println("\n[CLIENT] Drawing a piece...");
 
-                                    String drawnPiece = this.dcInterface.drawPiece(this.pseudonym, this.tableID);
+                                    String drawnPiece = this.dcInterface.drawPiece(this.pseudonym,
+                                            this.cipheredSignedSessionID, this.tableID);
                                     if (!drawnPiece.equals("Error"))
                                     {
                                         this.gamePieces.add(drawnPiece);
@@ -495,7 +512,8 @@ public class DCThread extends Thread
                                     DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
                                             bitCommitment);
 
-                                    while (!this.dcInterface.updateCommitment(this.pseudonym, this.tableID, commitData))
+                                    while (!this.dcInterface.updateCommitment(this.pseudonym,
+                                            this.cipheredSignedSessionID, this.tableID, commitData))
                                         System.out.println("\n[CLIENT] Failed to update hand commitment.");
 
                                     System.out.println(this.gamePieces.toString());
@@ -509,12 +527,14 @@ public class DCThread extends Thread
                                     System.out.println("\n[CLIENT] Denouncing cheating...");
 
                                     if (denounceCheatingMenu() == 1)
-                                        this.dcInterface.denounceCheating(this.pseudonym, this.tableID);
+                                        this.dcInterface.denounceCheating(this.pseudonym, this.cipheredSignedSessionID,
+                                                this.tableID);
 
                                     break;
                                 case 5:
                                     System.out.println("\n[CLIENT] Skipping turn...");
-                                    this.dcInterface.skipTurn(this.pseudonym, this.tableID);
+                                    this.dcInterface.skipTurn(this.pseudonym, this.cipheredSignedSessionID,
+                                            this.tableID);
                                     break;
                                 default:
                                     System.out.println("\n[CLIENT] Unexpected Error...");
@@ -528,20 +548,22 @@ public class DCThread extends Thread
 
         System.out.println("\n[CLIENT] BEFORE CHEAT HANDLING!");
 
-        if (!this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID))
+        if (!this.dcInterface.isHandlingCheating(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
-            DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.tableID);
-            DominoesTableInfo dominoesTable = this.dcInterface.listTableInfo(this.pseudonym, this.tableID);
+            DominoesGameState gameState = this.dcInterface.getGameState(this.pseudonym, this.cipheredSignedSessionID,
+                    this.tableID);
+            DominoesTableInfo dominoesTable = this.dcInterface.listTableInfo(this.pseudonym,
+                    this.cipheredSignedSessionID, this.tableID);
 
             System.out.println(gameState.toString());
             System.out.println(dominoesTable.toString());
 
             if (protestMenu(dominoesTable.getPlayers()[gameState.getWinner()]) == 1)
-                this.dcInterface.denounceCheating(this.pseudonym, this.tableID);
+                this.dcInterface.denounceCheating(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
         }
 
-        this.dcInterface.passedProtestMenu(this.pseudonym, this.tableID);
-        while (!this.dcInterface.allPassedProtestMenu(this.pseudonym, this.tableID))
+        this.dcInterface.passedProtestMenu(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
+        while (!this.dcInterface.allPassedProtestMenu(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
             this.reentrantLock.lock();
             try
@@ -562,19 +584,20 @@ public class DCThread extends Thread
             }
         }
 
-        while (this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID)
-                && !this.dcInterface.hasSentCommitData(this.pseudonym, this.tableID))
+        while (this.dcInterface.isHandlingCheating(this.pseudonym, this.cipheredSignedSessionID, this.tableID)
+                && !this.dcInterface.hasSentCommitData(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
             DominoesCommitData commitData = new DominoesCommitData(this.committedPieces.toArray(new String[0]),
                     this.bitCommitRandom2);
 
-            while(!this.dcInterface.sendCommitData(this.pseudonym, this.tableID, commitData))
+            while(!this.dcInterface.sendCommitData(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                    commitData))
                 System.out.println("\n[CLIENT] Could not send commit data. Retrying...");
         }
 
         System.out.println("\n[CLIENT] BEFORE CHEAT HANDLE WAITING!");
 
-        while (this.dcInterface.isHandlingCheating(this.pseudonym, this.tableID))
+        while (this.dcInterface.isHandlingCheating(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
             this.reentrantLock.lock();
             try
@@ -597,15 +620,17 @@ public class DCThread extends Thread
 
         System.out.println("\n[CLIENT] BEFORE ACCOUNTING HANDLING!");
 
-        while (this.dcInterface.isHandlingAccounting(this.pseudonym, this.tableID))
+        while (this.dcInterface.isHandlingAccounting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
         {
-            DominoesAccountingInfo accountingInfo = this.dcInterface.getAccountingInfo(this.pseudonym, this.tableID);
+            DominoesAccountingInfo accountingInfo = this.dcInterface.getAccountingInfo(this.pseudonym,
+                    this.cipheredSignedSessionID, this.tableID);
             int decision = accountingMenu(accountingInfo);
 
-            while (!this.dcInterface.sendAccountingDecision(this.pseudonym, this.tableID, decision == 1))
+            while (!this.dcInterface.sendAccountingDecision(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                    decision == 1))
                 System.out.println("\n[CLIENT] Could not send decision. Retrying...");
 
-            while (!this.dcInterface.allSentDecision(this.pseudonym, this.tableID))
+            while (!this.dcInterface.allSentDecision(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
                 this.reentrantLock.lock();
                 try
@@ -626,7 +651,7 @@ public class DCThread extends Thread
                 }
             }
 
-            if (this.dcInterface.allAgreedToAccounting(this.pseudonym, this.tableID))
+            if (this.dcInterface.allAgreedToAccounting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
                 System.out.println("\n[CLIENT] Handling Accounting!");
 
@@ -641,7 +666,7 @@ public class DCThread extends Thread
             }
         }
 
-        this.dcInterface.disbandTable(this.pseudonym, this.tableID);
+        this.dcInterface.disbandTable(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
         gameOver();
     }
 

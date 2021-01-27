@@ -226,7 +226,7 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, byte[] cipheredSessionID, String pseudonym, Object firstArgument,
+    public DMessage(int messageType, String pseudonym, byte[] cipheredSessionID, Object firstArgument,
                     Object secondArgument, Object thirdArgument, Object fourthArgument) throws DMessageException
     {
         this.messageType = messageType;

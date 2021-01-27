@@ -127,7 +127,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean joinTable(String pseudonym, int tableID)
+    public boolean joinTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -148,7 +148,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.JOIN_TABLE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.JOIN_TABLE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -179,7 +180,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public int joinRandomTable(String pseudonym)
+    public int joinRandomTable(String pseudonym, byte[] cipheredSessionID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -200,7 +201,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode(), pseudonym);
+            outMessage = new DMessage(DMessage.MessageType.JOIN_RANDOM_TABLE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID);
         }
         catch (DMessageException e)
         {
@@ -232,7 +234,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean startGame(String pseudonym, int tableID)
+    public boolean startGame(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -253,7 +255,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.START_GAME_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.START_GAME_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -284,7 +287,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void disbandTable(String pseudonym, int tableID)
+    public void disbandTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -305,7 +308,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DISBAND_TABLE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.DISBAND_TABLE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -326,7 +330,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean markAsReady(String pseudonym, int tableID)
+    public boolean markAsReady(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -347,7 +351,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.MARK_AS_READY_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.MARK_AS_READY_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -378,7 +383,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesTableInfo listTableInfo(String pseudonym, int tableID)
+    public DominoesTableInfo listTableInfo(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -400,7 +405,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.LIST_TABLE_INFO_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -429,7 +434,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void leaveTable(String pseudonym, int tableID)
+    public void leaveTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -450,7 +455,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.LEAVE_TABLE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.LEAVE_TABLE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -470,7 +476,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isPlayerTurn(String pseudonym, int tableID)
+    public boolean isPlayerTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -491,7 +497,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.TURN_CHECK_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.TURN_CHECK_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -523,7 +530,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean hasGameEnded(String pseudonym, int tableID)
+    public boolean hasGameEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -544,7 +551,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.GAME_STATE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.GAME_STATE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -576,7 +584,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isDeckSorting(String pseudonym, int tableID)
+    public boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -598,7 +606,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.DISTRIBUTION_STATE_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -630,7 +638,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean canDraw(String pseudonym, int tableID)
+    public boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -651,7 +659,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.CAN_DRAW_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.CAN_DRAW_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -683,7 +692,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesDeck getDeck(String pseudonym, int tableID)
+    public DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -704,7 +713,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DECK_FETCH_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.DECK_FETCH_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -733,7 +743,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int pieceDif)
+    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, int pieceDif)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -754,8 +764,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), pseudonym, tableID,
-                    deck, pieceDif);
+            outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID, deck, pieceDif);
         }
         catch (DMessageException e)
         {
@@ -787,7 +797,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void skipTurn(String pseudonym, int tableID)
+    public void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -808,7 +818,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.SKIP_TURN_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.SKIP_TURN_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -829,7 +840,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean commitHand(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean commitHand(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -850,8 +861,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.COMMIT_HAND_REQUEST.getMessageCode(), pseudonym, tableID,
-                    commitData);
+            outMessage = new DMessage(DMessage.MessageType.COMMIT_HAND_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID, commitData);
         }
         catch (DMessageException e)
         {
@@ -883,7 +894,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean hasPlayerCommitted(String pseudonym, int tableID)
+    public boolean hasPlayerCommitted(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -904,7 +915,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.COMMIT_STATE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.COMMIT_STATE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -936,7 +948,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isHandlingStart(String pseudonym, int tableID)
+    public boolean isHandlingStart(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -958,7 +970,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.START_HANDLING_STATE_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -990,7 +1002,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void stateHighestDouble(String pseudonym, int tableID, String piece)
+    public void stateHighestDouble(String pseudonym, byte[] cipheredSessionID, int tableID, String piece)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1011,8 +1023,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode(), pseudonym, tableID,
-                    piece);
+            outMessage = new DMessage(DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID, piece);
         }
         catch (DMessageException e)
         {
@@ -1033,7 +1045,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
+    public boolean hasDoubleCheckingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1055,7 +1067,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.DOUBLE_CHECKING_STATE_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1087,7 +1099,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isRedistributionNeeded(String pseudonym, int tableID)
+    public boolean isRedistributionNeeded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1109,7 +1121,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.REDISTRIBUTION_NEEDED_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1141,7 +1153,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesGameState getGameState(String pseudonym, int tableID)
+    public DominoesGameState getGameState(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1163,7 +1175,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.GAME_STATE_FETCH_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1192,7 +1204,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isResetNeeded(String pseudonym, int tableID)
+    public boolean isResetNeeded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1213,7 +1225,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1245,7 +1258,8 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint)
+    public boolean playPiece(String pseudonym, byte[] cipheredSessionID, int tableID, String targetEndPoint,
+                             String piece, String pieceEndPoint)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1266,8 +1280,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), pseudonym, tableID,
-                    targetEndPoint, piece, pieceEndPoint);
+            outMessage = new DMessage(DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID, targetEndPoint, piece, pieceEndPoint);
         }
         catch (DMessageException e)
         {
@@ -1299,7 +1313,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public String drawPiece(String pseudonym, int tableID)
+    public String drawPiece(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1320,7 +1334,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1352,7 +1367,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void denounceCheating(String pseudonym, int tableID)
+    public void denounceCheating(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1374,7 +1389,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.DENOUNCE_CHEATING_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1395,7 +1410,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isHandlingCheating(String pseudonym, int tableID)
+    public boolean isHandlingCheating(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1417,7 +1432,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.CHEAT_HANDLING_STATE_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1449,7 +1464,8 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean updateCommitment(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                    DominoesCommitData commitData)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1471,7 +1487,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode(), pseudonym,
-                    tableID, commitData);
+                    cipheredSessionID, tableID, commitData);
         }
         catch (DMessageException e)
         {
@@ -1503,7 +1519,8 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean sendCommitData(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                  DominoesCommitData commitData)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1525,7 +1542,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode(), pseudonym,
-                    tableID, commitData);
+                    cipheredSessionID, tableID, commitData);
         }
         catch (DMessageException e)
         {
@@ -1557,7 +1574,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean hasSentCommitData(String pseudonym, int tableID)
+    public boolean hasSentCommitData(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1579,7 +1596,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.HAS_SENT_COMMIT_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1611,7 +1628,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean isHandlingAccounting(String pseudonym, int tableID)
+    public boolean isHandlingAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1633,7 +1650,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.IS_HANDLING_ACCOUNT_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1665,7 +1682,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesAccountingInfo getAccountingInfo(String pseudonym, int tableID)
+    public DominoesAccountingInfo getAccountingInfo(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1687,7 +1704,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.ACCOUNTING_INFO_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1719,7 +1736,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean sendAccountingDecision(String pseudonym, int tableID, boolean decision)
+    public boolean sendAccountingDecision(String pseudonym, byte[] cipheredSessionID, int tableID, boolean decision)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1741,7 +1758,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.ACCOUNTING_DECISION_REQUEST.getMessageCode(), pseudonym,
-                    tableID, decision);
+                    cipheredSessionID, tableID, decision);
         }
         catch (DMessageException e)
         {
@@ -1773,7 +1790,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean allSentDecision(String pseudonym, int tableID)
+    public boolean allSentDecision(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1795,7 +1812,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.ALL_DECISIONS_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1827,7 +1844,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean allAgreedToAccounting(String pseudonym, int tableID)
+    public boolean allAgreedToAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1849,7 +1866,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.ALL_AGREED_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1881,7 +1898,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void passedProtestMenu(String pseudonym, int tableID)
+    public void passedProtestMenu(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1902,7 +1919,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.PROTEST_PASSED_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.PROTEST_PASSED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {
@@ -1923,7 +1941,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean allPassedProtestMenu(String pseudonym, int tableID)
+    public boolean allPassedProtestMenu(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -1945,7 +1963,7 @@ public class DCStub implements DCInterface
         try
         {
             outMessage = new DMessage(DMessage.MessageType.PROTEST_CHECK_REQUEST.getMessageCode(), pseudonym,
-                    tableID);
+                    cipheredSessionID, tableID);
         }
         catch (DMessageException e)
         {

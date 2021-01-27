@@ -80,7 +80,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean joinTable(String pseudonym, int tableID)
+    public boolean joinTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean joined = false;
         this.reentrantLock.lock();
@@ -102,7 +102,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public int joinRandomTable(String pseudonym)
+    public int joinRandomTable(String pseudonym, byte[] cipheredSessionID)
     {
         int tableID = -1;
         this.reentrantLock.lock();
@@ -124,7 +124,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean startGame(String pseudonym, int tableID)
+    public boolean startGame(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         int started = 0;
         this.reentrantLock.lock();
@@ -157,7 +157,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void disbandTable(String pseudonym, int tableID)
+    public void disbandTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         this.reentrantLock.lock();
         try
@@ -175,7 +175,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean markAsReady(String pseudonym, int tableID)
+    public boolean markAsReady(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         if (tableID < 0) return false;
 
@@ -204,7 +204,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTableInfo listTableInfo(String pseudonym, int tableID)
+    public DominoesTableInfo listTableInfo(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DominoesTableInfo dTable = null;
         this.reentrantLock.lock();
@@ -228,7 +228,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void leaveTable(String pseudonym, int tableID)
+    public void leaveTable(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         if (tableID < 0) return;
 
@@ -251,7 +251,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isPlayerTurn(String pseudonym, int tableID)
+    public boolean isPlayerTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -272,7 +272,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean hasGameEnded(String pseudonym, int tableID)
+    public boolean hasGameEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -292,7 +292,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isDeckSorting(String pseudonym, int tableID)
+    public boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = true;
         this.reentrantLock.lock();
@@ -313,7 +313,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean canDraw(String pseudonym, int tableID)
+    public boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = true;
         this.reentrantLock.lock();
@@ -334,7 +334,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesDeck getDeck(String pseudonym, int tableID)
+    public DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DominoesDeck dDeck = null;
         this.reentrantLock.lock();
@@ -354,7 +354,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, int tableID, DominoesDeck deck, int pieceDif)
+    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, int pieceDif)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -380,7 +380,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void skipTurn(String pseudonym, int tableID)
+    public void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         this.reentrantLock.lock();
         try
@@ -398,7 +398,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean commitHand(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean commitHand(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -422,7 +422,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean hasPlayerCommitted(String pseudonym, int tableID)
+    public boolean hasPlayerCommitted(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -443,7 +443,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isHandlingStart(String pseudonym, int tableID)
+    public boolean isHandlingStart(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -464,7 +464,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void stateHighestDouble(String pseudonym, int tableID, String piece)
+    public void stateHighestDouble(String pseudonym, byte[] cipheredSessionID, int tableID, String piece)
     {
         this.reentrantLock.lock();
         try
@@ -487,7 +487,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean hasDoubleCheckingEnded(String pseudonym, int tableID)
+    public boolean hasDoubleCheckingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -508,7 +508,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isRedistributionNeeded(String pseudonym, int tableID)
+    public boolean isRedistributionNeeded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -529,7 +529,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesGameState getGameState(String pseudonym, int tableID)
+    public DominoesGameState getGameState(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DominoesGameState gameState = null;
         this.reentrantLock.lock();
@@ -550,7 +550,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isResetNeeded(String pseudonym, int tableID)
+    public boolean isResetNeeded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -571,7 +571,8 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean playPiece(String pseudonym, int tableID, String targetEndPoint, String piece, String pieceEndPoint)
+    public boolean playPiece(String pseudonym, byte[] cipheredSessionID, int tableID, String targetEndPoint,
+                             String piece, String pieceEndPoint)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -595,7 +596,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public String drawPiece(String pseudonym, int tableID)
+    public String drawPiece(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         String result = "Error";
         this.reentrantLock.lock();
@@ -619,7 +620,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void denounceCheating(String pseudonym, int tableID)
+    public void denounceCheating(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         this.reentrantLock.lock();
         try
@@ -638,7 +639,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isHandlingCheating(String pseudonym, int tableID)
+    public boolean isHandlingCheating(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -659,7 +660,8 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean updateCommitment(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean updateCommitment(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                    DominoesCommitData commitData)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -683,7 +685,8 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean sendCommitData(String pseudonym, int tableID, DominoesCommitData commitData)
+    public boolean sendCommitData(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                  DominoesCommitData commitData)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -708,7 +711,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean hasSentCommitData(String pseudonym, int tableID)
+    public boolean hasSentCommitData(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -729,7 +732,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean isHandlingAccounting(String pseudonym, int tableID)
+    public boolean isHandlingAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -750,7 +753,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesAccountingInfo getAccountingInfo(String pseudonym, int tableID)
+    public DominoesAccountingInfo getAccountingInfo(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         DominoesAccountingInfo accountingInfo = null;
         this.reentrantLock.lock();
@@ -771,7 +774,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean sendAccountingDecision(String pseudonym, int tableID, boolean decision)
+    public boolean sendAccountingDecision(String pseudonym, byte[] cipheredSessionID, int tableID, boolean decision)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -795,7 +798,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean allSentDecision(String pseudonym, int tableID)
+    public boolean allSentDecision(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -816,7 +819,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean allAgreedToAccounting(String pseudonym, int tableID)
+    public boolean allAgreedToAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -837,7 +840,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public void passedProtestMenu(String pseudonym, int tableID)
+    public void passedProtestMenu(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         this.reentrantLock.lock();
         try
@@ -856,7 +859,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean allPassedProtestMenu(String pseudonym, int tableID)
+    public boolean allPassedProtestMenu(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
         boolean result = false;
         this.reentrantLock.lock();
