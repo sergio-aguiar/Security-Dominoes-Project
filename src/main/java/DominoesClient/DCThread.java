@@ -83,6 +83,8 @@ public class DCThread extends Thread
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
 
+        establishSession();
+
         while (true)
         {
             int option1 = clientMainMenu();
@@ -96,17 +98,17 @@ public class DCThread extends Thread
                         case 1:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
                             this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
-                                    2, this.sessionPublicKey);
+                                    2);
                             break;
                         case 2:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
                             this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
-                                    3, this.sessionPublicKey);
+                                    3);
                             break;
                         case 3:
                             System.out.println("\n[CLIENT] Creating a dominoes table...");
                             this.tableID = this.dcInterface.createTable(this.pseudonym, this.cipheredSignedSessionID,
-                                    4, this.sessionPublicKey);
+                                    4);
                             break;
                         case 4:
                             exit1 = true;
@@ -115,9 +117,6 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Unexpected Error...");
                             System.exit(703);
                     }
-
-                    establishSession();
-                    System.out.println("Table key: " + Arrays.toString(this.tablePublicKey));
 
                     if (!exit1)
                     {
@@ -162,7 +161,8 @@ public class DCThread extends Thread
                 case 2:
                     System.out.print("\n[CLIENT] Fetching available dominoes tables...");
 
-                    DominoesTableInfo[] tmpTables = this.dcInterface.listAvailableTables();
+                    DominoesTableInfo[] tmpTables = this.dcInterface.listAvailableTables(this.pseudonym,
+                            this.cipheredSignedSessionID);
                     if (tmpTables.length == 0) System.out.println("\n[CLIENT] No available tables found.");
                     else for (DominoesTableInfo table : tmpTables) System.out.print("\n" + table.toString());
 
@@ -212,31 +212,6 @@ public class DCThread extends Thread
                     }
 
                     if (noTables) break;
-
-                    while (this.sessionPublicKey != this.dcInterface.greetServer(this.pseudonym, this.tableID,
-                            this.sessionPublicKey))
-                    {
-                        this.reentrantLock.lock();
-                        try
-                        {
-                            synchronized (this)
-                            {
-                                this.turnCondition.awaitNanos(100000);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            System.out.println("DCThread: gameLogic: " + e.toString());
-                            System.exit(7019);
-                        }
-                        finally
-                        {
-                            this.reentrantLock.unlock();
-                        }
-                    }
-
-                    establishSession();
-                    System.out.println("Table key: " + Arrays.toString(this.tablePublicKey));
 
                     boolean exit3 = false;
                     do
@@ -703,10 +678,8 @@ public class DCThread extends Thread
 
     private void establishSession()
     {
-        this.tablePublicKey = this.dcInterface.getServerPublicKey(this.pseudonym, this.tableID);
-        this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.tablePublicKey);
-
-        while (!this.dcInterface.sendSessionID(this.pseudonym, this.tableID, this.cipheredSignedSessionID))
+        while (!Arrays.equals(this.sessionPublicKey, this.dcInterface.greetServer(this.pseudonym,
+                this.sessionPublicKey)))
         {
             this.reentrantLock.lock();
             try
@@ -719,7 +692,54 @@ public class DCThread extends Thread
             catch (Exception e)
             {
                 System.out.println("DCThread: establishSession: " + e.toString());
+                System.exit(7019);
+            }
+            finally
+            {
+                this.reentrantLock.unlock();
+            }
+        }
+
+        do
+        {
+            this.tablePublicKey = this.dcInterface.getServerPublicKey();
+
+            this.reentrantLock.lock();
+            try
+            {
+                synchronized (this)
+                {
+                    this.turnCondition.awaitNanos(100000);
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("DCThread: establishSession: " + e.toString());
                 System.exit(707);
+            }
+            finally
+            {
+                this.reentrantLock.unlock();
+            }
+        }
+        while (Arrays.equals(this.tablePublicKey, new byte[0]));
+
+        this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.tablePublicKey);
+
+        while (!this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID))
+        {
+            this.reentrantLock.lock();
+            try
+            {
+                synchronized (this)
+                {
+                    this.turnCondition.awaitNanos(100000);
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("DCThread: establishSession: " + e.toString());
+                System.exit(7337);
             }
             finally
             {

@@ -9,8 +9,8 @@ public class DAIMain
 
     public static void main(String[] args)
     {
-        DCStub dcStub = new DCStub(serverHostName, serverPort);
-        DAIThread daiThread = new DAIThread(dcStub);
-        daiThread.start();
+        // DCStub dcStub = new DCStub(serverHostName, serverPort);
+        // DAIThread daiThread = new DAIThread(dcStub);
+        // daiThread.start();
     }
 }

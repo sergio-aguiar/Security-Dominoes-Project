@@ -4,10 +4,9 @@ import DominoesMisc.*;
 
 public interface DCInterface
 {
+    int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap);
     // TODO: Cipher SessionID
-    int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap, byte[] publicKey);
-    // TODO: Cipher SessionID
-    DominoesTableInfo[] listAvailableTables();
+    DominoesTableInfo[] listAvailableTables(String pseudonym, byte[] cipheredSessionID);
     // TODO: Cipher SessionID
     boolean joinTable(String pseudonym, int tableID);
     // TODO: Cipher SessionID
@@ -83,8 +82,8 @@ public interface DCInterface
 
     boolean isUserRegistered(String user);
     boolean registerUser(String user);
-    byte[] greetServer(String pseudonym, int tableID, byte[] publicKey);
-    byte[] getServerPublicKey(String pseudonym, int tableID);
+    byte[] greetServer(String pseudonym, byte[] publicKey);
+    byte[] getServerPublicKey();
     // TODO: Cipher SessionID
-    boolean sendSessionID(String pseudonym, int tableID, byte[] cipheredSessionID);
+    boolean sendSessionID(String pseudonym, byte[] cipheredSessionID);
 }

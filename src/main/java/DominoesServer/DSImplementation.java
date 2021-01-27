@@ -6,6 +6,8 @@ import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DSImplementation implements DCInterface
@@ -13,20 +15,31 @@ public class DSImplementation implements DCInterface
     private final ReentrantLock reentrantLock;
     private final ArrayList<DominoesTable> dominoesTables;
 
+    private final HashMap<String, byte[]> playerSessionIDs;
+    private final HashMap<String, byte[]> playerPublicKeys;
+    private final byte[] serverPrivateKey;
+    private final byte[] serverPublicKey;
+
     public DSImplementation()
     {
         this.reentrantLock = new ReentrantLock();
         this.dominoesTables = new ArrayList<>();
+        this.playerSessionIDs = new HashMap<>();
+        this.playerPublicKeys = new HashMap<>();
+
+        Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
+        this.serverPrivateKey = keys.get("private");
+        this.serverPublicKey = keys.get("public");
     }
 
     @Override
-    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap, byte[] publicKey)
+    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap)
     {
         int tableID;
         this.reentrantLock.lock();
         try
         {
-            DominoesTable table = new DominoesTable(playerCap, pseudonym, publicKey, cipheredSessionID);
+            DominoesTable table = new DominoesTable(playerCap, pseudonym);
             tableID = table.getId();
             this.dominoesTables.add(table);
         }
@@ -43,7 +56,7 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public DominoesTableInfo[] listAvailableTables()
+    public DominoesTableInfo[] listAvailableTables(String pseudonym, byte[] cipheredSessionID)
     {
         DominoesTableInfo[] tables;
         this.reentrantLock.lock();
@@ -905,14 +918,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public byte[] greetServer(String pseudonym, int tableID ,byte[] publicKey)
+    public byte[] greetServer(String pseudonym, byte[] publicKey)
     {
         byte[] result;
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                table.reportPlayerKey(pseudonym, publicKey);
+            this.playerPublicKeys.put(pseudonym, publicKey);
             result = publicKey;
         }
         catch (Exception e)
@@ -928,14 +940,13 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public byte[] getServerPublicKey(String pseudonym, int tableID)
+    public byte[] getServerPublicKey()
     {
         byte[] result = new byte[0];
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.getTablePublicKey();
+            result = this.serverPublicKey;
         }
         catch (Exception e)
         {
@@ -949,21 +960,19 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean sendSessionID(String pseudonym, int tableID, byte[] cipheredSessionID)
+    public boolean sendSessionID(String pseudonym, byte[] cipheredSessionID)
     {
         boolean result = false;
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.reportPlayerSessionID(pseudonym, cipheredSessionID);
-                result = true;
-            }
+            this.playerSessionIDs.put(pseudonym, (byte[]) DominoesCryptoAsym.AsymDecipher(cipheredSessionID,
+                    this.serverPrivateKey));
+            result = true;
         }
         catch (Exception e)
         {
-            System.out.println("DSImplementation: getServerPublicKey: " + e.toString());
+            System.out.println("DSImplementation: sendSessionID: " + e.toString());
         }
         finally
         {

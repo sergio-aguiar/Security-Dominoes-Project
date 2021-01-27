@@ -30,7 +30,9 @@ public class DSInterface
             case 5:
             case 39:
             case 40:
+            case 41:
             case 42:
+            case 43:
                 break;
             case 3:
             case 6:
@@ -59,7 +61,6 @@ public class DSInterface
             case 36:
             case 37:
             case 38:
-            case 41:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -148,12 +149,12 @@ public class DSInterface
         {
             case 1:
                 int return1 = this.dsImplementation.createTable(inMessage.getPseudonym(),
-                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
-                        (byte[]) inMessage.getSecondArgument());
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), return1);
                 break;
             case 2:
-                DominoesTableInfo[] return2 = this.dsImplementation.listAvailableTables();
+                DominoesTableInfo[] return2 = this.dsImplementation.listAvailableTables(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID());
                 outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode(), return2);
                 break;
             case 3:
@@ -346,13 +347,17 @@ public class DSInterface
                 break;
             case 41:
                 byte[] return41 = this.dsImplementation.greetServer(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument(), (byte[]) inMessage.getSecondArgument());
+                        (byte[]) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.GREET_SERVER_REQUEST.getMessageCode(), return41);
                 break;
             case 42:
-                byte[] return42 = this.dsImplementation.getServerPublicKey(inMessage.getPseudonym(),
-                        (int) inMessage.getFirstArgument());
+                byte[] return42 = this.dsImplementation.getServerPublicKey();
                 outMessage = new DMessage(DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode(), return42);
+                break;
+            case 43:
+                boolean return43 = this.dsImplementation.sendSessionID(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID());
+                outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), return43);
                 break;
         }
         return outMessage;

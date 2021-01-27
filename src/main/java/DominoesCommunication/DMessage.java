@@ -137,8 +137,8 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument
-            , Object thirdArgument) throws DMessageException
+    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument,
+                    Object thirdArgument) throws DMessageException
     {
         this.messageType = messageType;
         this.pseudonym = pseudonym;
@@ -150,8 +150,8 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument
-            , Object thirdArgument, Object fourthArgument) throws DMessageException
+    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument,
+                    Object thirdArgument, Object fourthArgument) throws DMessageException
     {
         this.messageType = messageType;
         this.pseudonym = pseudonym;
@@ -175,7 +175,7 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, byte[] cipheredSessionID, String pseudonym) throws DMessageException
+    public DMessage(int messageType, String pseudonym, byte[] cipheredSessionID) throws DMessageException
     {
         this.messageType = messageType;
         this.pseudonym = pseudonym;
@@ -187,7 +187,7 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, byte[] cipheredSessionID, String pseudonym, Object firstArgument)
+    public DMessage(int messageType, String pseudonym, byte[] cipheredSessionID, Object firstArgument)
             throws DMessageException
     {
         this.messageType = messageType;
@@ -200,7 +200,7 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, byte[] cipheredSessionID, String pseudonym, Object firstArgument,
+    public DMessage(int messageType, String pseudonym, byte[] cipheredSessionID, Object firstArgument,
                     Object secondArgument) throws DMessageException
     {
         this.messageType = messageType;
@@ -213,7 +213,7 @@ public class DMessage implements Serializable
         this.fourthArgument = null;
     }
 
-    public DMessage(int messageType, byte[] cipheredSessionID, String pseudonym, Object firstArgument,
+    public DMessage(int messageType, String pseudonym, byte[] cipheredSessionID, Object firstArgument,
                     Object secondArgument, Object thirdArgument) throws DMessageException
     {
         this.messageType = messageType;

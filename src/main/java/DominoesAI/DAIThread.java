@@ -1,3 +1,4 @@
+/*
 package DominoesAI;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class DAIThread extends DCThread {
     private boolean gameStarted = false;
 
     public DAIThread(DCInterface dcInterface) {
-        super(generatePseudonym(), 1, dcInterface);
+        super(generatePseudonym(), dcInterface);
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
         this.tableID = -1;
@@ -208,3 +209,4 @@ public class DAIThread extends DCThread {
         this.gamePieces.clear();
     }
 }
+*/

@@ -5,6 +5,8 @@ import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
+import java.util.Arrays;
+
 public class DCStub implements DCInterface
 {
     private final String serverHostName;
@@ -17,7 +19,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap, byte[] publicKey)
+    public int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -38,8 +40,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), pseudonym, playerCap,
-                    publicKey, cipheredSessionID);
+            outMessage = new DMessage(DMessage.MessageType.CREATE_TABLE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, playerCap);
         }
         catch (DMessageException e)
         {
@@ -71,7 +73,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public DominoesTableInfo[] listAvailableTables()
+    public DominoesTableInfo[] listAvailableTables(String pseudonym, byte[] cipheredSessionID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -92,7 +94,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode());
+            outMessage = new DMessage(DMessage.MessageType.LIST_TABLES_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID);
         }
         catch (DMessageException e)
         {
@@ -2080,7 +2083,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public byte[] greetServer(String pseudonym, int tableID, byte[] publicKey)
+    public byte[] greetServer(String pseudonym, byte[] publicKey)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2101,8 +2104,8 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.GREET_SERVER_REQUEST.getMessageCode(), pseudonym, tableID,
-                    publicKey);
+            outMessage = new DMessage(DMessage.MessageType.GREET_SERVER_REQUEST.getMessageCode(), pseudonym,
+                    (Object) publicKey);
         }
         catch (DMessageException e)
         {
@@ -2130,11 +2133,13 @@ public class DCStub implements DCInterface
         }
         dcCommunication.close();
 
+        System.out.println("MY KEY RETURNED: " + Arrays.toString(((byte[]) inMessage.getReturnInfo())));
+
         return (byte[]) inMessage.getReturnInfo();
     }
 
     @Override
-    public byte[] getServerPublicKey(String pseudonym, int tableID)
+    public byte[] getServerPublicKey()
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2155,7 +2160,7 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode(), pseudonym, tableID);
+            outMessage = new DMessage(DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode());
         }
         catch (DMessageException e)
         {
@@ -2187,7 +2192,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean sendSessionID(String pseudonym, int tableID, byte[] cipheredSessionID)
+    public boolean sendSessionID(String pseudonym, byte[] cipheredSessionID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2208,7 +2213,7 @@ public class DCStub implements DCInterface
 
         try
         {
-            outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), pseudonym, tableID,
+            outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), pseudonym,
                     cipheredSessionID);
         }
         catch (DMessageException e)
