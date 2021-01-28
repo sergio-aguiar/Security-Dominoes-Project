@@ -2210,7 +2210,7 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean sendSessionID(String pseudonym, byte[] cipheredSessionID)
+    public byte[] sendSessionID(String pseudonym, byte[] cipheredSessionID)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2260,6 +2260,49 @@ public class DCStub implements DCInterface
         }
         dcCommunication.close();
 
-        return (boolean) inMessage.getReturnInfo();
+        return (byte[]) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+
+    }
+
+    @Override
+    public boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public byte[][] getPlayerPublicKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return new byte[0][];
+    }
+
+    @Override
+    public DominoesSymKeyMatrix getSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return null;
+    }
+
+    @Override
+    public boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                                  DominoesSymKeyMatrix symKeyMatrix)
+    {
+        return false;
+    }
+
+    @Override
+    public byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return new byte[0][];
     }
 }

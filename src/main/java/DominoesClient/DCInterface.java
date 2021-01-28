@@ -54,5 +54,15 @@ public interface DCInterface
     boolean registerUser(String user);
     byte[] greetServer(String pseudonym, byte[] publicKey);
     byte[] getServerPublicKey();
-    boolean sendSessionID(String pseudonym, byte[] cipheredSessionID);
+    // TODO: Cipher key
+    byte[] sendSessionID(String pseudonym, byte[] cipheredSessionID);
+
+    boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID);
+    void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID);
+    byte[][] getPlayerPublicKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
+    DominoesSymKeyMatrix getSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                           DominoesSymKeyMatrix symKeyMatrix);
+    byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
 }

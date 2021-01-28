@@ -17,6 +17,10 @@ public class DSInterface
     {
         DMessage outMessage = null;
 
+        if (inMessage.getMessageType() >= 1 && (inMessage.getMessageType() <= 38 || inMessage.getMessageType() >= 43))
+            if (inMessage.noCipheredSessionID())
+                throw new DMessageException("Argument \"cipheredSessionID\" was not given", inMessage);
+
         switch(inMessage.getMessageType())
         {
             case 1:
@@ -366,7 +370,7 @@ public class DSInterface
                 outMessage = new DMessage(DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode(), return42);
                 break;
             case 43:
-                boolean return43 = this.dsImplementation.sendSessionID(inMessage.getPseudonym(),
+                byte[] return43 = this.dsImplementation.sendSessionID(inMessage.getPseudonym(),
                         inMessage.getCipheredSessionID());
                 outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), return43);
                 break;

@@ -2,6 +2,7 @@ package DominoesClient;
 
 import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
+import DominoesSecurity.DominoesCryptoSym;
 import DominoesSecurity.DominoesSignature;
 
 import java.security.Key;
@@ -51,6 +52,9 @@ public class DCThread extends Thread
     private byte[] signedSessionID;
     private byte[] cipheredSignedSessionID;
     private byte[] tablePublicKey;
+    private byte[] tableSessionSymKey;
+    private byte[][] playerPublicKeys;
+    private byte[][] playerSessionSymKeys;
 
     private int bitCommitRandom1;
     private int bitCommitRandom2;
@@ -65,6 +69,10 @@ public class DCThread extends Thread
         this.publicKey = publicKey;
         this.sessionID = sessionID;
         this.signedSessionID = signSessionID();
+        this.tablePublicKey = null;
+        this.tableSessionSymKey = null;
+        this.playerPublicKeys = null;
+        this.playerSessionSymKeys = null;
         this.cipheredSignedSessionID = null;
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
@@ -310,6 +318,54 @@ public class DCThread extends Thread
             }
 
             if (this.dcInterface.hasGameEnded(this.pseudonym, this.cipheredSignedSessionID ,this.tableID)) break;
+
+            if (!this.dcInterface.hasKeySortingEnded(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
+            {
+                if (!this.dcInterface.hasKeySortingStarted(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
+                    this.dcInterface.startKeySorting(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
+                else
+                {
+                    this.playerPublicKeys = this.dcInterface.getPlayerPublicKeys(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID);
+
+                    DominoesSymKeyMatrix symKeyMatrix = this.dcInterface.getSymKeyDistributionMatrix(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID);
+
+                    for (int i = 0; i < symKeyMatrix.getPlayers().length; i++)
+                        if (symKeyMatrix.getPlayers()[i].equals(this.pseudonym))
+                        {
+                            for (int j = i + 1; j < symKeyMatrix.getSymKeyMatrix()[i].length; j++)
+                            {
+                                byte[] symKey = DominoesCryptoSym.GenerateSymKeys(Long.toString(
+                                        System.currentTimeMillis()));
+
+                                symKeyMatrix.updateKey(i, j, DominoesCryptoAsym.AsymCipher(symKey,
+                                        this.sessionPublicKey));
+
+                                symKeyMatrix.updateKey(j, i, DominoesCryptoAsym.AsymCipher(symKey,
+                                        this.playerPublicKeys[j]));
+                            }
+                        }
+
+                    if (!this.dcInterface.returnSymKeyDistributionMatrix(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID, symKeyMatrix))
+                    {
+                        System.out.println("\n[CLIENT] Unexpected Error...");
+                        System.exit(703);
+                    }
+
+                    continue;
+                }
+            }
+            else
+            {
+                this.playerSessionSymKeys = this.dcInterface.getSessionSymKeys(this.pseudonym,
+                        this.cipheredSignedSessionID, this.tableID);
+
+                for (int i = 0; i < this.playerSessionSymKeys.length; i++) if (this.playerSessionSymKeys[i] != null)
+                    this.playerSessionSymKeys[i] = (byte[]) DominoesCryptoAsym.AsymDecipher(
+                            this.playerSessionSymKeys[i], this.sessionPrivateKey);
+            }
 
             if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
@@ -703,6 +759,8 @@ public class DCThread extends Thread
 
     private void establishSession()
     {
+        System.out.println("\n[CLIENT] Establishing a session with the server...");
+
         while (!Arrays.equals(this.sessionPublicKey, this.dcInterface.greetServer(this.pseudonym,
                 this.sessionPublicKey)))
         {
@@ -724,6 +782,9 @@ public class DCThread extends Thread
                 this.reentrantLock.unlock();
             }
         }
+
+        System.out.println("\n[CLIENT] Server received session request.");
+        System.out.println("\n[CLIENT] Requesting table credentials...");
 
         do
         {
@@ -751,8 +812,13 @@ public class DCThread extends Thread
 
         this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.tablePublicKey);
 
-        while (!this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID))
+        System.out.println("\n[CLIENT] Table credentials obtained.");
+        System.out.println("\n[CLIENT] Generating session data...");
+
+        do
         {
+            this.tableSessionSymKey = this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID);
+
             this.reentrantLock.lock();
             try
             {
@@ -771,6 +837,9 @@ public class DCThread extends Thread
                 this.reentrantLock.unlock();
             }
         }
+        while (Arrays.equals(this.tableSessionSymKey , new byte[0]));
+
+        System.out.println("\n[CLIENT] Session established successfully.");
     }
 
     private byte[] signSessionID()

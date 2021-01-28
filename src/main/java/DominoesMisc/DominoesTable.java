@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 public class DominoesTable
 {
-    private static final long serialVersionUID = 1103L;
     private static int gID = 0;
     private static final int maxPieces = 6;
 

@@ -279,6 +279,11 @@ public class DMessage implements Serializable
         return this.fourthArgument;
     }
 
+    public boolean noCipheredSessionID()
+    {
+        return this.cipheredSessionID == null;
+    }
+
     public boolean noReturnInfo()
     {
         return this.returnInfo == null;

@@ -4,6 +4,7 @@ import DominoesClient.DCInterface;
 import DominoesDatabase.DSQLiteConnection;
 import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
+import DominoesSecurity.DominoesCryptoSym;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class DSImplementation implements DCInterface
 
     private final HashMap<String, byte[]> playerSessionIDs;
     private final HashMap<String, byte[]> playerPublicKeys;
+    private final HashMap<String, byte[]> playerSessionSymKeys;
     private final byte[] serverPrivateKey;
     private final byte[] serverPublicKey;
 
@@ -26,6 +28,7 @@ public class DSImplementation implements DCInterface
         this.dominoesTables = new ArrayList<>();
         this.playerSessionIDs = new HashMap<>();
         this.playerPublicKeys = new HashMap<>();
+        this.playerSessionSymKeys = new HashMap<>();
 
         Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
         this.serverPrivateKey = keys.get("private");
@@ -963,15 +966,18 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean sendSessionID(String pseudonym, byte[] cipheredSessionID)
+    public byte[] sendSessionID(String pseudonym, byte[] cipheredSessionID)
     {
-        boolean result = false;
+        byte[] result = new byte[0];
         this.reentrantLock.lock();
         try
         {
             this.playerSessionIDs.put(pseudonym, (byte[]) DominoesCryptoAsym.AsymDecipher(cipheredSessionID,
                     this.serverPrivateKey));
-            result = true;
+
+            byte[] sessionSymKey = DominoesCryptoSym.GenerateSymKeys(Long.toString(System.currentTimeMillis()));
+            this.playerSessionSymKeys.put(pseudonym, sessionSymKey);
+            result = sessionSymKey;
         }
         catch (Exception e)
         {
@@ -982,5 +988,48 @@ public class DSImplementation implements DCInterface
             this.reentrantLock.unlock();
         }
         return result;
+    }
+
+    @Override
+    public boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+
+    }
+
+    @Override
+    public boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return false;
+    }
+
+    @Override
+    public byte[][] getPlayerPublicKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return new byte[0][];
+    }
+
+    @Override
+    public DominoesSymKeyMatrix getSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return null;
+    }
+
+    @Override
+    public boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                                  DominoesSymKeyMatrix symKeyMatrix)
+    {
+        return false;
+    }
+
+    @Override
+    public byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        return new byte[0][];
     }
 }
