@@ -2,6 +2,8 @@ package DominoesClient;
 
 import DominoesMisc.*;
 
+import java.util.Stack;
+
 public interface DCInterface
 {
     int createTable(String pseudonym, byte[] cipheredSessionID, int playerCap);
@@ -17,10 +19,9 @@ public interface DCInterface
     boolean hasGameEnded(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher DominoesDeck
     DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID);
     // TODO: Cipher DominoesDeck, pieceDif
-    boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, int pieceDif);
+    boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, byte[] pieceDif);
     void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
     // TODO: Cipher commitData
     boolean commitHand(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData);
@@ -56,7 +57,6 @@ public interface DCInterface
     byte[] getServerPublicKey();
     // TODO: Cipher key
     byte[] sendSessionID(String pseudonym, byte[] cipheredSessionID);
-
     boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID);
     void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID);
@@ -65,4 +65,12 @@ public interface DCInterface
     boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
                                            DominoesSymKeyMatrix symKeyMatrix);
     byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
+
+    boolean hasDeckBeenProtected(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean sendDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                         byte[] deckProtectionPrivateKey);
+    void notifyDeckProtected(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean haveAllSentDeckProtectionPrivateKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean hasSentDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID);
+    Stack<byte[]> getDeckProtectionKeyStack(String pseudonym, byte[] cipheredSessionID, int tableID);
 }

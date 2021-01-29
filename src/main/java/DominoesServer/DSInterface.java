@@ -4,6 +4,8 @@ import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
+import java.util.Stack;
+
 public class DSInterface
 {
     private final DSImplementation dsImplementation;
@@ -65,6 +67,19 @@ public class DSInterface
             case 36:
             case 37:
             case 38:
+            case 44:
+            case 45:
+            case 46:
+            case 47:
+            case 48:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -78,9 +93,7 @@ public class DSInterface
                 if (inMessage.noSecondArgument())
                     throw new DMessageException("Argument \"deck\" was not given", inMessage);
                 if (inMessage.noThirdArgument())
-                    throw new DMessageException("Argument \"cardDif\" was not given", inMessage);
-                if ((int) inMessage.getThirdArgument() < -1 || (int) inMessage.getThirdArgument() > 1)
-                    throw new DMessageException("Argument \"cardDif\" was given an incorrect value", inMessage);
+                    throw new DMessageException("Argument \"pieceDif\" was not given", inMessage);
                 break;
             case 17:
             case 29:
@@ -224,7 +237,7 @@ public class DSInterface
             case 15:
                 boolean return15 = this.dsImplementation.returnDeck(inMessage.getPseudonym(),
                         inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
-                        (DominoesDeck) inMessage.getSecondArgument(), (int) inMessage.getThirdArgument());
+                        (DominoesDeck) inMessage.getSecondArgument(), (byte[]) inMessage.getThirdArgument());
                 outMessage = new DMessage(DMessage.MessageType.DECK_RETURN_REQUEST.getMessageCode(), return15);
                 break;
             case 16:
@@ -373,6 +386,83 @@ public class DSInterface
                 byte[] return43 = this.dsImplementation.sendSessionID(inMessage.getPseudonym(),
                         inMessage.getCipheredSessionID());
                 outMessage = new DMessage(DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode(), return43);
+                break;
+            case 44:
+                boolean return44 = this.dsImplementation.hasKeySortingStarted(inMessage.getPseudonym(),
+                    inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAS_KEY_SORTING_STARTED_REQUEST.getMessageCode(),
+                        return44);
+                break;
+            case 45:
+                this.dsImplementation.startKeySorting(inMessage.getPseudonym(), inMessage.getCipheredSessionID(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.START_KEY_SORTING_REQUEST.getMessageCode(),
+                        (Object) null);
+                break;
+            case 46:
+                boolean return46 = this.dsImplementation.hasKeySortingEnded(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAS_KEY_SORTING_ENDED_REQUEST.getMessageCode(),
+                        return46);
+                break;
+            case 47:
+                byte[][] return47 = this.dsImplementation.getPlayerPublicKeys(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.PLAYER_PUBLIC_KEYS_REQUEST.getMessageCode(), return47);
+                break;
+            case 48:
+                DominoesSymKeyMatrix return48 = this.dsImplementation.getSymKeyDistributionMatrix(
+                        inMessage.getPseudonym(), inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode(),
+                        return48);
+                break;
+            case 49:
+                boolean return49 = this.dsImplementation.returnSymKeyDistributionMatrix(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
+                        (DominoesSymKeyMatrix) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.RETURN_KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode(),
+                        return49);
+                break;
+            case 50:
+                byte[][] return50 = this.dsImplementation.getSessionSymKeys(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.SESSION_SYM_KEYS_REQUEST.getMessageCode(), return50);
+                break;
+            case 51:
+                boolean return51 = this.dsImplementation.hasDeckBeenProtected(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAS_DECK_BEEN_PROTECTED_REQUEST.getMessageCode(),
+                        return51);
+                break;
+            case 52:
+                boolean return52 = this.dsImplementation.sendDeckProtectionPrivateKey(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
+                        (byte[]) inMessage.getSecondArgument());
+                outMessage = new DMessage(DMessage.MessageType.SEND_DECK_PROTECTION_REQUEST.getMessageCode(), return52);
+                break;
+            case 53:
+                this.dsImplementation.notifyDeckProtected(inMessage.getPseudonym(), inMessage.getCipheredSessionID(),
+                        (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.NOTIFY_DECK_PROTECTED_REQUEST.getMessageCode(),
+                        (Object) null);
+                break;
+            case 54:
+                boolean return54 = this.dsImplementation.haveAllSentDeckProtectionPrivateKeys(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAVE_ALL_SENT_DECK_PROTECTION_REQUEST.getMessageCode(),
+                        return54);
+                break;
+            case 55:
+                boolean return55 = this.dsImplementation.hasSentDeckProtectionPrivateKey(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.HAS_SENT_DECK_PROTECTION_REQUEST.getMessageCode(),
+                        return55);
+                break;
+            case 56:
+                Stack<byte[]> return56 = this.dsImplementation.getDeckProtectionKeyStack(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DECK_PROTECTION_KEY_STACK_REQUEST.getMessageCode(),
+                        return56);
                 break;
         }
         return outMessage;

@@ -9,6 +9,7 @@ import DominoesSecurity.DominoesCryptoSym;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DSImplementation implements DCInterface
@@ -357,7 +358,8 @@ public class DSImplementation implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, int pieceDif)
+    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck,
+                              byte[] pieceDif)
     {
         boolean result = false;
         this.reentrantLock.lock();
@@ -366,7 +368,8 @@ public class DSImplementation implements DCInterface
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
                 table.setDeck(deck);
-                table.handleCardDif(pseudonym, pieceDif);
+                table.handleCardDif(pseudonym, (int) DominoesCryptoSym.SymDecipher(pieceDif,
+                        this.playerSessionSymKeys.get(pseudonym)));
                 result = true;
                 table.incrementTurn();
             }
@@ -410,7 +413,7 @@ public class DSImplementation implements DCInterface
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
                 result = table.distributionCommit(pseudonym, commitData);
-                if (result) table.incrementTurn();
+                // if (result) table.incrementTurn();
             }
         }
         catch (Exception e)
@@ -993,43 +996,289 @@ public class DSImplementation implements DCInterface
     @Override
     public boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isHandlingKeys();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasKeySortingStarted: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.startKeySorting();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: startKeySorting: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
     public boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.hasKeySortingEnded();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasKeySortingEnded: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public byte[][] getPlayerPublicKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return new byte[0][];
+        byte[][] result = new byte[0][];
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                byte[][] keys = new byte[table.getPlayers().length][];
+
+                for (int i = 0; i < table.getPlayers().length; i++)
+                    keys[i] = this.playerPublicKeys.get(table.getPlayers()[i]);
+
+                result = keys;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getPlayerPublicKeys: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public DominoesSymKeyMatrix getSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return null;
+        DominoesSymKeyMatrix matrix = null;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                matrix = table.getSymKeyMatrix();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getSymKeyDistributionMatrix: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return matrix;
     }
 
     @Override
     public boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
                                                   DominoesSymKeyMatrix symKeyMatrix)
     {
-        return false;
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.incrementTurn();
+                table.setSymKeyMatrix(symKeyMatrix);
+                result = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: returnSymKeyDistributionMatrix: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 
     @Override
     public byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return new byte[0][];
+        byte[][] result = new byte[0][];
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.getPlayerSymKeys(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getSessionSymKeys: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasDeckBeenProtected(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.hasDeckBeenProtected(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasDeckBeenProtected: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean sendDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                                byte[] deckProtectionPrivateKey)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                table.addDeckProtectionKey(pseudonym, deckProtectionPrivateKey);
+                table.incrementTurn();
+                result = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: sendDeckProtectionPublicKey: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public void notifyDeckProtected(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                if (table.notifyDeckProtected(pseudonym))
+                    table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: notifyDeckProtected: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+    }
+
+    @Override
+    public boolean haveAllSentDeckProtectionPrivateKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.haveAllSentDeckProtection();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: haveAllSentDeckProtectionPrivateKeys: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasSentDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.hasSentDeckProtection(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasSentDeckProtectionPrivateKey: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public Stack<byte[]> getDeckProtectionKeyStack(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        Stack<byte[]> result = null;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+            {
+                result = table.getDeckDecipherStack();
+                table.incrementTurn();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getDeckProtectionKeyStack: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
     }
 }

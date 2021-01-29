@@ -2,6 +2,7 @@ package DominoesMisc;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Stack;
 
 public class DominoesTable
 {
@@ -12,6 +13,7 @@ public class DominoesTable
     private DominoesDeck deck;
     private final DominoesGameState gameState;
     private final DominoesAccountingInfo accountingInfo;
+    private DominoesSymKeyMatrix symKeyMatrix;
     private final String[] players;
     private final boolean[] readyStates;
     private final int[] playerPieceCount;
@@ -24,6 +26,9 @@ public class DominoesTable
     private final DominoesCommitData[] commitGenData;
     private final Object[] decisionMade;
     private final boolean[] havePassedProtest;
+    private final boolean[] haveProtectedDeck;
+    private final boolean[] haveSentProtection;
+    private final Stack<byte[]> deckDecipherStack;
 
     private boolean started;
     private boolean ended;
@@ -31,6 +36,7 @@ public class DominoesTable
     private boolean resetNeeded;
     private boolean handlingCheating;
     private boolean handlingAccounting;
+    private boolean handlingKeys;
     private int turn;
 
     public DominoesTable(int playerCap, String tableLeader)
@@ -42,6 +48,7 @@ public class DominoesTable
         this.deck = new DominoesDeck();
         this.gameState = new DominoesGameState(playerCap);
         this.accountingInfo = new DominoesAccountingInfo(playerCap);
+        this.symKeyMatrix = null;
         this.players = new String[playerCap];
         this.players[0] = tableLeader;
         this.readyStates = new boolean[playerCap];
@@ -64,6 +71,11 @@ public class DominoesTable
         this.decisionMade[0] = null;
         this.havePassedProtest = new boolean[playerCap];
         this.havePassedProtest[0] = false;
+        this.haveProtectedDeck = new boolean[playerCap];
+        this.haveProtectedDeck[0] = false;
+        this.haveSentProtection = new boolean[playerCap];
+        this.haveSentProtection[0] = false;
+        this.deckDecipherStack = new Stack<>();
 
         for (int i = 1; i < playerCap; i++)
         {
@@ -77,6 +89,8 @@ public class DominoesTable
             this.commitGenData[i] = null;
             this.decisionMade[i] = null;
             this.havePassedProtest[i] = false;
+            this.haveProtectedDeck[i] = false;
+            this.haveSentProtection[i] = false;
         }
 
         this.started = false;
@@ -85,6 +99,7 @@ public class DominoesTable
         this.resetNeeded = false;
         this.handlingCheating = false;
         this.handlingAccounting = false;
+        this.handlingKeys = false;
         this.turn = 0;
     }
 
@@ -227,6 +242,11 @@ public class DominoesTable
         return this.handlingAccounting;
     }
 
+    public boolean isHandlingKeys()
+    {
+        return this.handlingKeys;
+    }
+
     public int getId()
     {
         return this.id;
@@ -267,9 +287,30 @@ public class DominoesTable
         return this.accountingInfo;
     }
 
+    public DominoesSymKeyMatrix getSymKeyMatrix()
+    {
+        return this.symKeyMatrix;
+    }
+
+    public Stack<byte[]> getDeckDecipherStack()
+    {
+        return this.deckDecipherStack;
+    }
+
     public void setDeck(DominoesDeck deck)
     {
         this.deck = deck;
+    }
+
+    public void setSymKeyMatrix(DominoesSymKeyMatrix symKeyMatrix)
+    {
+        this.symKeyMatrix = symKeyMatrix;
+
+        if (this.symKeyMatrix.getSymKeyMatrix()[this.players.length - 1][this.players.length - 2] != null)
+        {
+            this.handlingKeys = false;
+            this.turn = 0;
+        }
     }
 
     public void setReady(String pseudonym)
@@ -412,6 +453,20 @@ public class DominoesTable
             this.gameState.setDenounced(i);
     }
 
+    public void startKeySorting()
+    {
+        this.handlingKeys = true;
+        this.symKeyMatrix = new DominoesSymKeyMatrix(this.players);
+        this.turn = 0;
+    }
+
+    public boolean hasKeySortingEnded()
+    {
+        if (this.handlingKeys) return false;
+        System.out.println("hasKeySortingEnded:\n" + Arrays.deepToString(this.symKeyMatrix.getSymKeyMatrix()) + "\n");
+        return this.symKeyMatrix.getSymKeyMatrix()[this.players.length - 1][this.players.length - 2] != null;
+    }
+
     public void setCommitGenData(String pseudonym, DominoesCommitData commitGenData)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
@@ -482,9 +537,10 @@ public class DominoesTable
                     && this.commitGenData[i].hasRandom2()
                     && this.commitGenData[i].hasPieces())
             {
-                if (this.commitData[i].getBitCommitment() != DominoesCommitData.generateHash(
-                        this.commitData[i].getRandom1(), this.commitGenData[i].getRandom2(),
-                        this.commitGenData[i].getPieces())) this.gameState.setCheater(i);
+                // TODO: FINISH BIT COMMITMENT
+                // if (this.commitData[i].getBitCommitment() != DominoesCommitData.generateHash(
+                //         this.commitData[i].getRandom1(), this.commitGenData[i].getRandom2(),
+                //         this.commitGenData[i].getPieces())) this.gameState.setCheater(i);
             }
             else this.gameState.setCheater(i);
         }
@@ -566,6 +622,68 @@ public class DominoesTable
     {
         for (String player : this.players) if (player == null) return false;
         return true;
+    }
+
+    public byte[][] getPlayerSymKeys(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            return this.symKeyMatrix.getSymKeyMatrix()[i];
+
+        return new byte[0][];
+    }
+
+    public boolean hasDeckBeenProtected(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            return this.haveProtectedDeck[i];
+
+        return false;
+    }
+
+    public boolean notifyDeckProtected(String pseudonym)
+    {
+        boolean allProtected = true;
+
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.haveProtectedDeck[i] = true;
+
+        for (int i = 0; i < this.players.length; i++)
+            if (!this.haveProtectedDeck[i])
+            {
+                allProtected = false;
+                break;
+            }
+
+        if (allProtected) this.turn = this.players.length - 1;
+
+        return allProtected;
+    }
+
+    public void deckSymCipher(byte[] symKey)
+    {
+        deck.symCipher(symKey);
+    }
+
+    public void addDeckProtectionKey(String pseudonym, byte[] asymKey)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.haveSentProtection[i] = true;
+
+        this.deckDecipherStack.push(asymKey);
+    }
+
+    public boolean haveAllSentDeckProtection()
+    {
+        for (boolean deckProtected : this.haveProtectedDeck) if (!deckProtected) return false;
+        return this.deckDecipherStack.size() >= this.players.length;
+    }
+
+    public boolean hasSentDeckProtection(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            return this.haveSentProtection[i];
+
+        return false;
     }
 
     public boolean isResetNeeded()

@@ -51,14 +51,17 @@ public class DCThread extends Thread
     private int sessionID;
     private byte[] signedSessionID;
     private byte[] cipheredSignedSessionID;
-    private byte[] tablePublicKey;
-    private byte[] tableSessionSymKey;
+    private byte[] serverPublicKey;
+    private byte[] serverSessionSymKey;
+    private byte[] deckDistributionPrivateKey;
+    private byte[] deckDistributionPublicKey;
     private byte[][] playerPublicKeys;
     private byte[][] playerSessionSymKeys;
 
     private int bitCommitRandom1;
     private int bitCommitRandom2;
     private ArrayList<String> committedPieces;
+    private boolean knowsCommittedCards;
 
     public DCThread(String pseudonym, Key privateKey, Key publicKey, int sessionID, DCInterface dcInterface)
     {
@@ -69,8 +72,8 @@ public class DCThread extends Thread
         this.publicKey = publicKey;
         this.sessionID = sessionID;
         this.signedSessionID = signSessionID();
-        this.tablePublicKey = null;
-        this.tableSessionSymKey = null;
+        this.serverPublicKey = null;
+        this.serverSessionSymKey = null;
         this.playerPublicKeys = null;
         this.playerSessionSymKeys = null;
         this.cipheredSignedSessionID = null;
@@ -84,6 +87,7 @@ public class DCThread extends Thread
         this.tableID = -1;
         randomizeCommitData();
         this.committedPieces = null;
+        this.knowsCommittedCards = false;
     }
 
     @Override
@@ -321,6 +325,8 @@ public class DCThread extends Thread
 
             if (!this.dcInterface.hasKeySortingEnded(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
+                System.out.println("I MADE IT TO KEY SEY SORTING 1!");
+
                 if (!this.dcInterface.hasKeySortingStarted(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                     this.dcInterface.startKeySorting(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
                 else
@@ -328,8 +334,14 @@ public class DCThread extends Thread
                     this.playerPublicKeys = this.dcInterface.getPlayerPublicKeys(this.pseudonym,
                             this.cipheredSignedSessionID, this.tableID);
 
+                    System.out.println("Player public keys:");
+                    for (byte[] key : this.playerPublicKeys) System.out.println(Arrays.toString(key));
+
                     DominoesSymKeyMatrix symKeyMatrix = this.dcInterface.getSymKeyDistributionMatrix(this.pseudonym,
                             this.cipheredSignedSessionID, this.tableID);
+
+                    System.out.println("Matrix before edited:");
+                    for (byte[][] key : symKeyMatrix.getSymKeyMatrix()) System.out.println(Arrays.toString(key));
 
                     for (int i = 0; i < symKeyMatrix.getPlayers().length; i++)
                         if (symKeyMatrix.getPlayers()[i].equals(this.pseudonym))
@@ -347,6 +359,9 @@ public class DCThread extends Thread
                             }
                         }
 
+                    System.out.println("Matrix after edited:");
+                    for (byte[][] key : symKeyMatrix.getSymKeyMatrix()) System.out.println(Arrays.toString(key));
+
                     if (!this.dcInterface.returnSymKeyDistributionMatrix(this.pseudonym, this.cipheredSignedSessionID,
                             this.tableID, symKeyMatrix))
                     {
@@ -354,23 +369,99 @@ public class DCThread extends Thread
                         System.exit(703);
                     }
 
-                    continue;
                 }
+                continue;
             }
             else
             {
+                System.out.println("I MADE IT TO KEY SEY SORTING 2!");
+
                 this.playerSessionSymKeys = this.dcInterface.getSessionSymKeys(this.pseudonym,
                         this.cipheredSignedSessionID, this.tableID);
+
+                System.out.println("Sym keys while ciphered:");
+                for (byte[] key : this.playerSessionSymKeys) System.out.println(Arrays.toString(key));
 
                 for (int i = 0; i < this.playerSessionSymKeys.length; i++) if (this.playerSessionSymKeys[i] != null)
                     this.playerSessionSymKeys[i] = (byte[]) DominoesCryptoAsym.AsymDecipher(
                             this.playerSessionSymKeys[i], this.sessionPrivateKey);
+
+                System.out.println("Sym keys ready to be used:");
+                for (byte[] key : this.playerSessionSymKeys) System.out.println(Arrays.toString(key));
             }
+
+            System.out.println("I MADE IT AFTER KEY SORTING!");
 
             if (!this.dcInterface.hasPlayerCommitted(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
-                if (this.dcInterface.isDeckSorting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
+                if (!this.dcInterface.hasDeckBeenProtected(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                 {
+                    DominoesDeck deck = this.dcInterface.getDeck(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID);
+
+                    Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
+                    this.deckDistributionPrivateKey = keys.get("private");
+                    this.deckDistributionPublicKey = keys.get("public");
+
+                    System.out.println("Private key: " + Arrays.toString(this.deckDistributionPrivateKey));
+
+                    deck.asymCipher(this.deckDistributionPublicKey);
+
+                    this.dcInterface.notifyDeckProtected(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
+
+                    if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID, deck, DominoesCryptoSym.SymCipher(0, this.serverSessionSymKey)))
+                    {
+                        System.out.println("\n[CLIENT] Unexpected Error...");
+                        System.exit(703);
+                    }
+                }
+                else if (this.dcInterface.isDeckSorting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
+                {
+                    DominoesDeck deck = this.dcInterface.getDeck(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID);
+
+                    int lastPlayer = -1;
+                    int nextPlayer = -1;
+                    for (int i = 0; i < this.playerSessionSymKeys.length; i++)
+                        if (this.playerSessionSymKeys[i] == null)
+                        {
+                            if (i == 0)
+                            {
+                                lastPlayer = this.playerSessionSymKeys.length - 1;
+                                nextPlayer = i + 1;
+                            }
+                            else if (i == this.playerSessionSymKeys.length - 1)
+                            {
+                                lastPlayer = i - 1;
+                                nextPlayer = 0;
+                            }
+                            else
+                            {
+                                lastPlayer = i - 1;
+                                nextPlayer = i + 1;
+                            }
+                        }
+
+                    System.out.println("Last player: " + lastPlayer);
+                    System.out.println("Next player: " + nextPlayer);
+
+                    try
+                    {
+                        if (lastPlayer == -1)
+                        {
+                            System.out.println("\n[CLIENT] Unexpected Error...");
+                            System.exit(703);
+                        }
+                        else deck.symDecipher(this.playerSessionSymKeys[lastPlayer]);
+                    }
+                    catch (Exception e)
+                    {
+                        deck.symDecipher(this.serverSessionSymKey);
+                    }
+
+                    System.out.println("DECK AFTER DECIPHER: " + deck);
+
                     int option = clientPieceDistributionMenu();
                     switch (option)
                     {
@@ -379,15 +470,20 @@ public class DCThread extends Thread
 
                             if (this.dcInterface.canDraw(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                             {
-                                DominoesDeck deck1 = this.dcInterface.getDeck(this.pseudonym,
-                                        this.cipheredSignedSessionID, this.tableID);
-
-                                String tile1 = deck1.drawPiece();
+                                String tile1 = deck.drawPiece();
                                 if (tile1 != null) this.gamePieces.add(tile1);
                                 else System.out.println("\n[CLIENT] No pieces left to draw.");
 
+                                if (nextPlayer == -1)
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
-                                        this.tableID, deck1, 1))
+                                        this.tableID, deck, DominoesCryptoSym.SymCipher(1,
+                                                this.serverSessionSymKey)))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -402,15 +498,20 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Returning a piece...");
                             if (this.gamePieces.size() > 0)
                             {
-                                DominoesDeck deck2 = this.dcInterface.getDeck(this.pseudonym,
-                                        this.cipheredSignedSessionID, this.tableID);
-
                                 String tile2 = getTileToReturn();
-                                deck2.returnTile(tile2);
+                                deck.returnTile(tile2);
                                 this.gamePieces.remove(tile2);
 
+                                if (nextPlayer == -1)
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
-                                        this.tableID, deck2, -1))
+                                        this.tableID, deck, DominoesCryptoSym.SymCipher(-1,
+                                                this.serverSessionSymKey)))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -425,15 +526,20 @@ public class DCThread extends Thread
                             System.out.println("\n[CLIENT] Swapping a piece...");
                             if (this.gamePieces.size() > 0)
                             {
-                                DominoesDeck deck3 = this.dcInterface.getDeck(this.pseudonym,
-                                        this.cipheredSignedSessionID, this.tableID);
-
                                 String tile3 = getTileToReturn();
-                                this.gamePieces.add(deck3.swapTile(tile3));
+                                this.gamePieces.add(deck.swapTile(tile3));
                                 this.gamePieces.remove(tile3);
 
+                                if (nextPlayer == -1)
+                                {
+                                    System.out.println("\n[CLIENT] Unexpected Error...");
+                                    System.exit(703);
+                                }
+                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
-                                        this.tableID, deck3, 0))
+                                        this.tableID, deck, DominoesCryptoSym.SymCipher(0,
+                                                this.serverSessionSymKey)))
                                 {
                                     System.out.println("\n[CLIENT] Unexpected Error...");
                                     System.exit(703);
@@ -446,21 +552,49 @@ public class DCThread extends Thread
                             break;
                         case 4:
                             System.out.println("\n[CLIENT] Skipping a turn...");
-                            this.dcInterface.skipTurn(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
+
+                            // this.dcInterface.skipTurn(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
+
+                            if (nextPlayer == -1)
+                            {
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
+                            }
+                            else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+
+                            if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                                    this.tableID, deck, DominoesCryptoSym.SymCipher(0,
+                                            this.serverSessionSymKey)))
+                            {
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
+                            }
+
                             break;
                         case 5:
                             System.out.println("\n[CLIENT] Committing your hand...");
 
-                            int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
-                                    this.bitCommitRandom2, this.gamePieces.toArray(new String[0]));
+                            // TODO: BIT COMMITMENT CORRECTION
+                            // int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
+                            //         this.bitCommitRandom2, this.gamePieces.toArray(new String[0]));
+
+                            // TEMPORARY
+                            int bitCommitment = 1;
 
                             DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
                                     bitCommitment);
 
                             if (this.dcInterface.commitHand(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
-                                    commitData))
-                                this.committedPieces = new ArrayList<>(this.gamePieces);
+                                    commitData)) this.committedPieces = new ArrayList<>(this.gamePieces);
                             else System.out.println("\n[CLIENT You can only commit to full hands.");
+
+                            if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
+                                    this.tableID, deck, DominoesCryptoSym.SymCipher(0,
+                                            this.serverSessionSymKey)))
+                            {
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
+                            }
 
                             break;
                         default:
@@ -478,33 +612,77 @@ public class DCThread extends Thread
             {
                 if (this.dcInterface.isHandlingStart(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
                 {
-                    this.dcInterface.stateHighestDouble(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
-                            getHighestDouble());
-
-                    while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.cipheredSignedSessionID,
-                            this.tableID))
+                    if (!this.knowsCommittedCards)
                     {
-                        this.reentrantLock.lock();
-                        try
+                        if (this.dcInterface.haveAllSentDeckProtectionPrivateKeys(this.pseudonym,
+                                this.cipheredSignedSessionID, this.tableID))
                         {
-                            synchronized (this)
+                            Stack<byte[]> deckProtection = dcInterface.getDeckProtectionKeyStack(this.pseudonym,
+                                    this.cipheredSignedSessionID, this.tableID);
+
+                            while (deckProtection.size() > 1)
                             {
-                                this.turnCondition.awaitNanos(100000);
+                                byte[] key = deckProtection.pop();
+
+                                for (int i = 0; i < this.gamePieces.size(); i++)
+                                    this.gamePieces.set(i, Base64.getEncoder().encodeToString(
+                                            (byte[]) DominoesCryptoAsym.AsymDecipher(
+                                                    Base64.getDecoder().decode(this.gamePieces.get(i)), key)));
+
+                            }
+
+                            byte[] key = deckProtection.pop();
+
+                            for (int i = 0; i < this.gamePieces.size(); i++)
+                                this.gamePieces.set(i, (String) DominoesCryptoAsym.AsymDecipher(
+                                        Base64.getDecoder().decode(this.gamePieces.get(i)), key));
+
+                            this.committedPieces = new ArrayList<>(this.gamePieces);
+                            System.out.println(this.gamePieces.toString());
+
+                            this.knowsCommittedCards = true;
+                        }
+                        else if (!this.dcInterface.hasSentDeckProtectionPrivateKey(this.pseudonym,
+                                this.cipheredSignedSessionID, this.tableID))
+                        {
+                            if (!this.dcInterface.sendDeckProtectionPrivateKey(this.pseudonym,
+                                    this.cipheredSignedSessionID,this.tableID, this.deckDistributionPrivateKey))
+                            {
+                                System.out.println("\n[CLIENT] Unexpected Error...");
+                                System.exit(703);
                             }
                         }
-                        catch (Exception e)
-                        {
-                            System.out.println("DCThread: gameLogic: " + e.toString());
-                            System.exit(704);
-                        }
-                        finally
-                        {
-                            this.reentrantLock.unlock();
-                        }
                     }
+                    else
+                    {
+                        this.dcInterface.stateHighestDouble(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
+                                getHighestDouble());
 
-                    if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.cipheredSignedSessionID,
-                            this.tableID)) resetDistribution();
+                        while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.cipheredSignedSessionID,
+                                this.tableID))
+                        {
+                            this.reentrantLock.lock();
+                            try
+                            {
+                                synchronized (this)
+                                {
+                                    this.turnCondition.awaitNanos(100000);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                System.out.println("DCThread: gameLogic: " + e.toString());
+                                System.exit(704);
+                            }
+                            finally
+                            {
+                                this.reentrantLock.unlock();
+                            }
+                        }
+
+                        if (this.dcInterface.isRedistributionNeeded(this.pseudonym, this.cipheredSignedSessionID,
+                                this.tableID)) resetDistribution();
+                    }
                 }
                 else
                 {
@@ -562,8 +740,13 @@ public class DCThread extends Thread
 
                                     randomizeCommitData();
 
-                                    int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
-                                            this.bitCommitRandom2, this.committedPieces.toArray(new String[0]));
+                                    // TODO: BIT COMMITMENT CORRECTION
+
+                                    // int bitCommitment = DominoesCommitData.generateHash(this.bitCommitRandom1,
+                                    //         this.bitCommitRandom2, this.committedPieces.toArray(new String[0]));
+
+                                    // TEMPORARY
+                                    int bitCommitment = 1;
 
                                     DominoesCommitData commitData = new DominoesCommitData(this.bitCommitRandom1,
                                             bitCommitment);
@@ -759,7 +942,7 @@ public class DCThread extends Thread
 
     private void establishSession()
     {
-        System.out.println("\n[CLIENT] Establishing a session with the server...");
+        System.out.print("\n[CLIENT] Establishing a session with the server...");
 
         while (!Arrays.equals(this.sessionPublicKey, this.dcInterface.greetServer(this.pseudonym,
                 this.sessionPublicKey)))
@@ -783,12 +966,12 @@ public class DCThread extends Thread
             }
         }
 
-        System.out.println("\n[CLIENT] Server received session request.");
-        System.out.println("\n[CLIENT] Requesting table credentials...");
+        System.out.print("\n[CLIENT] Server received session request.");
+        System.out.print("\n[CLIENT] Requesting table credentials...");
 
         do
         {
-            this.tablePublicKey = this.dcInterface.getServerPublicKey();
+            this.serverPublicKey = this.dcInterface.getServerPublicKey();
 
             this.reentrantLock.lock();
             try
@@ -808,16 +991,16 @@ public class DCThread extends Thread
                 this.reentrantLock.unlock();
             }
         }
-        while (Arrays.equals(this.tablePublicKey, new byte[0]));
+        while (Arrays.equals(this.serverPublicKey, new byte[0]));
 
-        this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.tablePublicKey);
+        this.cipheredSignedSessionID = DominoesCryptoAsym.AsymCipher(this.signedSessionID, this.serverPublicKey);
 
-        System.out.println("\n[CLIENT] Table credentials obtained.");
-        System.out.println("\n[CLIENT] Generating session data...");
+        System.out.print("\n[CLIENT] Table credentials obtained.");
+        System.out.print("\n[CLIENT] Generating session data...");
 
         do
         {
-            this.tableSessionSymKey = this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID);
+            this.serverSessionSymKey = this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID);
 
             this.reentrantLock.lock();
             try
@@ -837,9 +1020,11 @@ public class DCThread extends Thread
                 this.reentrantLock.unlock();
             }
         }
-        while (Arrays.equals(this.tableSessionSymKey , new byte[0]));
+        while (Arrays.equals(this.serverSessionSymKey, new byte[0]));
 
-        System.out.println("\n[CLIENT] Session established successfully.");
+        this.cipheredSignedSessionID = DominoesCryptoSym.SymCipher(this.sessionID, this.serverSessionSymKey);
+
+        System.out.print("\n[CLIENT] Session established successfully.");
     }
 
     private byte[] signSessionID()

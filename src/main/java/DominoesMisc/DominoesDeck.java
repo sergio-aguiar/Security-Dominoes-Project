@@ -1,6 +1,10 @@
 package DominoesMisc;
 
+import DominoesSecurity.DominoesCryptoAsym;
+import DominoesSecurity.DominoesCryptoSym;
+
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -17,6 +21,7 @@ public class DominoesDeck implements Serializable
     private final String[] deck;
     private final int size = 28;
     private int pointer = this.size - 1;
+    private int cipherDepth = 0;
 
     public DominoesDeck(){
         this.deck = new String[size];
@@ -215,6 +220,64 @@ public class DominoesDeck implements Serializable
         System.out.print("[");
         for (String s : set) System.out.print(s + "; ");
         System.out.println("]");
+    }
+
+    public void asymCipher(byte[] asymKey)
+    {
+        for (int i = 0; i < this.deck.length; i++)
+        {
+            if (this.cipherDepth == 0)
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.AsymCipher(this.deck[i], asymKey));
+            else
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.AsymCipher(
+                        Base64.getDecoder().decode(this.deck[i]), asymKey));
+        }
+        this.cipherDepth++;
+        shuffle();
+    }
+
+    public void asymDecipher(byte[] asymKey)
+    {
+        for (int i = 0; i < this.deck.length; i++)
+        {
+            if (this.cipherDepth == 1)
+                this.deck[i] = (String) DominoesCryptoAsym.AsymDecipher(Base64.getDecoder().decode(this.deck[i]),
+                        asymKey);
+            else
+                this.deck[i] = Base64.getEncoder().encodeToString(
+                        (byte[]) DominoesCryptoAsym.AsymDecipher(Base64.getDecoder().decode(this.deck[i]), asymKey));
+        }
+        this.cipherDepth--;
+        shuffle();
+    }
+
+    public void symCipher(byte[] symKey)
+    {
+        for (int i = 0; i < this.deck.length; i++)
+        {
+            if (this.cipherDepth == 0)
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(this.deck[i], symKey));
+            else
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(
+                        Base64.getDecoder().decode(this.deck[i]), symKey));
+        }
+        this.cipherDepth++;
+        shuffle();
+    }
+
+    public void symDecipher(byte[] symKey)
+    {
+        for (int i = 0; i < this.deck.length; i++)
+        {
+            if (this.cipherDepth == 1)
+                this.deck[i] = (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(this.deck[i]),
+                        symKey);
+            else
+                this.deck[i] = Base64.getEncoder().encodeToString(
+                        (byte[]) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(this.deck[i]), symKey));
+        }
+        this.cipherDepth--;
+        shuffle();
     }
 
     // For debuging

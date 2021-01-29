@@ -6,6 +6,7 @@ import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 public class DCStub implements DCInterface
 {
@@ -743,7 +744,8 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, int pieceDif)
+    public boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck,
+                              byte[] pieceDif)
     {
         DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
         DMessage inMessage;
@@ -2266,43 +2268,679 @@ public class DCStub implements DCInterface
     @Override
     public boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.HAS_KEY_SORTING_STARTED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.HAS_KEY_SORTING_STARTED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
 
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: startKeySorting: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.START_KEY_SORTING_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: startKeySorting: " +
+                    e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.START_KEY_SORTING_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: startKeySorting: incorrect "
+                    + "reply message!");
+
+            System.exit(706);
+        }
     }
 
     @Override
     public boolean hasKeySortingEnded(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.HAS_KEY_SORTING_ENDED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.HAS_KEY_SORTING_ENDED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public byte[][] getPlayerPublicKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return new byte[0][];
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.PLAYER_PUBLIC_KEYS_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.PLAYER_PUBLIC_KEYS_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (byte[][]) inMessage.getReturnInfo();
     }
 
     @Override
     public DominoesSymKeyMatrix getSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return null;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "getSymKeyDistributionMatrix: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "getSymKeyDistributionMatrix: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSymKeyDistributionMatrix: "
+                    + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            return null;
+        }
+        dcCommunication.close();
+
+        return (DominoesSymKeyMatrix) inMessage.getReturnInfo();
     }
 
     @Override
     public boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
                                                   DominoesSymKeyMatrix symKeyMatrix)
     {
-        return false;
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "returnSymKeyDistributionMatrix: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.RETURN_KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID, symKeyMatrix);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "returnSymKeyDistributionMatrix: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.RETURN_KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "returnSymKeyDistributionMatrix: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "returnSymKeyDistributionMatrix: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 
     @Override
     public byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
     {
-        return new byte[0][];
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.SESSION_SYM_KEYS_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.SESSION_SYM_KEYS_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (byte[][]) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean hasDeckBeenProtected(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "hasDeckBeenProtected: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.HAS_DECK_BEEN_PROTECTED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasDeckBeenProtected: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.HAS_DECK_BEEN_PROTECTED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasDeckBeenProtected: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasDeckBeenProtected: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean sendDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID,
+                                                byte[] deckProtectionPrivateKey)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "sendDeckProtectionPublicKey: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.SEND_DECK_PROTECTION_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID, deckProtectionPrivateKey);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "sendDeckProtectionPublicKey: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.SEND_DECK_PROTECTION_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "sendDeckProtectionPublicKey: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "sendDeckProtectionPublicKey: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public void notifyDeckProtected(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: notifyDeckProtected: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.NOTIFY_DECK_PROTECTED_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: notifyDeckProtected: " +
+                    e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.NOTIFY_DECK_PROTECTED_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: notifyDeckProtected: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+    }
+
+    @Override
+    public boolean haveAllSentDeckProtectionPrivateKeys(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "haveAllSentDeckProtectionPrivateKeys: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.HAVE_ALL_SENT_DECK_PROTECTION_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllSentDeckProtectionPrivateKeys: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.HAVE_ALL_SENT_DECK_PROTECTION_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllSentDeckProtectionPrivateKeys: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllSentDeckProtectionPrivateKeys: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean hasSentDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "hasSentDeckProtectionPrivateKey: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.HAS_SENT_DECK_PROTECTION_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasSentDeckProtectionPrivateKey: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.HAS_SENT_DECK_PROTECTION_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasSentDeckProtectionPrivateKey: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "hasSentDeckProtectionPrivateKey: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public Stack<byte[]> getDeckProtectionKeyStack(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": " +
+                        "DCStub: getDeckProtectionKeyStack: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.DECK_PROTECTION_KEY_STACK_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.DECK_PROTECTION_KEY_STACK_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (Stack<byte[]>) inMessage.getReturnInfo();
     }
 }
