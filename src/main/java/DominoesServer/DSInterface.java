@@ -115,10 +115,6 @@ public class DSInterface
                     throw new DMessageException("Argument \"tableID\" was given an incorrect value", inMessage);
                 if (inMessage.noSecondArgument())
                     throw new DMessageException("Argument \"piece\" was not given", inMessage);
-                String[] splitArg1 = ((String) inMessage.getSecondArgument()).split("\\|");
-                if (!inMessage.getSecondArgument().equals("None")
-                        && (splitArg1.length != 2 || splitArg1[0].equals("") || splitArg1[1].equals("")))
-                    throw new DMessageException("Argument \"piece\" was given an incorrect value", inMessage);
                 break;
             case 25:
                 if (inMessage.noFirstArgument())

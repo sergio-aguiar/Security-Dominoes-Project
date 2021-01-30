@@ -472,11 +472,15 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            System.out.println("Player: " + pseudonym + " highest is " + piece);
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
             {
                 table.incrementTurn();
-                table.setDouble(pseudonym, piece);
+                table.setDouble(pseudonym, (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
+                        this.playerSessionSymKeys.get(pseudonym)));
+
+                System.out.println("Player: " + pseudonym + " highest is " +
+                        DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
+                                this.playerSessionSymKeys.get(pseudonym)));
             }
         }
         catch (Exception e)

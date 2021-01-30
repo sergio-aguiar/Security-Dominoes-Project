@@ -20,13 +20,11 @@ public interface DCInterface
     boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID);
     DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Missing cipher for server to 1st client
     boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, byte[] pieceDif);
     void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean commitHand(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData);
     boolean hasPlayerCommitted(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isHandlingStart(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher piece
     void stateHighestDouble(String pseudonym, byte[] cipheredSessionID, int tableID, String piece);
     boolean hasDoubleCheckingEnded(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isRedistributionNeeded(String pseudonym, byte[] cipheredSessionID, int tableID);

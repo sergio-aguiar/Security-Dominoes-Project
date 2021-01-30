@@ -421,31 +421,6 @@ public class DCThread extends Thread
                     DominoesDeck deck = this.dcInterface.getDeck(this.pseudonym,
                             this.cipheredSignedSessionID, this.tableID);
 
-                    DominoesDeck errorDeck = this.dcInterface.getDeck(this.pseudonym,
-                            this.cipheredSignedSessionID, this.tableID);
-
-/*                    int lastPlayer = -1;
-                    int nextPlayer = -1;
-                    for (int i = 0; i < this.playerSessionSymKeys.length; i++)
-                        if (this.playerSessionSymKeys[i] == null)
-                        {
-                            if (i == 0)
-                            {
-                                lastPlayer = this.playerSessionSymKeys.length - 1;
-                                nextPlayer = i + 1;
-                            }
-                            else if (i == this.playerSessionSymKeys.length - 1)
-                            {
-                                lastPlayer = i - 1;
-                                nextPlayer = 0;
-                            }
-                            else
-                            {
-                                lastPlayer = i - 1;
-                                nextPlayer = i + 1;
-                            }
-                        }*/
-
                     int lastPlayer = (int) DominoesCryptoSym.SymDecipher(this.dcInterface.getLastTurn(this.pseudonym,
                             this.cipheredSignedSessionID, this.tableID), this.serverSessionSymKey);
 
@@ -651,7 +626,8 @@ public class DCThread extends Thread
                     else
                     {
                         this.dcInterface.stateHighestDouble(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
-                                getHighestDouble());
+                                Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(getHighestDouble(),
+                                        this.serverSessionSymKey)));
 
                         while (!this.dcInterface.hasDoubleCheckingEnded(this.pseudonym, this.cipheredSignedSessionID,
                                 this.tableID))
