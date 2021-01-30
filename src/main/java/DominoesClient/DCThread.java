@@ -57,6 +57,7 @@ public class DCThread extends Thread
     private byte[] deckDistributionPublicKey;
     private byte[][] playerPublicKeys;
     private byte[][] playerSessionSymKeys;
+    private Stack<byte[]> protectionStack;
 
     private int bitCommitRandom1;
     private int bitCommitRandom2;
@@ -79,6 +80,7 @@ public class DCThread extends Thread
         this.cipheredSignedSessionID = null;
         this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
+        this.protectionStack = null;
 
         Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
         this.sessionPrivateKey = keys.get("private");
@@ -468,6 +470,7 @@ public class DCThread extends Thread
                                     System.exit(703);
                                 }
 
+                                System.out.println("PLAYER PIECES: ");
                                 System.out.println(this.gamePieces.toString());
                             }
                             else System.out.println("\n[CLIENT] Could not draw a piece. Hand full.");
@@ -492,6 +495,7 @@ public class DCThread extends Thread
                                     System.exit(703);
                                 }
 
+                                System.out.println("PLAYER PIECES: ");
                                 System.out.println(this.gamePieces.toString());
                             }
                             else System.out.println("\n[CLIENT] There are no pieces to return.");
@@ -516,6 +520,7 @@ public class DCThread extends Thread
                                     System.exit(703);
                                 }
 
+                                System.out.println("PLAYER PIECES: ");
                                 System.out.println(this.gamePieces.toString());
                             }
                             else System.out.println("\n[CLIENT] There are no pieces to swap.");
@@ -556,7 +561,10 @@ public class DCThread extends Thread
                             else System.out.println("\n[CLIENT You can only commit to full hands.");
 
                             if (this.playerSessionSymKeys[nextPlayer] != null)
+                            {
+                                System.out.println("IM CIPHERING THE DECK!!!!!");
                                 deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+                            }
 
                             if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                     this.tableID, deck, DominoesCryptoSym.SymCipher(0,
@@ -587,27 +595,29 @@ public class DCThread extends Thread
                         if (this.dcInterface.haveAllSentDeckProtectionPrivateKeys(this.pseudonym,
                                 this.cipheredSignedSessionID, this.tableID))
                         {
-                            Stack<byte[]> deckProtection = dcInterface.getDeckProtectionKeyStack(this.pseudonym,
+                            this.protectionStack = dcInterface.getDeckProtectionKeyStack(this.pseudonym,
                                     this.cipheredSignedSessionID, this.tableID);
+
+                            Stack<?> deckProtection = (Stack<?>) this.protectionStack.clone();
 
                             while (deckProtection.size() > 1)
                             {
-                                byte[] key = deckProtection.pop();
+                                byte[] key = (byte[]) deckProtection.pop();
 
                                 for (int i = 0; i < this.gamePieces.size(); i++)
                                     this.gamePieces.set(i, Base64.getEncoder().encodeToString(
                                             (byte[]) DominoesCryptoAsym.AsymDecipher(
                                                     Base64.getDecoder().decode(this.gamePieces.get(i)), key)));
-
                             }
 
-                            byte[] key = deckProtection.pop();
+                            byte[] key = (byte[]) deckProtection.pop();
 
                             for (int i = 0; i < this.gamePieces.size(); i++)
                                 this.gamePieces.set(i, (String) DominoesCryptoAsym.AsymDecipher(
                                         Base64.getDecoder().decode(this.gamePieces.get(i)), key));
 
                             this.committedPieces = new ArrayList<>(this.gamePieces);
+                            System.out.println("PLAYER PIECES: ");
                             System.out.println(this.gamePieces.toString());
 
                             this.knowsCommittedCards = true;
@@ -694,14 +704,18 @@ public class DCThread extends Thread
                                     }
                                     else System.out.println("\n[CLIENT] Error playing the piece.");
 
+                                    System.out.println("PLAYER PIECES: ");
                                     System.out.println(this.gamePieces.toString());
 
                                     break;
                                 case 2:
                                     System.out.println("\n[CLIENT] Drawing a piece...");
 
-                                    String drawnPiece = this.dcInterface.drawPiece(this.pseudonym,
-                                            this.cipheredSignedSessionID, this.tableID);
+                                    String drawnPiece = (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder()
+                                            .decode(this.dcInterface.drawPiece(this.pseudonym,
+                                                    this.cipheredSignedSessionID, this.tableID)),
+                                                        this.serverSessionSymKey);
+
                                     if (!drawnPiece.equals("Error"))
                                     {
                                         this.gamePieces.add(drawnPiece);
@@ -726,6 +740,7 @@ public class DCThread extends Thread
                                             this.cipheredSignedSessionID, this.tableID, commitData))
                                         System.out.println("\n[CLIENT] Failed to update hand commitment.");
 
+                                    System.out.println("PLAYER PIECES: ");
                                     System.out.println(this.gamePieces.toString());
 
                                     break;
@@ -971,7 +986,10 @@ public class DCThread extends Thread
 
         do
         {
-            this.serverSessionSymKey = this.dcInterface.sendSessionID(this.pseudonym, this.cipheredSignedSessionID);
+            this.serverSessionSymKey = (byte[]) DominoesCryptoAsym.AsymDecipher(this.dcInterface.sendSessionID(
+                    this.pseudonym, this.cipheredSignedSessionID), this.sessionPrivateKey);
+
+            System.out.println("SESSION KEY: " + Arrays.toString(this.serverSessionSymKey));
 
             this.reentrantLock.lock();
             try

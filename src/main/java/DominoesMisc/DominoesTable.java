@@ -1,6 +1,9 @@
 package DominoesMisc;
 
+import DominoesSecurity.DominoesCryptoAsym;
+
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Stack;
 
@@ -28,6 +31,7 @@ public class DominoesTable
     private final boolean[] havePassedProtest;
     private final boolean[] haveProtectedDeck;
     private final boolean[] haveSentProtection;
+    private final boolean[] haveGottenProtection;
     private final Stack<byte[]> deckDecipherStack;
 
     private boolean started;
@@ -77,6 +81,8 @@ public class DominoesTable
         this.haveProtectedDeck[0] = false;
         this.haveSentProtection = new boolean[playerCap];
         this.haveSentProtection[0] = false;
+        this.haveGottenProtection = new boolean[playerCap];
+        this.haveGottenProtection[0] = false;
         this.deckDecipherStack = new Stack<>();
 
         for (int i = 1; i < playerCap; i++)
@@ -93,6 +99,7 @@ public class DominoesTable
             this.havePassedProtest[i] = false;
             this.haveProtectedDeck[i] = false;
             this.haveSentProtection[i] = false;
+            this.haveGottenProtection[i] = false;
         }
 
         this.started = false;
@@ -320,8 +327,29 @@ public class DominoesTable
         return this.symKeyMatrix;
     }
 
-    public Stack<byte[]> getDeckDecipherStack()
+    public Stack<byte[]> getDeckDecipherStack(String pseudonym)
     {
+        boolean allGottenProtection = true;
+        for (int i = 0; i < this.players.length; i++)
+            if (this.players[i].equals(pseudonym)) this.haveGottenProtection[i] = true;
+            else if (!this.haveGottenProtection[i]) allGottenProtection = false;
+
+        if (allGottenProtection)
+        {
+            Stack<?> deckProtection = (Stack<?>) this.deckDecipherStack.clone();
+
+            while (deckProtection.size() > 0)
+            {
+                byte[] key = (byte[]) deckProtection.pop();
+                this.deck.asymDecipher(key);
+            }
+
+            System.out.println("DECK AFTER FULLY DECIPHERED:\nAvailable: ");
+            deck.printAvailableSet();
+            System.out.println("\nNonAvailable: ");
+            deck.printNotAvailableSet();
+        }
+
         return this.deckDecipherStack;
     }
 

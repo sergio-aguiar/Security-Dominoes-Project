@@ -32,7 +32,6 @@ public interface DCInterface
     boolean isResetNeeded(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean playPiece(String pseudonym, byte[] cipheredSessionID, int tableID, String targetEndPoint, String piece,
                       String pieceEndPoint);
-    // TODO: Cipher piece
     String drawPiece(String pseudonym, byte[] cipheredSessionID, int tableID);
     void denounceCheating(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isHandlingCheating(String pseudonym, byte[] cipheredSessionID, int tableID);
@@ -50,7 +49,6 @@ public interface DCInterface
     boolean registerUser(String user);
     byte[] greetServer(String pseudonym, byte[] publicKey);
     byte[] getServerPublicKey();
-    // TODO: Cipher key
     byte[] sendSessionID(String pseudonym, byte[] cipheredSessionID);
     boolean hasKeySortingStarted(String pseudonym, byte[] cipheredSessionID, int tableID);
     void startKeySorting(String pseudonym, byte[] cipheredSessionID, int tableID);
@@ -60,7 +58,6 @@ public interface DCInterface
     boolean returnSymKeyDistributionMatrix(String pseudonym, byte[] cipheredSessionID, int tableID,
                                            DominoesSymKeyMatrix symKeyMatrix);
     byte[][] getSessionSymKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
-
     boolean hasDeckBeenProtected(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean sendDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID,
                                          byte[] deckProtectionPrivateKey);
