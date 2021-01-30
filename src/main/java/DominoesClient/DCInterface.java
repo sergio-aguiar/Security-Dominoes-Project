@@ -2,6 +2,7 @@ package DominoesClient;
 
 import DominoesMisc.*;
 
+import java.security.Key;
 import java.util.Stack;
 
 public interface DCInterface
@@ -68,4 +69,8 @@ public interface DCInterface
     boolean isDeckSentFromServer(String pseudonym, byte[] cipheredSessionID, int tableID);
     byte[] getLastTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
     byte[] getNextTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
+    // TODO: Cipher score
+    byte[] getUserScore(String pseudonym, byte[] cipheredSessionID, String user);
+    // TODO: FINISH
+    void proveUserIdentity(String pseudonym, byte[] cipheredSessionID, String user, Key userPublicKey, int sessionID);
 }

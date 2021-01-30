@@ -113,11 +113,9 @@ public class DSQLiteConnection
     /**
      * Function that adds a new user to the database.
      * @param identifier The user's identifier.
-     * @return True is the user was registered with success, and false otherwise.
      */
-    public static boolean registerUser(String identifier)
+    public static void registerUser(String identifier)
     {
-        boolean result = false;
         Connection conn;
         try
         {
@@ -129,7 +127,6 @@ public class DSQLiteConnection
             preparedStatement.setString(1, identifier);
             preparedStatement.setInt(2,1000);
             preparedStatement.execute();
-            result = true;
 
             conn.close();
         }
@@ -137,7 +134,53 @@ public class DSQLiteConnection
         {
             System.out.println("\n[SERVER] Error registering user: " + e.getErrorCode());
         }
+    }
+
+    public static int getUserScore(String identifier)
+    {
+        int result = -1;
+        Connection conn;
+        try
+        {
+            conn = getConnection();
+
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT score FROM PlayerInfo WHERE " +
+                    "identifier=?;");
+
+            preparedStatement.setString(1, identifier);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) result = resultSet.getInt("score");
+
+            conn.close();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("\n[SERVER] Error getting user score: " + e.getErrorCode());
+        }
         return result;
+    }
+
+    public static void setUserScore(String identifier, int score)
+    {
+        Connection conn;
+        try
+        {
+            conn = getConnection();
+
+            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE PlayerInfo SET score = ? " +
+                    "WHERE identifier = ?;");
+
+            preparedStatement.setInt(1, score);
+            preparedStatement.setString(2, identifier);
+            preparedStatement.executeUpdate();
+
+            conn.close();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("\n[SERVER] Error setting user score: " + e.getErrorCode());
+        }
     }
 
     public static void forceStart()

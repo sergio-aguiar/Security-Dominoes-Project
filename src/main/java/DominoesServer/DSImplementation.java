@@ -1357,4 +1357,25 @@ public class DSImplementation implements DCInterface
         }
         return result;
     }
+
+    @Override
+    public byte[] getUserScore(String pseudonym, byte[] cipheredSessionID, String user)
+    {
+        byte[] result = new byte[0];
+        this.reentrantLock.lock();
+        try
+        {
+            result = DominoesCryptoSym.SymCipher(DSQLiteConnection.getUserScore(user),
+                    this.playerSessionSymKeys.get(pseudonym));
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getUserScore: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
 }

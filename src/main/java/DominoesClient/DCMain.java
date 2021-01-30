@@ -27,7 +27,9 @@ public class DCMain
         String serialID = cert.getSerialNumber().toString();
         if (!dcStub.isUserRegistered(serialID)) dcStub.registerUser(serialID);
 
-        DCThread dcThread = new DCThread(pseudonym, keys.get("privateKey"), keys.get("publicKey"), sessionID, dcStub);
+        DCThread dcThread = new DCThread(serialID, pseudonym, keys.get("privateKey"), keys.get("publicKey"), sessionID,
+                dcStub);
+
         dcThread.start();
     }
 

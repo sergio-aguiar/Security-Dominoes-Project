@@ -3105,4 +3105,64 @@ public class DCStub implements DCInterface
 
         return (byte[]) inMessage.getReturnInfo();
     }
+
+    @Override
+    public byte[] getUserScore(String pseudonym, byte[] cipheredSessionID, String user)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
+                        e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.GET_USER_SCORE_REQUEST.getMessageCode(), pseudonym,
+                    cipheredSessionID, user);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: "
+                    + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.GET_USER_SCORE_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
+                    "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
+                    "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (byte[]) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public void setUserScore(String pseudonym, byte[] cipheredSessionID, String user, byte[] score)
+    {
+
+    }
 }

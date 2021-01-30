@@ -39,6 +39,7 @@ public class DSInterface
             case 41:
             case 42:
             case 43:
+            case 60:
                 break;
             case 3:
             case 6:
@@ -477,6 +478,11 @@ public class DSInterface
                 byte[] return59 = this.dsImplementation.getNextTurn(inMessage.getPseudonym(),
                         inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.NEXT_TURN_REQUEST.getMessageCode(), return59);
+                break;
+            case 60:
+                byte[] return60 = this.dsImplementation.getUserScore(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (String) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.GET_USER_SCORE_REQUEST.getMessageCode(), return60);
                 break;
         }
         return outMessage;

@@ -39,6 +39,7 @@ public class DCThread extends Thread
     private final ReentrantLock reentrantLock;
     private final Condition turnCondition;
 
+    private final String identifier;
     private final String pseudonym;
     private final Key privateKey;
     private final Key publicKey;
@@ -64,10 +65,12 @@ public class DCThread extends Thread
     private ArrayList<String> committedPieces;
     private boolean knowsCommittedCards;
 
-    public DCThread(String pseudonym, Key privateKey, Key publicKey, int sessionID, DCInterface dcInterface)
+    public DCThread(String identifier, String pseudonym, Key privateKey, Key publicKey, int sessionID,
+                    DCInterface dcInterface)
     {
         this.reentrantLock = new ReentrantLock(true);
         this.turnCondition = this.reentrantLock.newCondition();
+        this.identifier = identifier;
         this.pseudonym = pseudonym;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
@@ -280,9 +283,12 @@ public class DCThread extends Thread
                     this.tableID = -1;
                     break;
                 case 5:
-                    System.out.println("\n[CLIENT] Showing score...");
+                    System.out.print("\n[CLIENT] Fetching score...");
+                    System.out.println("\n[CLIENT] Score: " + DominoesCryptoSym.SymDecipher(
+                            this.dcInterface.getUserScore(this.pseudonym, this.cipheredSignedSessionID,
+                                    this.identifier), this.serverSessionSymKey));
 
-                    // TODO: SHOW SCORE
+                    // TODO: GET NEW PSEUDONYM
 
                     break;
                 case 6:
@@ -880,7 +886,7 @@ public class DCThread extends Thread
             {
                 System.out.println("\n[CLIENT] Handling Accounting!");
 
-                // TODO: HANDLE ACCOUNTING
+                // TODO: HANDLE CC POINT CLAIMING
 
                 break;
             }
