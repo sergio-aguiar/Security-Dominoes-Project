@@ -20,10 +20,9 @@ public interface DCInterface
     boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID);
     DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Missing cipher fro server to 1st client
+    // TODO: Missing cipher for server to 1st client
     boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, byte[] pieceDif);
     void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher commitData
     boolean commitHand(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData);
     boolean hasPlayerCommitted(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isHandlingStart(String pseudonym, byte[] cipheredSessionID, int tableID);
@@ -39,9 +38,7 @@ public interface DCInterface
     String drawPiece(String pseudonym, byte[] cipheredSessionID, int tableID);
     void denounceCheating(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isHandlingCheating(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher commitData
     boolean updateCommitment(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData);
-    // TODO: Cipher commitData
     boolean sendCommitData(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesCommitData commitData);
     boolean hasSentCommitData(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean isHandlingAccounting(String pseudonym, byte[] cipheredSessionID, int tableID);

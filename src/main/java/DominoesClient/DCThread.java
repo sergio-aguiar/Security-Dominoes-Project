@@ -1017,7 +1017,7 @@ public class DCThread extends Thread
         }
         while (Arrays.equals(this.serverSessionSymKey, new byte[0]));
 
-        this.cipheredSignedSessionID = DominoesCryptoSym.SymCipher(this.sessionID, this.serverSessionSymKey);
+        this.cipheredSignedSessionID = DominoesCryptoSym.SymCipher(this.signedSessionID, this.serverSessionSymKey);
 
         System.out.print("\n[CLIENT] Session established successfully.");
     }
