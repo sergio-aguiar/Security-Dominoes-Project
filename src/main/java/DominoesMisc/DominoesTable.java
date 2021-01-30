@@ -37,7 +37,9 @@ public class DominoesTable
     private boolean handlingCheating;
     private boolean handlingAccounting;
     private boolean handlingKeys;
+    private boolean deckCipheredByServer;
     private int turn;
+    private int lastTurn;
 
     public DominoesTable(int playerCap, String tableLeader)
             throws DominoesTableException
@@ -100,7 +102,9 @@ public class DominoesTable
         this.handlingCheating = false;
         this.handlingAccounting = false;
         this.handlingKeys = false;
+        this.deckCipheredByServer = true;
         this.turn = 0;
+        this.lastTurn = playerCap - 1;
     }
 
     private boolean isValidPlayerCap(int playerCap)
@@ -133,6 +137,7 @@ public class DominoesTable
 
     public void incrementTurn()
     {
+        this.lastTurn = this.turn;
         if (this.haveAllCommitted())
         {
             if (this.turn == this.players.length - 1) this.turn = 0;
@@ -148,6 +153,29 @@ public class DominoesTable
                 if (this.turn == this.players.length - 1) this.turn = 0;
                 else this.turn++;
             }
+        }
+    }
+
+    public int getNextTurn()
+    {
+        if (this.haveAllCommitted())
+        {
+            if (this.turn == this.players.length - 1) return 0;
+            else return this.turn + 1;
+        }
+        else
+        {
+            int tmpTurn = this.turn;
+            if (this.turn == this.players.length - 1) tmpTurn = 0;
+            else tmpTurn++;
+
+            while (!this.leftToCommit.contains(tmpTurn))
+            {
+                if (tmpTurn == this.players.length - 1) tmpTurn = 0;
+                else tmpTurn++;
+            }
+
+            return tmpTurn;
         }
     }
 
@@ -335,6 +363,11 @@ public class DominoesTable
     public int getTurn()
     {
         return this.turn;
+    }
+
+    public int getLastTurn()
+    {
+        return this.lastTurn;
     }
 
     public boolean canDraw(String pseudonym)
@@ -682,6 +715,18 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
             return this.haveSentProtection[i];
+
+        return false;
+    }
+
+    public boolean isDeckCipheredByServer(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            if (this.deckCipheredByServer && this.symKeyMatrix.getSymKeyMatrix()[i][0] == null)
+            {
+                this.deckCipheredByServer = false;
+                return true;
+            }
 
         return false;
     }

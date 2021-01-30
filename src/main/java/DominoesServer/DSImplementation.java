@@ -6,10 +6,7 @@ import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
 import DominoesSecurity.DominoesCryptoSym;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DSImplementation implements DCInterface
@@ -1204,7 +1201,13 @@ public class DSImplementation implements DCInterface
         {
             for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                 if (table.notifyDeckProtected(pseudonym))
-                    table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
+                {
+                    // System.out.println("CIPHERING DECK WITH: " +
+                    // Arrays.toString(this.playerSessionSymKeys.get(table.getPlayers()[0])));
+                    // table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
+
+                    System.out.println("DECK: " + table.getDeck());
+                }
         }
         catch (Exception e)
         {
@@ -1274,6 +1277,69 @@ public class DSImplementation implements DCInterface
         catch (Exception e)
         {
             System.out.println("DSImplementation: getDeckProtectionKeyStack: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isDeckSentFromServer(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.isDeckCipheredByServer(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: isDeckSentFromServer: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] getLastTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        byte[] result = new byte[0];
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = DominoesCryptoSym.SymCipher(table.getLastTurn(), this.playerSessionSymKeys.get(pseudonym));
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getLastTurn: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] getNextTurn(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        byte[] result = new byte[0];
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = DominoesCryptoSym.SymCipher(table.getNextTurn(), this.playerSessionSymKeys.get(pseudonym));
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: getNextTurn: " + e.toString());
         }
         finally
         {

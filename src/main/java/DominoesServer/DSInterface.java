@@ -80,6 +80,9 @@ public class DSInterface
             case 54:
             case 55:
             case 56:
+            case 57:
+            case 58:
+            case 59:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -463,6 +466,21 @@ public class DSInterface
                         inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.DECK_PROTECTION_KEY_STACK_REQUEST.getMessageCode(),
                         return56);
+                break;
+            case 57:
+                boolean return57 = this.dsImplementation.isDeckSentFromServer(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.DECK_SENT_BY_SERVER_REQUEST.getMessageCode(), return57);
+                break;
+            case 58:
+                byte[] return58 = this.dsImplementation.getLastTurn(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.LAST_TURN_REQUEST.getMessageCode(), return58);
+                break;
+            case 59:
+                byte[] return59 = this.dsImplementation.getNextTurn(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.NEXT_TURN_REQUEST.getMessageCode(), return59);
                 break;
         }
         return outMessage;

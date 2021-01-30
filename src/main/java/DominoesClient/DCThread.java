@@ -421,7 +421,10 @@ public class DCThread extends Thread
                     DominoesDeck deck = this.dcInterface.getDeck(this.pseudonym,
                             this.cipheredSignedSessionID, this.tableID);
 
-                    int lastPlayer = -1;
+                    DominoesDeck errorDeck = this.dcInterface.getDeck(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID);
+
+/*                    int lastPlayer = -1;
                     int nextPlayer = -1;
                     for (int i = 0; i < this.playerSessionSymKeys.length; i++)
                         if (this.playerSessionSymKeys[i] == null)
@@ -441,23 +444,28 @@ public class DCThread extends Thread
                                 lastPlayer = i - 1;
                                 nextPlayer = i + 1;
                             }
-                        }
+                        }*/
+
+                    int lastPlayer = (int) DominoesCryptoSym.SymDecipher(this.dcInterface.getLastTurn(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID), this.serverSessionSymKey);
+
+                    int nextPlayer = (int) DominoesCryptoSym.SymDecipher(this.dcInterface.getNextTurn(this.pseudonym,
+                            this.cipheredSignedSessionID, this.tableID), this.serverSessionSymKey);
 
                     System.out.println("Last player: " + lastPlayer);
                     System.out.println("Next player: " + nextPlayer);
 
-                    try
+                    if (this.dcInterface.isDeckSentFromServer(this.pseudonym, this.cipheredSignedSessionID,
+                            this.tableID))
                     {
-                        if (lastPlayer == -1)
-                        {
-                            System.out.println("\n[CLIENT] Unexpected Error...");
-                            System.exit(703);
-                        }
-                        else deck.symDecipher(this.playerSessionSymKeys[lastPlayer]);
+                        // System.out.println("DECIPHERING DECK WITH: " + Arrays.toString(this.serverSessionSymKey));
+                        // deck.symDecipher(this.serverSessionSymKey);
                     }
-                    catch (Exception e)
+                    else
                     {
-                        deck.symDecipher(this.serverSessionSymKey);
+                        System.out.println("DECIPHERING DECK WITH: " +
+                                Arrays.toString(this.playerSessionSymKeys[lastPlayer]));
+                        deck.symDecipher(this.playerSessionSymKeys[lastPlayer]);
                     }
 
                     System.out.println("DECK AFTER DECIPHER: " + deck);
@@ -474,12 +482,8 @@ public class DCThread extends Thread
                                 if (tile1 != null) this.gamePieces.add(tile1);
                                 else System.out.println("\n[CLIENT] No pieces left to draw.");
 
-                                if (nextPlayer == -1)
-                                {
-                                    System.out.println("\n[CLIENT] Unexpected Error...");
-                                    System.exit(703);
-                                }
-                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+                                if (this.playerSessionSymKeys[nextPlayer] != null)
+                                    deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
 
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                         this.tableID, deck, DominoesCryptoSym.SymCipher(1,
@@ -502,12 +506,8 @@ public class DCThread extends Thread
                                 deck.returnTile(tile2);
                                 this.gamePieces.remove(tile2);
 
-                                if (nextPlayer == -1)
-                                {
-                                    System.out.println("\n[CLIENT] Unexpected Error...");
-                                    System.exit(703);
-                                }
-                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+                                if (this.playerSessionSymKeys[nextPlayer] != null)
+                                    deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
 
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                         this.tableID, deck, DominoesCryptoSym.SymCipher(-1,
@@ -530,12 +530,8 @@ public class DCThread extends Thread
                                 this.gamePieces.add(deck.swapTile(tile3));
                                 this.gamePieces.remove(tile3);
 
-                                if (nextPlayer == -1)
-                                {
-                                    System.out.println("\n[CLIENT] Unexpected Error...");
-                                    System.exit(703);
-                                }
-                                else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+                                if (this.playerSessionSymKeys[nextPlayer] != null)
+                                    deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
 
                                 if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                         this.tableID, deck, DominoesCryptoSym.SymCipher(0,
@@ -555,12 +551,8 @@ public class DCThread extends Thread
 
                             // this.dcInterface.skipTurn(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
 
-                            if (nextPlayer == -1)
-                            {
-                                System.out.println("\n[CLIENT] Unexpected Error...");
-                                System.exit(703);
-                            }
-                            else deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
+                            if (this.playerSessionSymKeys[nextPlayer] != null)
+                                deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
 
                             if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                     this.tableID, deck, DominoesCryptoSym.SymCipher(0,
@@ -587,6 +579,9 @@ public class DCThread extends Thread
                             if (this.dcInterface.commitHand(this.pseudonym, this.cipheredSignedSessionID, this.tableID,
                                     commitData)) this.committedPieces = new ArrayList<>(this.gamePieces);
                             else System.out.println("\n[CLIENT You can only commit to full hands.");
+
+                            if (this.playerSessionSymKeys[nextPlayer] != null)
+                                deck.symCipher(this.playerSessionSymKeys[nextPlayer]);
 
                             if (!this.dcInterface.returnDeck(this.pseudonym, this.cipheredSignedSessionID,
                                     this.tableID, deck, DominoesCryptoSym.SymCipher(0,

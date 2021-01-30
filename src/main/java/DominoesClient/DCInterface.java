@@ -20,7 +20,7 @@ public interface DCInterface
     boolean isDeckSorting(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean canDraw(String pseudonym, byte[] cipheredSessionID, int tableID);
     DominoesDeck getDeck(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher DominoesDeck, pieceDif
+    // TODO: Missing cipher fro server to 1st client
     boolean returnDeck(String pseudonym, byte[] cipheredSessionID, int tableID, DominoesDeck deck, byte[] pieceDif);
     void skipTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
     // TODO: Cipher commitData
@@ -73,4 +73,7 @@ public interface DCInterface
     boolean haveAllSentDeckProtectionPrivateKeys(String pseudonym, byte[] cipheredSessionID, int tableID);
     boolean hasSentDeckProtectionPrivateKey(String pseudonym, byte[] cipheredSessionID, int tableID);
     Stack<byte[]> getDeckProtectionKeyStack(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean isDeckSentFromServer(String pseudonym, byte[] cipheredSessionID, int tableID);
+    byte[] getLastTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
+    byte[] getNextTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
 }

@@ -61,7 +61,10 @@ public class DMessage implements Serializable
         NOTIFY_DECK_PROTECTED_REQUEST(53),
         HAVE_ALL_SENT_DECK_PROTECTION_REQUEST(54),
         HAS_SENT_DECK_PROTECTION_REQUEST(55),
-        DECK_PROTECTION_KEY_STACK_REQUEST(56);
+        DECK_PROTECTION_KEY_STACK_REQUEST(56),
+        DECK_SENT_BY_SERVER_REQUEST(57),
+        LAST_TURN_REQUEST(58),
+        NEXT_TURN_REQUEST(59);
 
         private static final long serialVersionUID = 1102L;
 
