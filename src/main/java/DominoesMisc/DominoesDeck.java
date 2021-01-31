@@ -20,7 +20,7 @@ public class DominoesDeck implements Serializable
     private static final long serialVersionUID = 1104L;
     private final String[] deck;
     private final int size = 28;
-    protected int pointer = 27;
+    private int pointer = this.size - 1;
     private int cipherDepth = 0;
 
     public DominoesDeck(){
@@ -79,15 +79,15 @@ public class DominoesDeck implements Serializable
         String[] leftSide = getLeftSideSet();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer + 1);
+    
+        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer);
         shuffleSet(rightSide, random.nextInt(rightSideSize, 2* (rightSideSize + 1)), rightSideSize);
 
         if (this.pointer + 1 >= 0) System.arraycopy(leftSide, 0, this.deck, 0, this.pointer + 1);
 
-        if (this.size - this.pointer - 1 > 0)
-            System.arraycopy(rightSide, 0,
-                    this.deck, this.pointer + 1, this.size - this.pointer - 1);
+        if (rightSideSize - (this.pointer + 1) > 0)
+            System.arraycopy(rightSide, this.pointer + 1,
+                    this.deck, this.pointer + 1, rightSideSize - (this.pointer + 1));
     }
 
     /**
@@ -97,10 +97,9 @@ public class DominoesDeck implements Serializable
     public String drawPiece()
     {
         String tile = getTile();
-        swapTiles(this.deck, 0, this.pointer, this.size);
         this.pointer--;
         if(!isEmpty()) splitShuffle();
-
+        
         return tile;
     }
 
@@ -113,10 +112,7 @@ public class DominoesDeck implements Serializable
     {
         String tileToTake = getTile();
         int indexOfOut = getIndex(tile, getRightSideSet());
-        if(indexOfOut < 0)
-            return null;
-
-        swapTiles(this.deck, 0 , this.pointer + 1 + indexOfOut, this.size);
+        swapTiles(this.deck, this.pointer, this.pointer + 1 + indexOfOut, this.size);
         splitShuffle();
 
         return tileToTake;
@@ -150,7 +146,7 @@ public class DominoesDeck implements Serializable
             System.err.println("Adição de um tile que n foi retirado(tile " + tile + ")");
             System.exit(1);
         }
-        if(this.pointer + 1 < this.size)
+        if(this.pointer + 1 < this.size) 
             swapTiles(this.deck, this.pointer + 1, this.pointer + 1 + indexOfOut, this.size);
     }
 
@@ -165,15 +161,21 @@ public class DominoesDeck implements Serializable
 
         String tile = this.deck[0];
 
+        swapTiles(this.deck, 0, this.pointer, this.size);
+
         return tile;
     }
 
     private int getIndex(String tile, String[] set)
     {
-        if(set.length == 0) return -1;
         for (int i = 0; i < set.length ; i++)
+        {
             if (tile.equals(set[i]))
-                return i;
+            {
+                return i; 
+            }
+                
+        } 
 
         return -1;
     }
@@ -187,35 +189,28 @@ public class DominoesDeck implements Serializable
         return this.pointer < 0;
     }
 
-    public String[] getRightSideSet()
+    private String[] getRightSideSet()
     {
 
         int rightSideSize = this.size - this.pointer - 1;
 
-        if(rightSideSize < 1 || rightSideSize >= this.size)
+        if(rightSideSize < 1)
             return new String[0];
 
         String[] rightSide = new String[rightSideSize];
 
-        System.arraycopy(this.deck, this.pointer + 1, rightSide, 0, rightSideSize);
-
         for (int i=0; i < rightSideSize; i++)
-            rightSide[i] = this.deck[this.pointer + i + 1];
+            rightSide[i] = this.deck[this.pointer + 1 + i];
 
         return rightSide;
 
     }
 
-    public String[] getLeftSideSet()
+    private String[] getLeftSideSet()
     {
-        int leftSideSize = this.pointer + 1;
+        String[] leftSide = new String[this.pointer + 1];
 
-        if(leftSideSize < 1)
-            return new String[0];
-
-        String[] leftSide = new String[leftSideSize];
-
-        System.arraycopy(this.deck, 0, leftSide, 0, leftSideSize);
+        if (this.pointer + 1 >= 0) System.arraycopy(this.deck, 0, leftSide, 0, this.pointer + 1);
 
         return leftSide;
     }
@@ -297,3 +292,4 @@ public class DominoesDeck implements Serializable
     }
 
 }
+
