@@ -6,28 +6,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-
-/**
- * The Serializer system.
- * Use to serialize and desirialize objects 
- * @author Ricardo Rodrigues Azevedo
- * @version 1.0
- * @since 2020-12-18
- */
-public class Serializer {
-    
-
-    /**
-     * Serialize an object
-     * @param obj to be serialized
-     * @return Serialized object in bytes
-     */
-    public static byte[] Serialize(Object obj) 
+public class Serializer
+{
+    public static byte[] serialize(Object obj)
     {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        ObjectOutputStream out = null;
-
+        ObjectOutputStream out;
         byte[] msgArray = null;
 
         try 
@@ -36,32 +20,28 @@ public class Serializer {
             out.writeObject(obj);
             out.flush();
             msgArray = bos.toByteArray();
-        } catch (IOException e) 
+        }
+        catch (IOException e)
         {
-            e.printStackTrace();
-            System.err.println("ERROR: Serializing message");
-        } finally 
+            System.out.println("Serializer: serialize: " + e.toString());
+        }
+        finally
         {
             try 
             {
                 bos.close();
 
-            } catch (IOException e) 
+            }
+            catch (IOException e)
             {
-                e.printStackTrace();
-                System.err.println("ERROR: closing ArrayOutputStream");
+                System.out.println("Serializer: serialize: " + e.toString());
             }
         }
 
         return msgArray;
     }
 
-    /**
-     * Deserialize an object
-     * @param obj in bytes to be deserialized
-     * @return Object deserialized
-     */
-    public static Object Deserialize(byte[] obj) 
+    public static Object deserialize(byte[] obj)
     {
         ByteArrayInputStream in = new ByteArrayInputStream(obj);
 
@@ -70,10 +50,10 @@ public class Serializer {
         try 
         {
             oInputStream = new ObjectInputStream(in);
-        } catch (IOException e) 
+        }
+        catch (IOException e)
         {
-            e.printStackTrace();
-            System.err.println("ERROR: Initializing Input Stream");
+            System.out.println("Serializer: deserialize: " + e.toString());
         }
 
         Object result = null;
@@ -81,15 +61,10 @@ public class Serializer {
         try 
         {
             result = oInputStream.readObject();
-
-        } catch (ClassNotFoundException e) 
+        }
+        catch (Exception e)
         {
-            e.printStackTrace();
-            System.err.println("ERROR: Object doesn't have a valid Class");
-        } catch (IOException e) 
-        {
-            e.printStackTrace();
-            System.err.println("ERROR: Serializing message");
+            System.out.println("Serializer: deserialize: " + e.toString());
         }
         finally
         {
@@ -97,10 +72,10 @@ public class Serializer {
             {
                 in.close();
 
-            } catch (IOException e) 
+            }
+            catch (IOException e)
             {
-                e.printStackTrace();
-                System.err.println("ERROR: closing ArrayOutputStream");
+                System.out.println("Serializer: deserialize: " + e.toString());
             }
         }
 

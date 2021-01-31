@@ -142,11 +142,6 @@ public class DominoesGameState implements Serializable
         return this.endPoints;
     }
 
-    public ArrayList<ArrayList<String>> getPastMoves()
-    {
-        return this.pastMoves;
-    }
-
     public int getWinner()
     {
         return this.winner;

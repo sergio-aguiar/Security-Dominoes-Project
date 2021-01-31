@@ -7,14 +7,6 @@ import java.io.Serializable;
 import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * The deck management system.
- * Manages Draw Swap and Insert
- * @author Ricardo Rodrigues Azevedo
- * @version 1.2
- * @since 2020-10-17
- */
-
 public class DominoesDeck implements Serializable
 {
     private static final int size = 28;
@@ -97,9 +89,9 @@ public class DominoesDeck implements Serializable
         for (int i = 0; i < this.deck.length; i++)
         {
             if (this.cipherDepth == 0)
-                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.AsymCipher(this.deck[i], asymKey));
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.asymCipher(this.deck[i], asymKey));
             else
-                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.AsymCipher(
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoAsym.asymCipher(
                         Base64.getDecoder().decode(this.deck[i]), asymKey));
         }
         this.cipherDepth++;
@@ -111,11 +103,11 @@ public class DominoesDeck implements Serializable
         for (int i = 0; i < this.deck.length; i++)
         {
             if (this.cipherDepth == 1)
-                this.deck[i] = (String) DominoesCryptoAsym.AsymDecipher(Base64.getDecoder().decode(this.deck[i]),
+                this.deck[i] = (String) DominoesCryptoAsym.asymDecipher(Base64.getDecoder().decode(this.deck[i]),
                         asymKey);
             else
                 this.deck[i] = Base64.getEncoder().encodeToString(
-                        (byte[]) DominoesCryptoAsym.AsymDecipher(Base64.getDecoder().decode(this.deck[i]), asymKey));
+                        (byte[]) DominoesCryptoAsym.asymDecipher(Base64.getDecoder().decode(this.deck[i]), asymKey));
         }
         this.cipherDepth--;
         shuffle();
@@ -126,9 +118,9 @@ public class DominoesDeck implements Serializable
         for (int i = 0; i < this.deck.length; i++)
         {
             if (this.cipherDepth == 0)
-                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(this.deck[i], symKey));
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.symCipher(this.deck[i], symKey));
             else
-                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(
+                this.deck[i] = Base64.getEncoder().encodeToString(DominoesCryptoSym.symCipher(
                         Base64.getDecoder().decode(this.deck[i]), symKey));
         }
         this.cipherDepth++;
@@ -140,11 +132,11 @@ public class DominoesDeck implements Serializable
         for (int i = 0; i < this.deck.length; i++)
         {
             if (this.cipherDepth == 1)
-                this.deck[i] = (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(this.deck[i]),
+                this.deck[i] = (String) DominoesCryptoSym.symDecipher(Base64.getDecoder().decode(this.deck[i]),
                         symKey);
             else
                 this.deck[i] = Base64.getEncoder().encodeToString(
-                        (byte[]) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(this.deck[i]), symKey));
+                        (byte[]) DominoesCryptoSym.symDecipher(Base64.getDecoder().decode(this.deck[i]), symKey));
         }
         this.cipherDepth--;
         shuffle();

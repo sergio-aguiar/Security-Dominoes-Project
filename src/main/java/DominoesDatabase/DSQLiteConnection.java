@@ -2,7 +2,6 @@ package DominoesDatabase;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.sqlite.SQLiteException;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +9,7 @@ import java.sql.*;
 
 public class DSQLiteConnection
 {
-    /**
-     * The class's Hikari Configuration instance.
-     */
     private static final HikariConfig config = new HikariConfig();
-    /**
-     * The class's Hikari Data Source instance.
-     */
     private static final HikariDataSource hikariDataSource;
 
     static
@@ -65,25 +58,13 @@ public class DSQLiteConnection
         }
     }
 
-    /**
-     *  Class Constructor: SQLiteConnection.
-     */
     private DSQLiteConnection() { }
-    /**
-     * Get function for the database connection.
-     * @return An instance of a connection to the database.
-     * @throws SQLException When there was a database associated issue.
-     */
+
     public static Connection getConnection() throws SQLException
     {
         return hikariDataSource.getConnection();
     }
 
-    /**
-     * Get function for checking whether a user is registered to the database.
-     * @param identifier The user's identifier.
-     * @return True if the user in question is present in the database (registered), and false otherwise.
-     */
     public static boolean isUserRegistered(String identifier)
     {
         boolean result = false;
@@ -109,10 +90,6 @@ public class DSQLiteConnection
         return result;
     }
 
-    /**
-     * Function that adds a new user to the database.
-     * @param identifier The user's identifier.
-     */
     public static void registerUser(String identifier)
     {
         Connection conn;

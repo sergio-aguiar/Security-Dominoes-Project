@@ -85,12 +85,6 @@ public class DMessage implements Serializable
             return this.messageCode;
         }
 
-        public static String getNameByMessageCode(int messageCode)
-        {
-            for (MessageType m : values()) if (m.getMessageCode() == messageCode) return m.name();
-            return "Error";
-        }
-
         @Override
         public String toString()
         {
@@ -143,45 +137,6 @@ public class DMessage implements Serializable
         this.secondArgument = null;
         this.thirdArgument = null;
         this.fourthArgument = null;
-    }
-
-    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument)
-            throws DMessageException
-    {
-        this.messageType = messageType;
-        this.pseudonym = pseudonym;
-        this.cipheredSessionID = null;
-        this.returnInfo = null;
-        this.firstArgument = firstArgument;
-        this.secondArgument = secondArgument;
-        this.thirdArgument = null;
-        this.fourthArgument = null;
-    }
-
-    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument,
-                    Object thirdArgument) throws DMessageException
-    {
-        this.messageType = messageType;
-        this.pseudonym = pseudonym;
-        this.cipheredSessionID = null;
-        this.returnInfo = null;
-        this.firstArgument = firstArgument;
-        this.secondArgument = secondArgument;
-        this.thirdArgument = thirdArgument;
-        this.fourthArgument = null;
-    }
-
-    public DMessage(int messageType, String pseudonym, Object firstArgument, Object secondArgument,
-                    Object thirdArgument, Object fourthArgument) throws DMessageException
-    {
-        this.messageType = messageType;
-        this.pseudonym = pseudonym;
-        this.cipheredSessionID = null;
-        this.returnInfo = null;
-        this.firstArgument = firstArgument;
-        this.secondArgument = secondArgument;
-        this.thirdArgument = thirdArgument;
-        this.fourthArgument = fourthArgument;
     }
 
     public DMessage(int messageType, Object returnInfo) throws DMessageException

@@ -17,19 +17,9 @@ public class DominoesTableInfo implements Serializable
         this.readyStates = readyStates;
     }
 
-    public int getId()
-    {
-        return this.id;
-    }
-
     public String[] getPlayers()
     {
         return this.players;
-    }
-
-    public boolean[] getReadyStates()
-    {
-        return this.readyStates;
     }
 
     @Override

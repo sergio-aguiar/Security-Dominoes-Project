@@ -10,8 +10,8 @@ public class DSProxy extends Thread
 {
     private static final ReentrantLock reentrantLock = new ReentrantLock();
     private static int nProxy = 0;
-    private DSCommunication dsCommunication;
-    private DSInterface dsInterface;
+    private final DSCommunication dsCommunication;
+    private final DSInterface dsInterface;
 
     public DSProxy(DSCommunication dsCommunication, DSInterface dsInterface)
     {
@@ -23,7 +23,7 @@ public class DSProxy extends Thread
     @Override
     public void run()
     {
-        DMessage inMessage = null;
+        DMessage inMessage;
         DMessage outMessage = null;
 
         inMessage = (DMessage) this.dsCommunication.readObject();

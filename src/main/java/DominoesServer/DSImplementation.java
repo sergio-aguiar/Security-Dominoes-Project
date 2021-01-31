@@ -30,7 +30,7 @@ public class DSImplementation implements DCInterface
         this.playerPublicKeys = new HashMap<>();
         this.playerSessionSymKeys = new HashMap<>();
 
-        Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
+        Map<String, byte[]> keys = DominoesCryptoAsym.generateAsymKeys();
         this.serverPrivateKey = keys.get("private");
         this.serverPublicKey = keys.get("public");
     }
@@ -239,8 +239,6 @@ public class DSImplementation implements DCInterface
             this.reentrantLock.unlock();
         }
 
-        System.out.println(dTable);
-
         return dTable;
     }
 
@@ -388,7 +386,7 @@ public class DSImplementation implements DCInterface
                 for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                 {
                     table.setDeck(deck);
-                    table.handleCardDif(pseudonym, (int) DominoesCryptoSym.SymDecipher(pieceDif,
+                    table.handleCardDif(pseudonym, (int) DominoesCryptoSym.symDecipher(pieceDif,
                             this.playerSessionSymKeys.get(pseudonym)));
                     result = true;
                     table.incrementTurn();
@@ -502,12 +500,8 @@ public class DSImplementation implements DCInterface
                 for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                 {
                     table.incrementTurn();
-                    table.setDouble(pseudonym, (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
+                    table.setDouble(pseudonym, (String) DominoesCryptoSym.symDecipher(Base64.getDecoder().decode(piece),
                             this.playerSessionSymKeys.get(pseudonym)));
-
-                    System.out.println("Player: " + pseudonym + " highest is " +
-                            DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
-                                    this.playerSessionSymKeys.get(pseudonym)));
                 }
         }
         catch (Exception e)
@@ -647,7 +641,7 @@ public class DSImplementation implements DCInterface
                     result = table.drawPiece(pseudonym);
 
                     if (result == null) result = "Error";
-                    else result = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(result,
+                    else result = Base64.getEncoder().encodeToString(DominoesCryptoSym.symCipher(result,
                             this.playerSessionSymKeys.get(pseudonym)));
                 }
         }
@@ -1024,15 +1018,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            this.playerSessionIDs.put(pseudonym, (byte[]) DominoesCryptoAsym.AsymDecipher(cipheredSessionID,
+            this.playerSessionIDs.put(pseudonym, (byte[]) DominoesCryptoAsym.asymDecipher(cipheredSessionID,
                     this.serverPrivateKey));
 
-            byte[] sessionSymKey = DominoesCryptoSym.GenerateSymKeys(Long.toString(System.currentTimeMillis()));
+            byte[] sessionSymKey = DominoesCryptoSym.generateSymKeys(Long.toString(System.currentTimeMillis()));
             this.playerSessionSymKeys.put(pseudonym, sessionSymKey);
 
-            System.out.println("SESSION KEY: " + Arrays.toString(sessionSymKey));
-
-            result = DominoesCryptoAsym.AsymCipher(sessionSymKey, this.playerPublicKeys.get(pseudonym));
+            result = DominoesCryptoAsym.asymCipher(sessionSymKey, this.playerPublicKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1265,14 +1257,7 @@ public class DSImplementation implements DCInterface
         {
             if (checkSessionID(pseudonym, cipheredSessionID))
                 for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                    if (table.notifyDeckProtected(pseudonym))
-                    {
-                        // System.out.println("CIPHERING DECK WITH: " +
-                        // Arrays.toString(this.playerSessionSymKeys.get(table.getPlayers()[0])));
-                        // table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
-
-                        System.out.println("DECK: " + table.getDeck());
-                    }
+                    table.notifyDeckProtected(pseudonym);
         }
         catch (Exception e)
         {
@@ -1384,7 +1369,7 @@ public class DSImplementation implements DCInterface
         {
             if (checkSessionID(pseudonym, cipheredSessionID))
                 for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                    result = DominoesCryptoSym.SymCipher(table.getLastTurn(), this.playerSessionSymKeys.get(pseudonym));
+                    result = DominoesCryptoSym.symCipher(table.getLastTurn(), this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1406,7 +1391,7 @@ public class DSImplementation implements DCInterface
         {
             if (checkSessionID(pseudonym, cipheredSessionID))
                 for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                    result = DominoesCryptoSym.SymCipher(table.getNextTurn(), this.playerSessionSymKeys.get(pseudonym));
+                    result = DominoesCryptoSym.symCipher(table.getNextTurn(), this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1427,7 +1412,7 @@ public class DSImplementation implements DCInterface
         try
         {
             if (checkSessionID(pseudonym, cipheredSessionID))
-                result = DominoesCryptoSym.SymCipher(DSQLiteConnection.getUserScore(user),
+                result = DominoesCryptoSym.symCipher(DSQLiteConnection.getUserScore(user),
                         this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
@@ -1451,12 +1436,12 @@ public class DSImplementation implements DCInterface
         {
             if (checkSessionID(pseudonym, cipheredSessionID))
             {
-                byte[] signedSessionID = (byte[]) DominoesCryptoSym.SymDecipher(cipheredSessionID,
+                byte[] signedSessionID = (byte[]) DominoesCryptoSym.symDecipher(cipheredSessionID,
                         this.playerSessionSymKeys.get(pseudonym));
 
                 if (DominoesSignature.isValid(signedSessionID, userPublicKey))
                 {
-                    DominoesAccountingInfo accountingInfo = null;
+                    DominoesAccountingInfo accountingInfo;
                     for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                     {
                         accountingInfo = table.getAccountingInfo();
@@ -1551,7 +1536,7 @@ public class DSImplementation implements DCInterface
 
     private boolean checkSessionID(String pseudonym, byte[] cipheredSessionID)
     {
-        return Arrays.equals(this.playerSessionIDs.get(pseudonym), (byte[]) DominoesCryptoSym.SymDecipher(
+        return Arrays.equals(this.playerSessionIDs.get(pseudonym), (byte[]) DominoesCryptoSym.symDecipher(
                 cipheredSessionID, this.playerSessionSymKeys.get(pseudonym)));
     }
 }

@@ -6,7 +6,6 @@ import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Stack;
 
 public class DCStub implements DCInterface
@@ -47,8 +46,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: createTable: " +
-                    e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: createTable: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -504,8 +502,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isPlayerTurn: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isPlayerTurn: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -558,8 +556,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasGameEnded: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasGameEnded: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -612,8 +610,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckSorting: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckSorting: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -666,8 +664,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isDeckEmpty: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -772,8 +770,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: returnDeck: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -826,8 +823,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: skipTurn: " +
-                    e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: skipTurn: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -869,8 +865,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: commitHand: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: commitHand: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -923,8 +918,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -932,16 +927,16 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.COMMIT_STATE_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: incorrect "
-                    + "reply message!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: " +
+                    "incorrect reply message!");
 
             System.exit(706);
         }
 
         if (inMessage.noReturnInfo())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: no return "
-                    + "value!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasPlayerCommitted: no " +
+                    "return value!");
 
             System.exit(704);
         }
@@ -977,8 +972,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -986,16 +981,16 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.START_HANDLING_STATE_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: incorrect "
-                    + "reply message!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: incorrect " +
+                    "reply message!");
 
             System.exit(706);
         }
 
         if (inMessage.noReturnInfo())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: no return "
-                    + "value!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingStart: no return " +
+                    "value!");
 
             System.exit(704);
         }
@@ -1040,8 +1035,8 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.DOUBLE_STATING_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: stateHighestDouble: incorrect "
-                    + "reply message!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: stateHighestDouble: " +
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1128,8 +1123,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isRedistributionNeeded: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1233,8 +1228,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1243,7 +1238,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.RESET_NEEDED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1251,7 +1246,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isResetNeeded: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1288,8 +1283,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: playPiece: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: playPiece: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1298,7 +1292,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.PLAY_PIECE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: playPiece: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1306,7 +1300,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: playPiece: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1342,8 +1336,7 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawCard: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawCard: " + e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1352,7 +1345,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.DRAW_PIECE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawCard: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1360,7 +1353,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: drawCard: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1405,8 +1398,8 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.DENOUNCE_CHEATING_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: denounceCheating: incorrect "
-                    + "reply message!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: denounceCheating: incorrect " +
+                    "reply message!");
 
             System.exit(706);
         }
@@ -1439,8 +1432,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1449,7 +1442,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.CHEAT_HANDLING_STATE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1457,7 +1450,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingCheating: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1494,8 +1487,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1504,7 +1497,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.COMMIT_UPDATE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1512,7 +1505,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: updateCommitment: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1549,8 +1542,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1559,7 +1552,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SEND_COMMIT_DATA_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1567,7 +1560,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendCommitData: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1603,8 +1596,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasSentCommitData: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasSentCommitData: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1613,7 +1606,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAS_SENT_COMMIT_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasSentCommitData: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1621,7 +1614,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasSentCommitData: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1657,8 +1650,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingAccounting: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingAccounting: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1667,7 +1660,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.IS_HANDLING_ACCOUNT_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingAccounting: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1675,7 +1668,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isHandlingAccounting: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1711,8 +1704,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getAccountingInfo: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getAccountingInfo: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1721,7 +1714,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.ACCOUNTING_INFO_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getAccountingInfo: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1729,7 +1722,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getAccountingInfo: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1775,7 +1768,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.ACCOUNTING_DECISION_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendAccountingDecision: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1783,7 +1776,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendAccountingDecision: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1819,8 +1812,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allSentDecision: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allSentDecision: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1829,7 +1822,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.ALL_DECISIONS_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allSentDecision: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1837,7 +1830,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allSentDecision: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1873,8 +1866,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allAgreedToAccounting: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allAgreedToAccounting: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1883,7 +1876,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.ALL_AGREED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allAgreedToAccounting: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1891,7 +1884,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allAgreedToAccounting: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -1970,8 +1963,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allPassedProtestMenu: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allPassedProtestMenu: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -1980,7 +1973,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.PROTEST_CHECK_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allPassedProtestMenu: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -1988,7 +1981,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: allPassedProtestMenu: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2023,8 +2016,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isUserRegistered: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isUserRegistered: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2033,7 +2026,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.CHECK_USER_REGISTER_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isUserRegistered: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2041,7 +2034,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: isUserRegistered: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2076,8 +2069,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: registerUser: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: registerUser: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2086,7 +2079,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.REGISTER_USER_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: registerUser: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2094,7 +2087,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: registerUser: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2130,8 +2123,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: greetServer: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: greetServer: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2140,7 +2133,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.GREET_SERVER_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: greetServer: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2148,13 +2141,11 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: greetServer: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
         dcCommunication.close();
-
-        System.out.println("MY KEY RETURNED: " + Arrays.toString(((byte[]) inMessage.getReturnInfo())));
 
         return (byte[]) inMessage.getReturnInfo();
     }
@@ -2185,8 +2176,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getServerPublicKey: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getServerPublicKey: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2195,7 +2186,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SERVER_KEY_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getServerPublicKey: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2203,7 +2194,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getServerPublicKey: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2239,8 +2230,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2249,7 +2240,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SESSION_ID_SEND_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2257,7 +2248,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: sendSessionID: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2293,8 +2284,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2303,7 +2294,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAS_KEY_SORTING_STARTED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2311,7 +2302,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingStarted: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2390,8 +2381,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2400,7 +2391,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAS_KEY_SORTING_ENDED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2408,7 +2399,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: hasKeySortingEnded: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2444,8 +2435,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2454,7 +2445,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.PLAYER_PUBLIC_KEYS_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2462,7 +2453,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getPlayerPublicKeys: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2507,8 +2498,8 @@ public class DCStub implements DCInterface
 
         if (inMessage.getMessageType() != DMessage.MessageType.KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode())
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSymKeyDistributionMatrix: "
-                    + "incorrect " + "reply message!");
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "getSymKeyDistributionMatrix: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2560,7 +2551,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.RETURN_KEY_DISTRIBUTION_MATRIX_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "returnSymKeyDistributionMatrix: " + "incorrect " + "reply message!");
+                    "returnSymKeyDistributionMatrix: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2568,7 +2559,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "returnSymKeyDistributionMatrix: " + "no return " + "value!");
+                    "returnSymKeyDistributionMatrix: no return value!");
 
             System.exit(704);
         }
@@ -2604,8 +2595,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2614,7 +2605,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SESSION_SYM_KEYS_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2622,7 +2613,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getSessionSymKeys: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2668,7 +2659,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAS_DECK_BEEN_PROTECTED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasDeckBeenProtected: " + "incorrect " + "reply message!");
+                    "hasDeckBeenProtected: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2676,7 +2667,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasDeckBeenProtected: " + "no return " + "value!");
+                    "hasDeckBeenProtected: no return value!");
 
             System.exit(704);
         }
@@ -2723,7 +2714,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SEND_DECK_PROTECTION_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "sendDeckProtectionPublicKey: " + "incorrect " + "reply message!");
+                    "sendDeckProtectionPublicKey: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2731,7 +2722,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "sendDeckProtectionPublicKey: " + "no return " + "value!");
+                    "sendDeckProtectionPublicKey: no return value!");
 
             System.exit(704);
         }
@@ -2777,7 +2768,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.NOTIFY_DECK_PROTECTED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: notifyDeckProtected: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2820,7 +2811,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAVE_ALL_SENT_DECK_PROTECTION_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "haveAllSentDeckProtectionPrivateKeys: " + "incorrect " + "reply message!");
+                    "haveAllSentDeckProtectionPrivateKeys: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2828,7 +2819,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "haveAllSentDeckProtectionPrivateKeys: " + "no return " + "value!");
+                    "haveAllSentDeckProtectionPrivateKeys: no return value!");
 
             System.exit(704);
         }
@@ -2874,7 +2865,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.HAS_SENT_DECK_PROTECTION_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasSentDeckProtectionPrivateKey: " + "incorrect " + "reply message!");
+                    "hasSentDeckProtectionPrivateKey: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2882,7 +2873,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasSentDeckProtectionPrivateKey: " + "no return " + "value!");
+                    "hasSentDeckProtectionPrivateKey: no return value!");
 
             System.exit(704);
         }
@@ -2918,8 +2909,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -2928,7 +2919,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.DECK_PROTECTION_KEY_STACK_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -2936,7 +2927,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getDeckProtectionKeyStack: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -2982,7 +2973,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.DECK_SENT_BY_SERVER_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "isDeckComingFromServer: " + "incorrect " + "reply message!");
+                    "isDeckComingFromServer: incorrect reply message!");
 
             System.exit(706);
         }
@@ -2990,7 +2981,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "isDeckComingFromServer: " + "no return " + "value!");
+                    "isDeckComingFromServer: no return value!");
 
             System.exit(704);
         }
@@ -3026,8 +3017,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getLastTurn: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getLastTurn: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -3036,7 +3027,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.LAST_TURN_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getLastTurn: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -3044,7 +3035,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getLastTurn: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -3090,7 +3081,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.NEXT_TURN_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getNextTurn: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -3098,7 +3089,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getNextTurn: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -3134,8 +3125,8 @@ public class DCStub implements DCInterface
         }
         catch (DMessageException e)
         {
-            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: "
-                    + e.toString());
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
+                    e.toString());
         }
 
         dcCommunication.writeObject(outMessage);
@@ -3144,7 +3135,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.GET_USER_SCORE_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }
@@ -3152,7 +3143,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: getUserScore: " +
-                    "no return " + "value!");
+                    "no return value!");
 
             System.exit(704);
         }
@@ -3199,7 +3190,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.PROVE_IDENTITY_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "proveUserIdentity: " + "incorrect " + "reply message!");
+                    "proveUserIdentity: incorrect reply message!");
 
             System.exit(706);
         }
@@ -3207,7 +3198,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "proveUserIdentity: " + "no return " + "value!");
+                    "proveUserIdentity: no return value!");
 
             System.exit(704);
         }
@@ -3253,7 +3244,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.ALL_FINISHED_ACCOUNTING_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "haveAllFinishedAccounting: " + "incorrect " + "reply message!");
+                    "haveAllFinishedAccounting: incorrect reply message!");
 
             System.exit(706);
         }
@@ -3261,7 +3252,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "haveAllFinishedAccounting: " + "no return " + "value!");
+                    "haveAllFinishedAccounting: no return value!");
 
             System.exit(704);
         }
@@ -3307,7 +3298,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.WAS_PSEUDONYM_USED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasPseudonymBeenUsed: " + "incorrect " + "reply message!");
+                    "hasPseudonymBeenUsed: incorrect reply message!");
 
             System.exit(706);
         }
@@ -3315,7 +3306,7 @@ public class DCStub implements DCInterface
         if (inMessage.noReturnInfo())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
-                    "hasPseudonymBeenUsed: " + "no return " + "value!");
+                    "hasPseudonymBeenUsed: no return value!");
 
             System.exit(704);
         }
@@ -3361,7 +3352,7 @@ public class DCStub implements DCInterface
         if (inMessage.getMessageType() != DMessage.MessageType.SET_PSEUDONYM_USED_REQUEST.getMessageCode())
         {
             System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: setPseudonymAsUsed: " +
-                    "incorrect " + "reply message!");
+                    "incorrect reply message!");
 
             System.exit(706);
         }

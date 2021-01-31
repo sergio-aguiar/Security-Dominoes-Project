@@ -131,16 +131,13 @@ public class DominoesTable
         return joined;
     }
 
-    public boolean leaveTable(String pseudonym)
+    public void leaveTable(String pseudonym)
     {
-        boolean left = false;
         for (int i = 1; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
         {
             this.players[i] = null;
-            left = true;
             break;
         }
-        return left;
     }
 
     public void incrementTurn()
@@ -187,19 +184,6 @@ public class DominoesTable
         }
     }
 
-    public String distributionDrawPiece(String pseudonym)
-    {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
-            if (this.playerPieceCount[i] < maxPieces)
-            {
-                this.playerPieceCount[i]++;
-                String result = this.deck.drawPiece();
-                System.out.println("Table res: " + result);
-                return result;
-            }
-        return "Error";
-    }
-
     public String drawPiece(String pseudonym)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
@@ -208,23 +192,6 @@ public class DominoesTable
             return this.deck.drawPiece();
         }
         return "Error";
-    }
-
-    public String distributionSwapPiece(String pseudonym, String piece)
-    {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
-            if (this.playerPieceCount[i] > 0) return this.deck.swapPiece(piece);
-        return "Error";
-    }
-
-    public void distributionReturnPiece(String pseudonym, String piece)
-    {
-        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
-            if (this.playerPieceCount[i] > 0)
-            {
-                this.playerPieceCount[i]--;
-                this.deck.returnPiece(piece);
-            }
     }
 
     public boolean distributionCommit(String pseudonym, DominoesCommitData commitData)
@@ -288,11 +255,6 @@ public class DominoesTable
         return this.id;
     }
 
-    public int getPlayerCap()
-    {
-        return this.players.length;
-    }
-
     public DominoesDeck getDeck()
     {
         return this.deck;
@@ -344,11 +306,6 @@ public class DominoesTable
                 byte[] key = (byte[]) deckProtection.pop();
                 this.deck.asymDecipher(key);
             }
-
-            System.out.println("DECK AFTER FULLY DECIPHERED:\nAvailable: ");
-            deck.printAvailableSet();
-            System.out.println("\nNonAvailable: ");
-            deck.printWholeSet();
         }
 
         return this.deckDecipherStack;
@@ -379,19 +336,9 @@ public class DominoesTable
         }
     }
 
-    public boolean hasStarted()
-    {
-        return this.started;
-    }
-
     public boolean hasEnded()
     {
         return this.ended;
-    }
-
-    public int getTurn()
-    {
-        return this.turn;
     }
 
     public int getLastTurn()
@@ -428,7 +375,6 @@ public class DominoesTable
     public boolean areAllDoublesSubmitted()
     {
         for (String piece : this.playerDoubles) if (piece == null) return false;
-        System.out.println("Player Doubles: " + Arrays.toString(this.playerDoubles));
         return true;
     }
 
@@ -442,7 +388,6 @@ public class DominoesTable
                 {
                     this.firstPlayer = i;
                     this.turn = i;
-                    System.out.println("First player: " + i + " with the piece " + this.playerDoubles[i]);
                 }
             }
 
@@ -531,7 +476,6 @@ public class DominoesTable
     public boolean hasKeySortingEnded()
     {
         if (this.handlingKeys) return false;
-        System.out.println("hasKeySortingEnded:\n" + Arrays.deepToString(this.symKeyMatrix.getSymKeyMatrix()) + "\n");
         return this.symKeyMatrix.getSymKeyMatrix()[this.players.length - 1][this.players.length - 2] != null;
     }
 
@@ -588,17 +532,11 @@ public class DominoesTable
 
     public void computeCheaters()
     {
-        System.out.println(Arrays.toString(this.illegalMoves));
-        System.out.println(this.gameState.isCheater(0));
-        System.out.println(this.gameState.isCheater(1));
-
         for (int i = 0; i < this.players.length; i++)
         {
             if (this.illegalMoves[i])
             {
                 this.gameState.setCheater(i);
-                System.out.println("Setting player " + i + " as a cheater!");
-                System.out.println(this.gameState.isCheater(i));
                 continue;
             }
 
@@ -625,41 +563,32 @@ public class DominoesTable
             {
                 if (this.gameState.getDenounced()[i])
                 {
-                    System.out.println("\nTHERE ARE NO CHEATERS! AND DENOUNCED BY " + i);
                     for (int pieceCount : this.playerPieceCount) result -= pieceCount;
                 }
                 else if (this.gameState.getWinner() == i)
                 {
-                    System.out.println("\nTHERE ARE CHEATERS! AND WON BY " + i);
                     for (int pieceCount : this.playerPieceCount) result += pieceCount;
                 }
                 else if (this.gameState.getWinner() != -1)
                 {
-                    System.out.println("\nTHERE ARE CHEATERS! AND NOT WON BY " + i);
                     result -= this.playerPieceCount[i];
                 }
             }
             else
             {
-                System.out.println("\nIS CHEATER: " +this.gameState.isCheater(i));
                 if (this.gameState.isCheater(i))
                 {
-                    System.out.println("\nTHERE ARE CHEATERS! AND ONE IS " + i);
                     for (int pieceCount : this.playerPieceCount) result -= pieceCount;
                 }
                 else if (this.gameState.getWinner() == i)
                 {
-                    System.out.println("\nTHERE ARE CHEATERS! AND WON BY " + i);
                     for (int pieceCount : this.playerPieceCount) result += pieceCount;
                 }
                 else if (this.gameState.getWinner() != -1)
                 {
-                    System.out.println("\nTHERE ARE CHEATERS! AND NOT WON BY " + i);
                     result -= this.playerPieceCount[i];
                 }
             }
-
-            System.out.print("\nPlayer " + this.players[i] + " result: " + result);
         }
         return result;
     }
@@ -727,11 +656,6 @@ public class DominoesTable
         if (allProtected) this.turn = this.players.length - 1;
 
         return allProtected;
-    }
-
-    public void deckSymCipher(byte[] symKey)
-    {
-        deck.symCipher(symKey);
     }
 
     public void addDeckProtectionKey(String pseudonym, byte[] asymKey)

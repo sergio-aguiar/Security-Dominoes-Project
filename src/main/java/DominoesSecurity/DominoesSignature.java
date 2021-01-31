@@ -11,71 +11,69 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.SignedObject;
 
-public class DominoesSignature {
-
-    public static byte[] sign(Serializable data, Key privateKey) {
+public class DominoesSignature
+{
+    public static byte[] sign(Serializable data, Key privateKey)
+    {
         Signature signatureEngine = null;
 
-        try {
+        try
+        {
             signatureEngine = Signature.getInstance("SHA256withRSA");
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            System.out.println("DominoesSignature: sign: " + e.toString());
         }
 
         SignedObject result = null;
-        try {
+        try
+        {
             result = new SignedObject(data, (PrivateKey) privateKey, signatureEngine);
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        }
+        catch (InvalidKeyException | SignatureException | IOException e)
+        {
+            System.out.println("DominoesSignature: sign: " + e.toString());
         }
 
-        return Serializer.Serialize(result);
+        return Serializer.serialize(result);
     }
     
     public static boolean isValid(byte[] data, Key publicKey ){
     
-        SignedObject signedObject = (SignedObject)Serializer.Deserialize(data);
+        SignedObject signedObject = (SignedObject)Serializer.deserialize(data);
 
         PublicKey pKey = (PublicKey) publicKey;
 
         Signature signatureEngine = null;
-        try {
+        try
+        {
             signatureEngine = Signature.getInstance("SHA256withRSA");
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            System.out.println("DominoesSignature: isValid: " + e.toString());
         }
 
-        try {
+        try
+        {
             signatureEngine.initVerify(pKey);
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DominoesSignature: isValid: " + e.toString());
         }
 
         boolean isVerify = false;
-        try {
+        try
+        {
             isVerify = signedObject.verify(pKey, signatureEngine);
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
-        
+        catch (InvalidKeyException | SignatureException e)
+        {
+            System.out.println("DominoesSignature: isValid: " + e.toString());
+        }
+
         return isVerify;
-    
     }
-
-
-
 }
