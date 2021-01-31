@@ -4,6 +4,7 @@ import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
+import java.security.Key;
 import java.util.Stack;
 
 public class DSInterface
@@ -84,6 +85,8 @@ public class DSInterface
             case 57:
             case 58:
             case 59:
+            case 61:
+            case 62:
                 if (inMessage.noFirstArgument())
                     throw new DMessageException("Argument \"tableID\" was not given", inMessage);
                 if ((int) inMessage.getFirstArgument() < 0)
@@ -483,6 +486,18 @@ public class DSInterface
                 byte[] return60 = this.dsImplementation.getUserScore(inMessage.getPseudonym(),
                         inMessage.getCipheredSessionID(), (String) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.GET_USER_SCORE_REQUEST.getMessageCode(), return60);
+                break;
+            case 61:
+                boolean return61 = this.dsImplementation.proveUserIdentity(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument(),
+                        (String) inMessage.getSecondArgument(), (Key) inMessage.getThirdArgument());
+                outMessage = new DMessage(DMessage.MessageType.PROVE_IDENTITY_REQUEST.getMessageCode(), return61);
+                break;
+            case 62:
+                boolean return62 = this.dsImplementation.haveAllFinishedAccounting(inMessage.getPseudonym(),
+                        inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.ALL_FINISHED_ACCOUNTING_REQUEST.getMessageCode(),
+                        return62);
                 break;
         }
         return outMessage;

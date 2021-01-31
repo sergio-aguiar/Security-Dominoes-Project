@@ -5,6 +5,7 @@ import DominoesCommunication.DMessage;
 import DominoesCommunication.DMessageException;
 import DominoesMisc.*;
 
+import java.security.Key;
 import java.util.Arrays;
 import java.util.Stack;
 
@@ -3161,8 +3162,111 @@ public class DCStub implements DCInterface
     }
 
     @Override
-    public void setUserScore(String pseudonym, byte[] cipheredSessionID, String user, byte[] score)
+    public boolean proveUserIdentity(String pseudonym, byte[] cipheredSessionID, int tableID, String user,
+                                     Key userPublicKey)
     {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
 
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "proveUserIdentity: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.PROVE_IDENTITY_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID, user, userPublicKey);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "proveUserIdentity: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.PROVE_IDENTITY_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "proveUserIdentity: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "proveUserIdentity: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
+    }
+
+    @Override
+    public boolean haveAllFinishedAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        DCCommunication dcCommunication = new DCCommunication(serverHostName, serverHostPort);
+        DMessage inMessage;
+        DMessage outMessage = null;
+
+        while (!dcCommunication.open())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                        "haveAllFinishedAccounting: " + e.toString());
+            }
+        }
+
+        try
+        {
+            outMessage = new DMessage(DMessage.MessageType.ALL_FINISHED_ACCOUNTING_REQUEST.getMessageCode(),
+                    pseudonym, cipheredSessionID, tableID);
+        }
+        catch (DMessageException e)
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllFinishedAccounting: " + e.toString());
+        }
+
+        dcCommunication.writeObject(outMessage);
+        inMessage = (DMessage) dcCommunication.readObject();
+
+        if (inMessage.getMessageType() != DMessage.MessageType.ALL_FINISHED_ACCOUNTING_REQUEST.getMessageCode())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllFinishedAccounting: " + "incorrect " + "reply message!");
+
+            System.exit(706);
+        }
+
+        if (inMessage.noReturnInfo())
+        {
+            System.out.println("Thread " + Thread.currentThread().getName() + ": DCStub: " +
+                    "haveAllFinishedAccounting: " + "no return " + "value!");
+
+            System.exit(704);
+        }
+        dcCommunication.close();
+
+        return (boolean) inMessage.getReturnInfo();
     }
 }

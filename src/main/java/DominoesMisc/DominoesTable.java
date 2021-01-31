@@ -1,9 +1,6 @@
 package DominoesMisc;
 
-import DominoesSecurity.DominoesCryptoAsym;
-
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.Stack;
 
@@ -32,6 +29,7 @@ public class DominoesTable
     private final boolean[] haveProtectedDeck;
     private final boolean[] haveSentProtection;
     private final boolean[] haveGottenProtection;
+    private final boolean[] haveFinishedAccounting;
     private final Stack<byte[]> deckDecipherStack;
 
     private boolean started;
@@ -83,6 +81,8 @@ public class DominoesTable
         this.haveSentProtection[0] = false;
         this.haveGottenProtection = new boolean[playerCap];
         this.haveGottenProtection[0] = false;
+        this.haveFinishedAccounting = new boolean[playerCap];
+        this.haveFinishedAccounting[0] = false;
         this.deckDecipherStack = new Stack<>();
 
         for (int i = 1; i < playerCap; i++)
@@ -100,6 +100,7 @@ public class DominoesTable
             this.haveProtectedDeck[i] = false;
             this.haveSentProtection[i] = false;
             this.haveGottenProtection[i] = false;
+            this.haveFinishedAccounting[i] = false;
         }
 
         this.started = false;
@@ -556,6 +557,8 @@ public class DominoesTable
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
             this.decisionMade[i] = decision;
+
+        if (haveAllDecided()) if (!haveAllAgreedToAccounting()) Arrays.fill(this.haveFinishedAccounting, true);
     }
 
     public boolean haveAllDecided()
@@ -757,6 +760,18 @@ public class DominoesTable
             }
 
         return false;
+    }
+
+    public void notifyFinishedAccounting(String pseudonym)
+    {
+        for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
+            this.haveFinishedAccounting[i] = true;
+    }
+
+    public boolean haveAllFinishedAccounting()
+    {
+        for (boolean accounted : this.haveFinishedAccounting) if (!accounted) return false;
+        return true;
     }
 
     public boolean isResetNeeded()

@@ -66,7 +66,8 @@ public class DMessage implements Serializable
         LAST_TURN_REQUEST(58),
         NEXT_TURN_REQUEST(59),
         GET_USER_SCORE_REQUEST(60),
-        PROVE_IDENTITY_REQUEST(61);
+        PROVE_IDENTITY_REQUEST(61),
+        ALL_FINISHED_ACCOUNTING_REQUEST(62);
 
         private static final long serialVersionUID = 1102L;
 

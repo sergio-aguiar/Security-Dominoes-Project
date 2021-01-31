@@ -17,24 +17,9 @@ public class DCMain
     public static void main(String[] args)
     {
         DCStub dcStub = new DCStub(serverHostName, serverPort);
-        int sessionID = ThreadLocalRandom.current().nextInt(0,131072);
 
-        X509Certificate cert = DominoesCC.getCert();
-        Map<String, Key> keys = DominoesCC.getKeys(cert);
-
-        String pseudonym = generatePseudonym(sessionID, keys.get("privateKey"));
-
-        String serialID = cert.getSerialNumber().toString();
-        if (!dcStub.isUserRegistered(serialID)) dcStub.registerUser(serialID);
-
-        DCThread dcThread = new DCThread(serialID, pseudonym, keys.get("privateKey"), keys.get("publicKey"), sessionID,
-                dcStub);
+        DCThread dcThread = new DCThread(dcStub);
 
         dcThread.start();
-    }
-
-    public static String generatePseudonym(int sessionID, Key privateKey)
-    {
-        return Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
     }
 }

@@ -5,7 +5,9 @@ import DominoesDatabase.DSQLiteConnection;
 import DominoesMisc.*;
 import DominoesSecurity.DominoesCryptoAsym;
 import DominoesSecurity.DominoesCryptoSym;
+import DominoesSecurity.DominoesSignature;
 
+import java.security.Key;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -1371,6 +1373,72 @@ public class DSImplementation implements DCInterface
         catch (Exception e)
         {
             System.out.println("DSImplementation: getUserScore: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean proveUserIdentity(String pseudonym, byte[] cipheredSessionID, int tableID, String user,
+                                     Key userPublicKey)
+    {
+        boolean result = false;
+        this.reentrantLock.lock();
+        try
+        {
+            byte[] signedSessionID = (byte[]) DominoesCryptoSym.SymDecipher(cipheredSessionID,
+                    this.playerSessionSymKeys.get(pseudonym));
+
+            if (DominoesSignature.isValid(signedSessionID, userPublicKey))
+            {
+                DominoesAccountingInfo accountingInfo = null;
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    accountingInfo = table.getAccountingInfo();
+
+                    if (accountingInfo != null)
+                    {
+                        for (int i = 0; i < accountingInfo.getPlayers().length; i++)
+                        {
+                            if (accountingInfo.getPlayers()[i].equals(pseudonym))
+                            {
+                                int score = DSQLiteConnection.getUserScore(user);
+                                DSQLiteConnection.setUserScore(user, score + accountingInfo.getResults()[i]);
+                                table.notifyFinishedAccounting(pseudonym);
+                                result = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: proveUserIdentity: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean haveAllFinishedAccounting(String pseudonym, byte[] cipheredSessionID, int tableID)
+    {
+        boolean result = true;
+        this.reentrantLock.lock();
+        try
+        {
+            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                result = table.haveAllFinishedAccounting();
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: haveAllFinishedAccounting: " + e.toString());
         }
         finally
         {

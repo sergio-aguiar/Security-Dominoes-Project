@@ -1,11 +1,13 @@
 package DominoesClient;
 
 import DominoesMisc.*;
+import DominoesSecurity.DominoesCC;
 import DominoesSecurity.DominoesCryptoAsym;
 import DominoesSecurity.DominoesCryptoSym;
 import DominoesSecurity.DominoesSignature;
 
 import java.security.Key;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Condition;
@@ -13,49 +15,25 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DCThread extends Thread
 {
-    public enum DCStates
-    {
-        AT_MAIN_MENUS("AMM"),
-        AT_TABLE_LEADER_MENU("ATLM"),
-        AT_TABLE_GUEST_MENU("ATGM"),
-        AWAITING_GAME_START("AGS"),
-        AT_PIECE_DISTRIBUTION("APD");
-
-        private final String description;
-
-        DCStates(String description)
-        {
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return this.description;
-        }
-    }
-
     private static final Scanner sc = new Scanner(System.in);
 
     private final ReentrantLock reentrantLock;
     private final Condition turnCondition;
 
     private final String identifier;
-    private final String pseudonym;
-    private final Key privateKey;
-    private final Key publicKey;
+    private final byte[] signedSessionID;
     private final DCInterface dcInterface;
     private final ArrayList<String> gamePieces;
     private final byte[] sessionPrivateKey;
     private final byte[] sessionPublicKey;
 
+    private String pseudonym;
     private int tableID;
     private int sessionID;
-    private byte[] signedSessionID;
     private byte[] cipheredSignedSessionID;
     private byte[] serverPublicKey;
     private byte[] serverSessionSymKey;
     private byte[] deckDistributionPrivateKey;
-    private byte[] deckDistributionPublicKey;
     private byte[][] playerPublicKeys;
     private byte[][] playerSessionSymKeys;
     private Stack<byte[]> protectionStack;
@@ -65,17 +43,18 @@ public class DCThread extends Thread
     private ArrayList<String> committedPieces;
     private boolean knowsCommittedCards;
 
-    public DCThread(String identifier, String pseudonym, Key privateKey, Key publicKey, int sessionID,
-                    DCInterface dcInterface)
+    public DCThread(DCInterface dcInterface)
     {
         this.reentrantLock = new ReentrantLock(true);
         this.turnCondition = this.reentrantLock.newCondition();
-        this.identifier = identifier;
-        this.pseudonym = pseudonym;
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-        this.sessionID = sessionID;
-        this.signedSessionID = signSessionID();
+
+        X509Certificate cert = DominoesCC.getCert();
+        Map<String, Key> keys = DominoesCC.getKeys(cert);
+
+        this.identifier = cert.getSerialNumber().toString();
+        this.sessionID = generateSessionID();
+        this.pseudonym = generatePseudonym(this.sessionID, keys.get("privateKey"));
+        this.signedSessionID = signSessionID(keys.get("privateKey"));
         this.serverPublicKey = null;
         this.serverSessionSymKey = null;
         this.playerPublicKeys = null;
@@ -85,9 +64,9 @@ public class DCThread extends Thread
         this.gamePieces = new ArrayList<>();
         this.protectionStack = null;
 
-        Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
-        this.sessionPrivateKey = keys.get("private");
-        this.sessionPublicKey = keys.get("public");
+        Map<String, byte[]> sessionKeys = DominoesCryptoAsym.GenerateAsymKeys();
+        this.sessionPrivateKey = sessionKeys.get("private");
+        this.sessionPublicKey = sessionKeys.get("public");
 
         this.tableID = -1;
         randomizeCommitData();
@@ -99,6 +78,8 @@ public class DCThread extends Thread
     public void run()
     {
         System.out.println("[CLIENT] Dominoes Client starting...");
+
+        if (!this.dcInterface.isUserRegistered(this.identifier)) this.dcInterface.registerUser(this.identifier);
 
         establishSession();
 
@@ -248,13 +229,12 @@ public class DCThread extends Thread
                                 {
                                     System.out.println("\n[CLIENT] Awaiting game Start...");
                                     gameLogic();
-                                    exit3 = true;
                                 }
                                 else
                                 {
                                     System.out.println("\n[CLIENT] The table was disbanded.");
-                                    exit3 = true;
                                 }
+                                exit3 = true;
                                 break;
                             case 2:
                                 System.out.println("\n[CLIENT] Listing Table Information...");
@@ -409,11 +389,11 @@ public class DCThread extends Thread
 
                     Map<String, byte[]> keys = DominoesCryptoAsym.GenerateAsymKeys();
                     this.deckDistributionPrivateKey = keys.get("private");
-                    this.deckDistributionPublicKey = keys.get("public");
+                    byte[] deckDistributionPublicKey = keys.get("public");
 
                     System.out.println("Private key: " + Arrays.toString(this.deckDistributionPrivateKey));
 
-                    deck.asymCipher(this.deckDistributionPublicKey);
+                    deck.asymCipher(deckDistributionPublicKey);
 
                     this.dcInterface.notifyDeckProtected(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
 
@@ -444,7 +424,7 @@ public class DCThread extends Thread
                         // System.out.println("DECIPHERING DECK WITH: " + Arrays.toString(this.serverSessionSymKey));
                         // deck.symDecipher(this.serverSessionSymKey);
                     }
-                    else
+                    else if (this.playerSessionSymKeys[lastPlayer] != null)
                     {
                         System.out.println("DECIPHERING DECK WITH: " +
                                 Arrays.toString(this.playerSessionSymKeys[lastPlayer]));
@@ -884,21 +864,60 @@ public class DCThread extends Thread
 
             if (this.dcInterface.allAgreedToAccounting(this.pseudonym, this.cipheredSignedSessionID, this.tableID))
             {
-                System.out.println("\n[CLIENT] Handling Accounting!");
+                System.out.print("\n[CLIENT] Handling Accounting!");
 
-                // TODO: HANDLE CC POINT CLAIMING
+                X509Certificate cert = DominoesCC.getCert();
+                Map<String, Key> keys = DominoesCC.getKeys(cert);
 
-                break;
+                if (this.dcInterface.proveUserIdentity(this.pseudonym, DominoesCryptoSym.SymCipher(
+                        DominoesSignature.sign(this.sessionID, keys.get("privateKey")), this.serverSessionSymKey),
+                        this.tableID, this.identifier, keys.get("publicKey")))
+                    System.out.print("\n[CLIENT] Identity verified. Accounting successful.");
+                else System.out.println("\n[CLIENT] Failed identity verification. Accounting did not proceed.");
+
+                while (!this.dcInterface.haveAllFinishedAccounting(this.pseudonym, this.cipheredSignedSessionID,
+                        this.tableID))
+                {
+                    System.out.println("WAITING FOR ALL TO FINISH ACCOUNTING!");
+
+                    this.reentrantLock.lock();
+                    try
+                    {
+                        synchronized (this)
+                        {
+                            this.turnCondition.awaitNanos(100000);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("DCThread: gameLogic: " + e.toString());
+                        System.exit(705);
+                    }
+                    finally
+                    {
+                        this.reentrantLock.unlock();
+                    }
+                }
             }
             else
             {
                 System.out.println("\n[CLIENT] Not every member agreed to the accounting. Game terminating...");
-                break;
             }
+            break;
         }
 
         this.dcInterface.disbandTable(this.pseudonym, this.cipheredSignedSessionID, this.tableID);
         gameOver();
+    }
+
+    public String generatePseudonym(int sessionID, Key privateKey)
+    {
+        return Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
+    }
+
+    public int generateSessionID()
+    {
+        return ThreadLocalRandom.current().nextInt(0,131072);
     }
 
     private String getTileToReturn()
@@ -1022,9 +1041,9 @@ public class DCThread extends Thread
         System.out.print("\n[CLIENT] Session established successfully.");
     }
 
-    private byte[] signSessionID()
+    private byte[] signSessionID(Key privateKey)
     {
-        return DominoesSignature.sign(this.sessionID, this.privateKey);
+        return DominoesSignature.sign(this.sessionID, privateKey);
     }
 
     private int clientMainMenu()

@@ -72,5 +72,6 @@ public interface DCInterface
     // TODO: Cipher score
     byte[] getUserScore(String pseudonym, byte[] cipheredSessionID, String user);
     // TODO: FINISH
-    void proveUserIdentity(String pseudonym, byte[] cipheredSessionID, String user, Key userPublicKey, int sessionID);
+    boolean proveUserIdentity(String pseudonym, byte[] cipheredSessionID, int tableID, String user, Key userPublicKey);
+    boolean haveAllFinishedAccounting(String pseudonym, byte[] cipheredSessionID, int tableID);
 }
