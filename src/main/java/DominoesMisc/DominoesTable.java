@@ -473,6 +473,7 @@ public class DominoesTable
             this.lastTurn = this.turn;
             this.turn = 0;
             this.resetNeeded = false;
+            this.deckCipheredByServer = true;
         }
         return this.firstPlayer == -1;
     }

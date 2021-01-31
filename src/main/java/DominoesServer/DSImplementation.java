@@ -42,9 +42,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            DominoesTable table = new DominoesTable(playerCap, pseudonym);
-            tableID = table.getId();
-            this.dominoesTables.add(table);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+            {
+                DominoesTable table = new DominoesTable(playerCap, pseudonym);
+                tableID = table.getId();
+                this.dominoesTables.add(table);
+            }
+            else tableID = -1;
         }
         catch (Exception e)
         {
@@ -65,10 +69,14 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            tables = new DominoesTableInfo[this.dominoesTables.size()];
-            for (int i = 0; i < this.dominoesTables.size(); i++)
-                tables[i] = new DominoesTableInfo(this.dominoesTables.get(i).getId(),
-                        this.dominoesTables.get(i).getPlayers(), this.dominoesTables.get(i).getReadyStates());
+            if (checkSessionID(pseudonym, cipheredSessionID))
+            {
+                tables = new DominoesTableInfo[this.dominoesTables.size()];
+                for (int i = 0; i < this.dominoesTables.size(); i++)
+                    tables[i] = new DominoesTableInfo(this.dominoesTables.get(i).getId(),
+                            this.dominoesTables.get(i).getPlayers(), this.dominoesTables.get(i).getReadyStates());
+            }
+            else tables = new DominoesTableInfo[0];
         }
         catch (Exception e)
         {
@@ -89,8 +97,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                joined = table.joinTable(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    joined = table.joinTable(pseudonym);
         }
         catch (Exception e)
         {
@@ -111,8 +120,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (!table.isFull()) if (table.joinTable(pseudonym))
-                tableID = table.getId();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (!table.isFull()) if (table.joinTable(pseudonym))
+                    tableID = table.getId();
         }
         catch (Exception e)
         {
@@ -133,19 +143,20 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                for (boolean ready : table.getReadyStates()) if (!ready)
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                 {
-                    started = -1;
-                    break;
+                    for (boolean ready : table.getReadyStates()) if (!ready)
+                    {
+                        started = -1;
+                        break;
+                    }
+                    if (started != -1)
+                    {
+                        started = table.getId();
+                        table.startGame();
+                    }
                 }
-                if (started != -1)
-                {
-                    started = table.getId();
-                    table.startGame();
-                }
-            }
         }
         catch (Exception e)
         {
@@ -165,7 +176,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            this.dominoesTables.removeIf(table -> table.getId() == tableID);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                this.dominoesTables.removeIf(table -> table.getId() == tableID);
         }
         catch (Exception e)
         {
@@ -186,13 +198,14 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
-                {
-                    table.setReady(pseudonym);
-                    marked = true;
-                    break;
-                }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    for (int i = 0; i < table.getPlayers().length; i++) if (table.getPlayers()[i].equals(pseudonym))
+                    {
+                        table.setReady(pseudonym);
+                        marked = true;
+                        break;
+                    }
         }
         catch (Exception e)
         {
@@ -213,8 +226,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                dTable = new DominoesTableInfo(table.getId(), table.getPlayers(), table.getReadyStates());
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    dTable = new DominoesTableInfo(table.getId(), table.getPlayers(), table.getReadyStates());
         }
         catch (Exception e)
         {
@@ -238,10 +252,11 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                for (int i = 0; i < table.getPlayers().length; i++)
-                    if (table.getPlayers()[i] != null && table.getPlayers()[i].equals(pseudonym))
-                        table.leaveTable(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    for (int i = 0; i < table.getPlayers().length; i++)
+                        if (table.getPlayers()[i] != null && table.getPlayers()[i].equals(pseudonym))
+                            table.leaveTable(pseudonym);
         }
         catch (Exception e)
         {
@@ -260,8 +275,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isTurn(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isTurn(pseudonym);
         }
         catch (Exception e)
         {
@@ -281,7 +297,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) result = table.hasEnded();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) result = table.hasEnded();
         }
         catch (Exception e)
         {
@@ -301,8 +318,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = !table.haveAllCommitted();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = !table.haveAllCommitted();
         }
         catch (Exception e)
         {
@@ -322,8 +340,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.canDraw(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.canDraw(pseudonym);
         }
         catch (Exception e)
         {
@@ -343,7 +362,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dDeck = table.getDeck();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) dDeck = table.getDeck();
         }
         catch (Exception e)
         {
@@ -364,14 +384,15 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.setDeck(deck);
-                table.handleCardDif(pseudonym, (int) DominoesCryptoSym.SymDecipher(pieceDif,
-                        this.playerSessionSymKeys.get(pseudonym)));
-                result = true;
-                table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.setDeck(deck);
+                    table.handleCardDif(pseudonym, (int) DominoesCryptoSym.SymDecipher(pieceDif,
+                            this.playerSessionSymKeys.get(pseudonym)));
+                    result = true;
+                    table.incrementTurn();
+                }
         }
         catch (Exception e)
         {
@@ -390,7 +411,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.incrementTurn();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.incrementTurn();
         }
         catch (Exception e)
         {
@@ -409,11 +431,11 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.distributionCommit(pseudonym, commitData);
-                // if (result) table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    result = table.distributionCommit(pseudonym, commitData);
+                }
         }
         catch (Exception e)
         {
@@ -433,8 +455,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.hasPlayerCommitted(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.hasPlayerCommitted(pseudonym);
         }
         catch (Exception e)
         {
@@ -454,8 +477,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.getFirstPlayer() == -1;
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.getFirstPlayer() == -1;
         }
         catch (Exception e)
         {
@@ -474,16 +498,17 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.incrementTurn();
-                table.setDouble(pseudonym, (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
-                        this.playerSessionSymKeys.get(pseudonym)));
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.incrementTurn();
+                    table.setDouble(pseudonym, (String) DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
+                            this.playerSessionSymKeys.get(pseudonym)));
 
-                System.out.println("Player: " + pseudonym + " highest is " +
-                        DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
-                                this.playerSessionSymKeys.get(pseudonym)));
-            }
+                    System.out.println("Player: " + pseudonym + " highest is " +
+                            DominoesCryptoSym.SymDecipher(Base64.getDecoder().decode(piece),
+                                    this.playerSessionSymKeys.get(pseudonym)));
+                }
         }
         catch (Exception e)
         {
@@ -502,8 +527,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.areAllDoublesSubmitted();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.areAllDoublesSubmitted();
         }
         catch (Exception e)
         {
@@ -523,8 +549,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isRedistributionNeeded(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isRedistributionNeeded(pseudonym);
         }
         catch (Exception e)
         {
@@ -544,8 +571,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                gameState = table.getGameState();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    gameState = table.getGameState();
         }
         catch (Exception e)
         {
@@ -565,8 +593,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isResetNeeded();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isResetNeeded();
         }
         catch (Exception e)
         {
@@ -587,11 +616,12 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.playPiece(pseudonym, targetEndPoint, piece, pieceEndPoint);
-                if (result) table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    result = table.playPiece(pseudonym, targetEndPoint, piece, pieceEndPoint);
+                    if (result) table.incrementTurn();
+                }
         }
         catch (Exception e)
         {
@@ -611,14 +641,15 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.drawPiece(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    result = table.drawPiece(pseudonym);
 
-                if (result == null) result = "Error";
-                else result = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(result,
-                        this.playerSessionSymKeys.get(pseudonym)));
-            }
+                    if (result == null) result = "Error";
+                    else result = Base64.getEncoder().encodeToString(DominoesCryptoSym.SymCipher(result,
+                            this.playerSessionSymKeys.get(pseudonym)));
+                }
         }
         catch (Exception e)
         {
@@ -637,8 +668,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                table.denounceCheating(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    table.denounceCheating(pseudonym);
         }
         catch (Exception e)
         {
@@ -657,8 +689,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isHandlingCheating();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isHandlingCheating();
         }
         catch (Exception e)
         {
@@ -679,11 +712,12 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.updateCommit(pseudonym, commitData);
-                if (result) table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    result = table.updateCommit(pseudonym, commitData);
+                    if (result) table.incrementTurn();
+                }
         }
         catch (Exception e)
         {
@@ -704,12 +738,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.setCommitGenData(pseudonym, commitData);
-                result = true;
-                table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.setCommitGenData(pseudonym, commitData);
+                    result = true;
+                    table.incrementTurn();
+                }
         }
         catch (Exception e)
         {
@@ -729,8 +764,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.hasSentCommitData(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.hasSentCommitData(pseudonym);
         }
         catch (Exception e)
         {
@@ -750,8 +786,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isHandlingAccounting();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isHandlingAccounting();
         }
         catch (Exception e)
         {
@@ -771,8 +808,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                accountingInfo = table.getAccountingInfo();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    accountingInfo = table.getAccountingInfo();
         }
         catch (Exception e)
         {
@@ -792,11 +830,12 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.setDecisionMade(pseudonym, decision);
-                result = true;
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.setDecisionMade(pseudonym, decision);
+                    result = true;
+                }
         }
         catch (Exception e)
         {
@@ -816,8 +855,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.haveAllDecided();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.haveAllDecided();
         }
         catch (Exception e)
         {
@@ -837,8 +877,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.haveAllAgreedToAccounting();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.haveAllAgreedToAccounting();
         }
         catch (Exception e)
         {
@@ -857,8 +898,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                table.passedProtest(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    table.passedProtest(pseudonym);
         }
         catch (Exception e)
         {
@@ -877,8 +919,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.haveAllPassedProtest();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.haveAllPassedProtest();
         }
         catch (Exception e)
         {
@@ -1009,8 +1052,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isHandlingKeys();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isHandlingKeys();
         }
         catch (Exception e)
         {
@@ -1029,7 +1073,8 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.startKeySorting();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID) table.startKeySorting();
         }
         catch (Exception e)
         {
@@ -1048,8 +1093,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.hasKeySortingEnded();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.hasKeySortingEnded();
         }
         catch (Exception e)
         {
@@ -1069,15 +1115,16 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                byte[][] keys = new byte[table.getPlayers().length][];
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    byte[][] keys = new byte[table.getPlayers().length][];
 
-                for (int i = 0; i < table.getPlayers().length; i++)
-                    keys[i] = this.playerPublicKeys.get(table.getPlayers()[i]);
+                    for (int i = 0; i < table.getPlayers().length; i++)
+                        keys[i] = this.playerPublicKeys.get(table.getPlayers()[i]);
 
-                result = keys;
-            }
+                    result = keys;
+                }
         }
         catch (Exception e)
         {
@@ -1097,8 +1144,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                matrix = table.getSymKeyMatrix();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    matrix = table.getSymKeyMatrix();
         }
         catch (Exception e)
         {
@@ -1119,12 +1167,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.incrementTurn();
-                table.setSymKeyMatrix(symKeyMatrix);
-                result = true;
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.incrementTurn();
+                    table.setSymKeyMatrix(symKeyMatrix);
+                    result = true;
+                }
         }
         catch (Exception e)
         {
@@ -1144,8 +1193,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.getPlayerSymKeys(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.getPlayerSymKeys(pseudonym);
         }
         catch (Exception e)
         {
@@ -1165,8 +1215,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.hasDeckBeenProtected(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.hasDeckBeenProtected(pseudonym);
         }
         catch (Exception e)
         {
@@ -1187,12 +1238,13 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                table.addDeckProtectionKey(pseudonym, deckProtectionPrivateKey);
-                table.incrementTurn();
-                result = true;
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    table.addDeckProtectionKey(pseudonym, deckProtectionPrivateKey);
+                    table.incrementTurn();
+                    result = true;
+                }
         }
         catch (Exception e)
         {
@@ -1211,15 +1263,16 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                if (table.notifyDeckProtected(pseudonym))
-                {
-                    // System.out.println("CIPHERING DECK WITH: " +
-                    // Arrays.toString(this.playerSessionSymKeys.get(table.getPlayers()[0])));
-                    // table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    if (table.notifyDeckProtected(pseudonym))
+                    {
+                        // System.out.println("CIPHERING DECK WITH: " +
+                        // Arrays.toString(this.playerSessionSymKeys.get(table.getPlayers()[0])));
+                        // table.deckSymCipher(this.playerSessionSymKeys.get(table.getPlayers()[0]));
 
-                    System.out.println("DECK: " + table.getDeck());
-                }
+                        System.out.println("DECK: " + table.getDeck());
+                    }
         }
         catch (Exception e)
         {
@@ -1238,8 +1291,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.haveAllSentDeckProtection();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.haveAllSentDeckProtection();
         }
         catch (Exception e)
         {
@@ -1259,8 +1313,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.hasSentDeckProtection(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.hasSentDeckProtection(pseudonym);
         }
         catch (Exception e)
         {
@@ -1280,11 +1335,12 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-            {
-                result = table.getDeckDecipherStack(pseudonym);
-                table.incrementTurn();
-            }
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                {
+                    result = table.getDeckDecipherStack(pseudonym);
+                    table.incrementTurn();
+                }
         }
         catch (Exception e)
         {
@@ -1304,8 +1360,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.isDeckCipheredByServer(pseudonym);
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.isDeckCipheredByServer(pseudonym);
         }
         catch (Exception e)
         {
@@ -1325,8 +1382,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = DominoesCryptoSym.SymCipher(table.getLastTurn(), this.playerSessionSymKeys.get(pseudonym));
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = DominoesCryptoSym.SymCipher(table.getLastTurn(), this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1346,8 +1404,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = DominoesCryptoSym.SymCipher(table.getNextTurn(), this.playerSessionSymKeys.get(pseudonym));
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = DominoesCryptoSym.SymCipher(table.getNextTurn(), this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1367,8 +1426,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            result = DominoesCryptoSym.SymCipher(DSQLiteConnection.getUserScore(user),
-                    this.playerSessionSymKeys.get(pseudonym));
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                result = DominoesCryptoSym.SymCipher(DSQLiteConnection.getUserScore(user),
+                        this.playerSessionSymKeys.get(pseudonym));
         }
         catch (Exception e)
         {
@@ -1389,26 +1449,29 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            byte[] signedSessionID = (byte[]) DominoesCryptoSym.SymDecipher(cipheredSessionID,
-                    this.playerSessionSymKeys.get(pseudonym));
-
-            if (DominoesSignature.isValid(signedSessionID, userPublicKey))
+            if (checkSessionID(pseudonym, cipheredSessionID))
             {
-                DominoesAccountingInfo accountingInfo = null;
-                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                {
-                    accountingInfo = table.getAccountingInfo();
+                byte[] signedSessionID = (byte[]) DominoesCryptoSym.SymDecipher(cipheredSessionID,
+                        this.playerSessionSymKeys.get(pseudonym));
 
-                    if (accountingInfo != null)
+                if (DominoesSignature.isValid(signedSessionID, userPublicKey))
+                {
+                    DominoesAccountingInfo accountingInfo = null;
+                    for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
                     {
-                        for (int i = 0; i < accountingInfo.getPlayers().length; i++)
+                        accountingInfo = table.getAccountingInfo();
+
+                        if (accountingInfo != null)
                         {
-                            if (accountingInfo.getPlayers()[i].equals(pseudonym))
+                            for (int i = 0; i < accountingInfo.getPlayers().length; i++)
                             {
-                                int score = DSQLiteConnection.getUserScore(user);
-                                DSQLiteConnection.setUserScore(user, score + accountingInfo.getResults()[i]);
-                                table.notifyFinishedAccounting(pseudonym);
-                                result = true;
+                                if (accountingInfo.getPlayers()[i].equals(pseudonym))
+                                {
+                                    int score = DSQLiteConnection.getUserScore(user);
+                                    DSQLiteConnection.setUserScore(user, score + accountingInfo.getResults()[i]);
+                                    table.notifyFinishedAccounting(pseudonym);
+                                    result = true;
+                                }
                             }
                         }
                     }
@@ -1433,8 +1496,9 @@ public class DSImplementation implements DCInterface
         this.reentrantLock.lock();
         try
         {
-            for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
-                result = table.haveAllFinishedAccounting();
+            if (checkSessionID(pseudonym, cipheredSessionID))
+                for (DominoesTable table : this.dominoesTables) if (table.getId() == tableID)
+                    result = table.haveAllFinishedAccounting();
         }
         catch (Exception e)
         {
@@ -1483,5 +1547,11 @@ public class DSImplementation implements DCInterface
         {
             this.reentrantLock.unlock();
         }
+    }
+
+    private boolean checkSessionID(String pseudonym, byte[] cipheredSessionID)
+    {
+        return Arrays.equals(this.playerSessionIDs.get(pseudonym), (byte[]) DominoesCryptoSym.SymDecipher(
+                cipheredSessionID, this.playerSessionSymKeys.get(pseudonym)));
     }
 }
