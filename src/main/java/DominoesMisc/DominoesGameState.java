@@ -38,26 +38,18 @@ public class DominoesGameState implements Serializable
     {
         boolean valid = false;
 
-        System.out.println("\npiece: " + piece);
-        System.out.println("targetEP: " + targetEndPoint);
-        System.out.println("pieceEP: " + pieceEndPoint);
-
         if (targetEndPoint.equals("First") && this.playedPieces.isEmpty())
         {
             String[] edges = piece.split("\\|");
 
             if (!edges[0].equals(edges[1]))
             {
-                System.out.println("GOT TO 1!");
-
                 valid = false;
                 this.endPoints.add(edges[0]);
                 this.endPoints.add(edges[1]);
             }
             else
             {
-                System.out.println("GOT TO 2!");
-
                 valid = true;
                 for (int i = 0; i < 4; i++) this.endPoints.add(edges[0]);
             }
@@ -126,8 +118,6 @@ public class DominoesGameState implements Serializable
         
         this.playedPieces.add(piece);
         this.pastMoves.get(player).add(piece);
-
-        System.out.println("DSG: play piece: " + targetEndPoint + " ," + piece + " ," + valid);
 
         return valid;
     }

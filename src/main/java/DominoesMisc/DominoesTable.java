@@ -476,6 +476,9 @@ public class DominoesTable
     public boolean hasKeySortingEnded()
     {
         if (this.handlingKeys) return false;
+        if (this.symKeyMatrix == null) return false;
+        if (this.symKeyMatrix.getSymKeyMatrix() == null) return false;
+        if (this.symKeyMatrix.getSymKeyMatrix()[this.players.length - 1] == null) return false;
         return this.symKeyMatrix.getSymKeyMatrix()[this.players.length - 1][this.players.length - 2] != null;
     }
 

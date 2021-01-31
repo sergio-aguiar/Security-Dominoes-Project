@@ -50,10 +50,10 @@ public class Serializer
         try 
         {
             oInputStream = new ObjectInputStream(in);
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
-            System.out.println("Serializer: deserialize: " + e.toString());
+            e.printStackTrace();
+            System.err.println("ERROR: Initializing Input Stream");
         }
 
         Object result = null;
@@ -61,10 +61,15 @@ public class Serializer
         try 
         {
             result = oInputStream.readObject();
-        }
-        catch (Exception e)
+
+        } catch (ClassNotFoundException e)
         {
-            System.out.println("Serializer: deserialize: " + e.toString());
+            e.printStackTrace();
+            System.err.println("ERROR: Object doesn't have a valid Class");
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            System.err.println("ERROR: Serializing message");
         }
         finally
         {
@@ -72,10 +77,10 @@ public class Serializer
             {
                 in.close();
 
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
-                System.out.println("Serializer: deserialize: " + e.toString());
+                e.printStackTrace();
+                System.err.println("ERROR: closing ArrayOutputStream");
             }
         }
 

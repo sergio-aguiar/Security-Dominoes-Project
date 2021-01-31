@@ -15,33 +15,33 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DCThread extends Thread
 {
-    private static final Scanner sc = new Scanner(System.in);
+    protected static final Scanner sc = new Scanner(System.in);
 
-    private final ReentrantLock reentrantLock;
-    private final Condition turnCondition;
+    protected final ReentrantLock reentrantLock;
+    protected final Condition turnCondition;
 
-    private final String identifier;
-    private final DCInterface dcInterface;
-    private final ArrayList<String> gamePieces;
-    private final byte[] sessionPrivateKey;
-    private final byte[] sessionPublicKey;
+    protected final String identifier;
+    protected final DCInterface dcInterface;
+    protected final ArrayList<String> gamePieces;
 
-    private String pseudonym;
-    private int tableID;
-    private int sessionID;
-    private byte[] signedSessionID;
-    private byte[] cipheredSignedSessionID;
-    private byte[] serverPublicKey;
-    private byte[] serverSessionSymKey;
-    private byte[] deckDistributionPrivateKey;
-    private byte[][] playerPublicKeys;
-    private byte[][] playerSessionSymKeys;
-    private Stack<byte[]> protectionStack;
+    protected String pseudonym;
+    protected int tableID;
+    protected int sessionID;
+    protected byte[] signedSessionID;
+    protected byte[] cipheredSignedSessionID;
+    protected byte[] sessionPrivateKey;
+    protected byte[] sessionPublicKey;
+    protected byte[] serverPublicKey;
+    protected byte[] serverSessionSymKey;
+    protected byte[] deckDistributionPrivateKey;
+    protected byte[][] playerPublicKeys;
+    protected byte[][] playerSessionSymKeys;
+    protected Stack<byte[]> protectionStack;
 
-    private int bitCommitRandom1;
-    private int bitCommitRandom2;
-    private ArrayList<String> committedPieces;
-    private boolean knowsCommittedCards;
+    protected int bitCommitRandom1;
+    protected int bitCommitRandom2;
+    protected ArrayList<String> committedPieces;
+    protected boolean knowsCommittedCards;
 
     public DCThread(DCInterface dcInterface)
     {
@@ -265,7 +265,7 @@ public class DCThread extends Thread
                     break;
                 case 5:
                     System.out.print("\n[CLIENT] Fetching score...");
-                    System.out.println("\n[CLIENT] Score: " + DominoesCryptoSym.symDecipher(
+                    System.out.print("\n[CLIENT] Score: " + DominoesCryptoSym.symDecipher(
                             this.dcInterface.getUserScore(this.pseudonym, this.cipheredSignedSessionID,
                                     this.identifier), this.serverSessionSymKey));
 
@@ -276,6 +276,10 @@ public class DCThread extends Thread
                     this.pseudonym = generatePseudonym(this.sessionID, keys.get("privateKey"));
                     establishSession();
                     this.signedSessionID = signSessionID(keys.get("privateKey"));
+
+                    Map<String, byte[]> sessionKeys = DominoesCryptoAsym.generateAsymKeys();
+                    this.sessionPrivateKey = sessionKeys.get("private");
+                    this.sessionPublicKey = sessionKeys.get("public");
 
                     break;
                 case 6:
@@ -819,6 +823,10 @@ public class DCThread extends Thread
                 establishSession();
                 this.signedSessionID = signSessionID(keys.get("privateKey"));
 
+                Map<String, byte[]> sessionKeys = DominoesCryptoAsym.generateAsymKeys();
+                this.sessionPrivateKey = sessionKeys.get("private");
+                this.sessionPublicKey = sessionKeys.get("public");
+
                 while (!this.dcInterface.haveAllFinishedAccounting(this.pseudonym, this.cipheredSignedSessionID,
                         this.tableID))
                 {
@@ -852,7 +860,7 @@ public class DCThread extends Thread
         gameOver();
     }
 
-    public String generatePseudonym(int sessionID, Key privateKey)
+    protected String generatePseudonym(int sessionID, Key privateKey)
     {
         String newPseudonym = Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
 
@@ -865,36 +873,36 @@ public class DCThread extends Thread
         return newPseudonym;
     }
 
-    public int generateSessionID()
+    protected int generateSessionID()
     {
         return ThreadLocalRandom.current().nextInt(0,131072);
     }
 
-    private String getTileToReturn()
+    protected String getTileToReturn()
     {
         return this.gamePieces.get(ThreadLocalRandom.current().nextInt(0,this.gamePieces.size()));
     }
 
-    private String getHighestDouble()
+    protected String getHighestDouble()
     {
         for (String piece : new String[]{"6|6", "5|5", "4|4", "3|3", "2|2", "1|1", "0|0"})
             if (this.gamePieces.contains(piece)) return piece;
         return "None";
     }
 
-    private void resetDistribution()
+    protected void resetDistribution()
     {
         this.gamePieces.clear();
         this.knowsCommittedCards = false;
     }
 
-    private void randomizeCommitData()
+    protected void randomizeCommitData()
     {
         this.bitCommitRandom1 = ThreadLocalRandom.current().nextInt(0,32);
         this.bitCommitRandom2 = ThreadLocalRandom.current().nextInt(0,32);
     }
 
-    private void gameOver()
+    protected void gameOver()
     {
         this.gamePieces.clear();
         this.tableID = -1;
@@ -902,7 +910,7 @@ public class DCThread extends Thread
         this.committedPieces = null;
     }
 
-    private void establishSession()
+    protected void establishSession()
     {
         while (!Arrays.equals(this.sessionPublicKey, this.dcInterface.greetServer(this.pseudonym,
                 this.sessionPublicKey)))
@@ -963,8 +971,6 @@ public class DCThread extends Thread
             this.serverSessionSymKey = (byte[]) DominoesCryptoAsym.asymDecipher(this.dcInterface.sendSessionID(
                     this.pseudonym, this.cipheredSignedSessionID), this.sessionPrivateKey);
 
-            System.out.println("SESSION KEY: " + Arrays.toString(this.serverSessionSymKey));
-
             this.reentrantLock.lock();
             try
             {
@@ -990,7 +996,7 @@ public class DCThread extends Thread
         System.out.print("\n[CLIENT] Session established successfully.");
     }
 
-    private byte[] signSessionID(Key privateKey)
+    protected byte[] signSessionID(Key privateKey)
     {
         return DominoesSignature.sign(this.sessionID, privateKey);
     }
