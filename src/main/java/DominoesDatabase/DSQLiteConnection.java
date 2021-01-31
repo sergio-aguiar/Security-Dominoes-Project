@@ -54,9 +54,8 @@ public class DSQLiteConnection
                     ");");
 
             statement.execute("CREATE TABLE IF NOT EXISTS Pseudonyms(" +
-                    "id INTEGER PRIMARY KEY," +
-                    "identifier VARCHAR(255) NOT NULL," +
-                    "pseudonym VERCHAR(255) NOT NULL" +
+                    "pseudonym VARCHAR(255) PRIMARY KEY," +
+                    "identifier VARCHAR(255) NOT NULL" +
                     ");");
         }
         catch (SQLException e)
@@ -180,6 +179,53 @@ public class DSQLiteConnection
         catch (SQLException e)
         {
             System.out.println("\n[SERVER] Error setting user score: " + e.getErrorCode());
+        }
+    }
+
+    public static boolean hasPseudonymBeenUsed(String pseudonym)
+    {
+        boolean result = false;
+        Connection conn;
+        try
+        {
+            conn = getConnection();
+
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT identifier FROM Pseudonyms WHERE " +
+                    "pseudonym=?;");
+
+            preparedStatement.setString(1, pseudonym);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            result = resultSet.next();
+
+            conn.close();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("\n[SERVER] Error checking if pseudonym has been used: " + e.getErrorCode());
+        }
+
+        return result;
+    }
+
+    public static void setPseudonymAsUsed(String pseudonym, String user)
+    {
+        Connection conn;
+        try
+        {
+            conn = getConnection();
+
+            PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO Pseudonyms(pseudonym, " +
+                    "identifier) VALUES(?,?);");
+
+            preparedStatement.setString(1, pseudonym);
+            preparedStatement.setString(2, user);
+            preparedStatement.execute();
+
+            conn.close();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("\n[SERVER] Error setting pseudonym as used: " + e.getErrorCode());
         }
     }
 

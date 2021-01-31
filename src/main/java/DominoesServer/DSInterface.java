@@ -20,7 +20,9 @@ public class DSInterface
     {
         DMessage outMessage = null;
 
-        if (inMessage.getMessageType() >= 1 && (inMessage.getMessageType() <= 38 || inMessage.getMessageType() >= 43))
+        if (inMessage.getMessageType() >= 1
+                && (inMessage.getMessageType() <= 38
+                    || (inMessage.getMessageType() >= 43 && inMessage.getMessageType() <= 62)))
             if (inMessage.noCipheredSessionID())
                 throw new DMessageException("Argument \"cipheredSessionID\" was not given", inMessage);
 
@@ -41,6 +43,8 @@ public class DSInterface
             case 42:
             case 43:
             case 60:
+            case 63:
+            case 64:
                 break;
             case 3:
             case 6:
@@ -498,6 +502,17 @@ public class DSInterface
                         inMessage.getCipheredSessionID(), (int) inMessage.getFirstArgument());
                 outMessage = new DMessage(DMessage.MessageType.ALL_FINISHED_ACCOUNTING_REQUEST.getMessageCode(),
                         return62);
+                break;
+            case 63:
+                boolean return63 = this.dsImplementation.hasPseudonymBeenUsed(inMessage.getPseudonym());
+
+                outMessage = new DMessage(DMessage.MessageType.WAS_PSEUDONYM_USED_REQUEST.getMessageCode(), return63);
+                break;
+            case 64:
+                this.dsImplementation.setPseudonymAsUsed(inMessage.getPseudonym(),
+                        (String) inMessage.getFirstArgument());
+                outMessage = new DMessage(DMessage.MessageType.SET_PSEUDONYM_USED_REQUEST.getMessageCode(),
+                        (Object) null);
                 break;
         }
         return outMessage;

@@ -69,9 +69,9 @@ public interface DCInterface
     boolean isDeckSentFromServer(String pseudonym, byte[] cipheredSessionID, int tableID);
     byte[] getLastTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
     byte[] getNextTurn(String pseudonym, byte[] cipheredSessionID, int tableID);
-    // TODO: Cipher score
     byte[] getUserScore(String pseudonym, byte[] cipheredSessionID, String user);
-    // TODO: FINISH
     boolean proveUserIdentity(String pseudonym, byte[] cipheredSessionID, int tableID, String user, Key userPublicKey);
     boolean haveAllFinishedAccounting(String pseudonym, byte[] cipheredSessionID, int tableID);
+    boolean hasPseudonymBeenUsed(String pseudonym);
+    void setPseudonymAsUsed(String pseudonym, String user);
 }

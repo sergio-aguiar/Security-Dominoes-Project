@@ -459,6 +459,10 @@ public class DominoesTable
             Arrays.fill(this.playerPieceCount, 0);
             Arrays.fill(this.bitCommitment, false);
             Arrays.fill(this.playerDoubles, null);
+            Arrays.fill(this.haveProtectedDeck, false);
+            Arrays.fill(this.haveSentProtection, false);
+            Arrays.fill(this.haveGottenProtection, false);
+            this.deckDecipherStack.empty();
 
             for (int j = 0; j < this.players.length; j++)
             {
@@ -466,6 +470,7 @@ public class DominoesTable
                 this.leftToReset.add(j);
             }
 
+            this.lastTurn = this.turn;
             this.turn = 0;
             this.resetNeeded = false;
         }

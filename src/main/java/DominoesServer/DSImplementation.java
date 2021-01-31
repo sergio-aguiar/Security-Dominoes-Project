@@ -1446,4 +1446,42 @@ public class DSImplementation implements DCInterface
         }
         return result;
     }
+
+    @Override
+    public boolean hasPseudonymBeenUsed(String pseudonym)
+    {
+        boolean result = true;
+        this.reentrantLock.lock();
+        try
+        {
+            result = DSQLiteConnection.hasPseudonymBeenUsed(pseudonym);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: hasPseudonymBeenUsed: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+        return result;
+    }
+
+    @Override
+    public void setPseudonymAsUsed(String pseudonym, String user)
+    {
+        this.reentrantLock.lock();
+        try
+        {
+            DSQLiteConnection.setPseudonymAsUsed(pseudonym,user);
+        }
+        catch (Exception e)
+        {
+            System.out.println("DSImplementation: setPseudonymAsUsed: " + e.toString());
+        }
+        finally
+        {
+            this.reentrantLock.unlock();
+        }
+    }
 }

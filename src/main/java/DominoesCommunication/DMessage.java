@@ -67,7 +67,9 @@ public class DMessage implements Serializable
         NEXT_TURN_REQUEST(59),
         GET_USER_SCORE_REQUEST(60),
         PROVE_IDENTITY_REQUEST(61),
-        ALL_FINISHED_ACCOUNTING_REQUEST(62);
+        ALL_FINISHED_ACCOUNTING_REQUEST(62),
+        WAS_PSEUDONYM_USED_REQUEST(63),
+        SET_PSEUDONYM_USED_REQUEST(64);
 
         private static final long serialVersionUID = 1102L;
 

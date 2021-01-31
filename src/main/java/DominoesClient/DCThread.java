@@ -21,7 +21,6 @@ public class DCThread extends Thread
     private final Condition turnCondition;
 
     private final String identifier;
-    private final byte[] signedSessionID;
     private final DCInterface dcInterface;
     private final ArrayList<String> gamePieces;
     private final byte[] sessionPrivateKey;
@@ -30,6 +29,7 @@ public class DCThread extends Thread
     private String pseudonym;
     private int tableID;
     private int sessionID;
+    private byte[] signedSessionID;
     private byte[] cipheredSignedSessionID;
     private byte[] serverPublicKey;
     private byte[] serverSessionSymKey;
@@ -48,6 +48,8 @@ public class DCThread extends Thread
         this.reentrantLock = new ReentrantLock(true);
         this.turnCondition = this.reentrantLock.newCondition();
 
+        this.dcInterface = dcInterface;
+
         X509Certificate cert = DominoesCC.getCert();
         Map<String, Key> keys = DominoesCC.getKeys(cert);
 
@@ -60,7 +62,6 @@ public class DCThread extends Thread
         this.playerPublicKeys = null;
         this.playerSessionSymKeys = null;
         this.cipheredSignedSessionID = null;
-        this.dcInterface = dcInterface;
         this.gamePieces = new ArrayList<>();
         this.protectionStack = null;
 
@@ -268,7 +269,13 @@ public class DCThread extends Thread
                             this.dcInterface.getUserScore(this.pseudonym, this.cipheredSignedSessionID,
                                     this.identifier), this.serverSessionSymKey));
 
-                    // TODO: GET NEW PSEUDONYM
+                    X509Certificate cert = DominoesCC.getCert();
+                    Map<String, Key> keys = DominoesCC.getKeys(cert);
+
+                    this.sessionID = generateSessionID();
+                    this.pseudonym = generatePseudonym(this.sessionID, keys.get("privateKey"));
+                    establishSession();
+                    this.signedSessionID = signSessionID(keys.get("privateKey"));
 
                     break;
                 case 6:
@@ -872,8 +879,16 @@ public class DCThread extends Thread
                 if (this.dcInterface.proveUserIdentity(this.pseudonym, DominoesCryptoSym.SymCipher(
                         DominoesSignature.sign(this.sessionID, keys.get("privateKey")), this.serverSessionSymKey),
                         this.tableID, this.identifier, keys.get("publicKey")))
+                {
                     System.out.print("\n[CLIENT] Identity verified. Accounting successful.");
+                    this.dcInterface.setPseudonymAsUsed(this.pseudonym, this.identifier);
+                }
                 else System.out.println("\n[CLIENT] Failed identity verification. Accounting did not proceed.");
+
+                this.sessionID = generateSessionID();
+                this.pseudonym = generatePseudonym(this.sessionID, keys.get("privateKey"));
+                establishSession();
+                this.signedSessionID = signSessionID(keys.get("privateKey"));
 
                 while (!this.dcInterface.haveAllFinishedAccounting(this.pseudonym, this.cipheredSignedSessionID,
                         this.tableID))
@@ -912,7 +927,15 @@ public class DCThread extends Thread
 
     public String generatePseudonym(int sessionID, Key privateKey)
     {
-        return Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
+        String newPseudonym = Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
+
+        while (this.dcInterface.hasPseudonymBeenUsed(newPseudonym))
+        {
+            this.sessionID = generateSessionID();
+            newPseudonym = Base64.getEncoder().encodeToString(DominoesSignature.sign(sessionID, privateKey));
+        }
+
+        return newPseudonym;
     }
 
     public int generateSessionID()
@@ -935,6 +958,7 @@ public class DCThread extends Thread
     private void resetDistribution()
     {
         this.gamePieces.clear();
+        this.knowsCommittedCards = false;
     }
 
     private void randomizeCommitData()
@@ -953,8 +977,6 @@ public class DCThread extends Thread
 
     private void establishSession()
     {
-        System.out.print("\n[CLIENT] Establishing a session with the server...");
-
         while (!Arrays.equals(this.sessionPublicKey, this.dcInterface.greetServer(this.pseudonym,
                 this.sessionPublicKey)))
         {
@@ -978,7 +1000,7 @@ public class DCThread extends Thread
         }
 
         System.out.print("\n[CLIENT] Server received session request.");
-        System.out.print("\n[CLIENT] Requesting table credentials...");
+        System.out.print("\n[CLIENT] Requesting server credentials...");
 
         do
         {
