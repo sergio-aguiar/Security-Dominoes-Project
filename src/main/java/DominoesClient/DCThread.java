@@ -474,7 +474,7 @@ public class DCThread extends Thread
                             if (this.gamePieces.size() > 0)
                             {
                                 String tile2 = getTileToReturn();
-                                deck.returnTile(tile2);
+                                deck.returnPiece(tile2);
                                 this.gamePieces.remove(tile2);
 
                                 if (this.playerSessionSymKeys[nextPlayer] != null)
@@ -499,7 +499,7 @@ public class DCThread extends Thread
                             if (this.gamePieces.size() > 0)
                             {
                                 String tile3 = getTileToReturn();
-                                this.gamePieces.add(deck.swapTile(tile3));
+                                this.gamePieces.add(deck.swapPiece(tile3));
                                 this.gamePieces.remove(tile3);
 
                                 if (this.playerSessionSymKeys[nextPlayer] != null)

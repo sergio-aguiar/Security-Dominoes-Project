@@ -17,21 +17,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DominoesDeck implements Serializable
 {
+    private static final int size = 28;
+
     private static final long serialVersionUID = 1104L;
     private final String[] deck;
-    private final int size = 28;
-    private int pointer = this.size - 1;
+    private int lastPiece = size - 1;
     private int cipherDepth = 0;
 
-    public DominoesDeck(){
+    public DominoesDeck()
+    {
         this.deck = new String[size];
-        generateSet();
+        generatePieces();
     }
 
-    /**
-     * Method for initialize the deck. Also shuffle it
-     */
-    private void generateSet()
+
+    private void generatePieces()
     {
         int count = 0;
         for (int i = 0; i < 7; i++) for (int j=i; j < 7; j++) this.deck[count++] = (i + "|" + j);
@@ -39,180 +39,50 @@ public class DominoesDeck implements Serializable
         shuffle();
     }
 
-    private void swapTiles(String[] set, int index, int newIndex, int maxSize)
+    private void swapPieces(int piece1, int piece2)
     {
-        if(index < 0 || index > maxSize) return;
-        if(newIndex < 0 || newIndex > maxSize) return;
-
-        if (index < newIndex)
-        {
-            String tmp = set[index];
-            set[index] = set[newIndex];
-            set[newIndex] = tmp;
-        }
-        else
-        {
-            String tmp = set[newIndex];
-            set[newIndex] = set[index];
-            set[index] = tmp;
-        }
+        String tmpPiece = this.deck[piece1];
+        this.deck[piece1] = this.deck[piece2];
+        this.deck[piece2] = tmpPiece;
     }
 
-    private void shuffleSet(String[] set,int times, int maxSize)
+    public void shuffle()
     {
-        if(maxSize < 1) return;
-
-        for (int i=0; i < times; i++)
+        for (int i = 0; i < 100; i++)
         {
-            ThreadLocalRandom random = ThreadLocalRandom.current();
-            int firstIndex = random.nextInt(0, maxSize);
-            int secondIndex = random.nextInt(0, maxSize);
-            swapTiles(set, firstIndex, secondIndex, maxSize);
+            if (this.lastPiece > 0)
+                swapPieces(ThreadLocalRandom.current().nextInt(0, this.lastPiece + 1),
+                        ThreadLocalRandom.current().nextInt(0, this.lastPiece + 1));
+
+            if (this.lastPiece < 27)
+                swapPieces(ThreadLocalRandom.current().nextInt(this.lastPiece + 1, size),
+                        ThreadLocalRandom.current().nextInt(this.lastPiece + 1, size));
         }
     }
 
-    private void splitShuffle()
-    {
-        String[] rightSide = getRightSideSet();
-        int rightSideSize = rightSide.length;
-
-        String[] leftSide = getLeftSideSet();
-
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-    
-        shuffleSet(leftSide,random.nextInt(this.pointer, 2 * (this.pointer + 1)), this.pointer);
-        shuffleSet(rightSide, random.nextInt(rightSideSize, 2* (rightSideSize + 1)), rightSideSize);
-
-        if (this.pointer + 1 >= 0) System.arraycopy(leftSide, 0, this.deck, 0, this.pointer + 1);
-
-        if (rightSideSize - (this.pointer + 1) > 0)
-            System.arraycopy(rightSide, this.pointer + 1,
-                    this.deck, this.pointer + 1, rightSideSize - (this.pointer + 1));
-    }
-
-    /**
-     * Method for draw one of the available tile in the set
-     * @return a String of the tile
-     */
     public String drawPiece()
     {
-        String tile = getTile();
-        this.pointer--;
-        if(!isEmpty()) splitShuffle();
-        
-        return tile;
+        String piece = this.deck[0];
+        swapPieces(0, this.lastPiece);
+        this.lastPiece--;
+        shuffle();
+        return piece;
     }
 
-    /**
-     * Method for swap a player tile with one of the available. The tile to swap is inserted in the deck and top tile of the available's deck is draw
-     * @param tile to swap
-     * @return tile from the available list
-     */
-    public String swapTile(String tile)
+    public void returnPiece(String piece)
     {
-        String tileToTake = getTile();
-        int indexOfOut = getIndex(tile, getRightSideSet());
-        swapTiles(this.deck, this.pointer, this.pointer + 1 + indexOfOut, this.size);
-        splitShuffle();
-
-        return tileToTake;
-    }
-
-    /**
-     * Method to insert a tile in the deck
-     * @param tile to insert
-     */
-    public void returnTile(String tile)
-    {
-        addTile(tile);
-        this.pointer++;
-        splitShuffle();
-
-    }
-
-    private void shuffle()
-    {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        shuffleSet(this.deck, random.nextInt(this.size - 1,this.size * 2), this.size);
-    }
-
-    private void addTile(String tile)
-    {
-        String[] rightSide = getRightSideSet();
-        int indexOfOut = getIndex(tile, rightSide);
-
-        if(indexOfOut < 0)
+        for (int i = this.lastPiece + 1; i < size; i++) if (this.deck[i].equals(piece))
         {
-            System.err.println("Adição de um tile que n foi retirado(tile " + tile + ")");
-            System.exit(1);
+            swapPieces(this.lastPiece + 1, i);
+            this.lastPiece++;
+            shuffle();
         }
-        if(this.pointer + 1 < this.size) 
-            swapTiles(this.deck, this.pointer + 1, this.pointer + 1 + indexOfOut, this.size);
     }
 
-    private String getTile()
+    public String swapPiece(String piece)
     {
-        if (isEmpty())
-        {
-            // System.err.println("Deck vazio n pode retirar mais");
-            // System.exit(1);
-            return null;
-        }
-
-        String tile = this.deck[0];
-
-        swapTiles(this.deck, 0, this.pointer, this.size);
-
-        return tile;
-    }
-
-    private int getIndex(String tile, String[] set)
-    {
-        for (int i = 0; i < set.length ; i++)
-        {
-            if (tile.equals(set[i]))
-            {
-                return i; 
-            }
-                
-        } 
-
-        return -1;
-    }
-
-    /**
-     * Check if there is any tiles in the deck
-     * @return true if the deck has tiles. false if not
-     */
-    public boolean isEmpty()
-    {
-        return this.pointer < 0;
-    }
-
-    private String[] getRightSideSet()
-    {
-
-        int rightSideSize = this.size - this.pointer - 1;
-
-        if(rightSideSize < 1)
-            return new String[0];
-
-        String[] rightSide = new String[rightSideSize];
-
-        for (int i=0; i < rightSideSize; i++)
-            rightSide[i] = this.deck[this.pointer + 1 + i];
-
-        return rightSide;
-
-    }
-
-    private String[] getLeftSideSet()
-    {
-        String[] leftSide = new String[this.pointer + 1];
-
-        if (this.pointer + 1 >= 0) System.arraycopy(this.deck, 0, leftSide, 0, this.pointer + 1);
-
-        return leftSide;
+        returnPiece(piece);
+        return drawPiece();
     }
 
     private void printSet(String[] set)
@@ -280,16 +150,16 @@ public class DominoesDeck implements Serializable
         shuffle();
     }
 
-    // For debuging
     protected void printAvailableSet()
     {
-        printSet(getLeftSideSet());
+        String[] availableSet = new String[this.lastPiece + 1];
+        if (this.lastPiece + 1 >= 0) System.arraycopy(this.deck, 0, availableSet, 0, this.lastPiece + 1);
+        printSet(availableSet);
     }
 
-    protected void printNotAvailableSet()
+    protected void printWholeSet()
     {
-        printSet(getRightSideSet());
+        printSet(this.deck);
     }
-
 }
 

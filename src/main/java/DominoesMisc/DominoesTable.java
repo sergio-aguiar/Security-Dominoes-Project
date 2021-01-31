@@ -213,7 +213,7 @@ public class DominoesTable
     public String distributionSwapPiece(String pseudonym, String piece)
     {
         for (int i = 0; i < this.players.length; i++) if (this.players[i].equals(pseudonym))
-            if (this.playerPieceCount[i] > 0) return this.deck.swapTile(piece);
+            if (this.playerPieceCount[i] > 0) return this.deck.swapPiece(piece);
         return "Error";
     }
 
@@ -223,7 +223,7 @@ public class DominoesTable
             if (this.playerPieceCount[i] > 0)
             {
                 this.playerPieceCount[i]--;
-                this.deck.returnTile(piece);
+                this.deck.returnPiece(piece);
             }
     }
 
@@ -348,7 +348,7 @@ public class DominoesTable
             System.out.println("DECK AFTER FULLY DECIPHERED:\nAvailable: ");
             deck.printAvailableSet();
             System.out.println("\nNonAvailable: ");
-            deck.printNotAvailableSet();
+            deck.printWholeSet();
         }
 
         return this.deckDecipherStack;

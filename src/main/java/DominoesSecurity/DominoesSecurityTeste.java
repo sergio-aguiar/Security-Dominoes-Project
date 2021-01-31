@@ -26,10 +26,10 @@ public class DominoesSecurityTeste {
         String piece = deck.drawPiece();
         String piece2 = deck.drawPiece();
         String piece3 = deck.drawPiece();
-        deck.returnTile(piece);
-        String piece4 = deck.swapTile(piece2);
+        deck.returnPiece(piece);
+        String piece4 = deck.swapPiece(piece2);
         String piece5 = deck.drawPiece();
-        deck.returnTile(piece3);
+        deck.returnPiece(piece3);
         String piece6 = deck.drawPiece();
 
 
@@ -70,10 +70,10 @@ public class DominoesSecurityTeste {
         String piece = deck.drawPiece();
         String piece2 = deck.drawPiece();
         String piece3 = deck.drawPiece();
-        deck.returnTile(piece);
-        String piece4 = deck.swapTile(piece2);
+        deck.returnPiece(piece);
+        String piece4 = deck.swapPiece(piece2);
         String piece5 = deck.drawPiece();
-        deck.returnTile(piece3);
+        deck.returnPiece(piece3);
         String piece6 = deck.drawPiece();
 
 
